@@ -1,0 +1,107 @@
+<div style="padding: 2rem; max-width: 960px; margin: 0 auto;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+    <h1 class="titulo" style="font-size: 1.5rem;">Películas</h1>
+    <button class="boton" (click)="abrirNuevaPelicula()" *ngIf="!mostrarFormulario">
+      + Nueva película
+    </button>
+  </div>
+
+  <p *ngIf="error" style="color: #D4537E;">{{ error }}</p>
+  <p *ngIf="cargando">Cargando...</p>
+
+  <!-- Formulario de alta / edición -->
+  <form *ngIf="mostrarFormulario" [formGroup]="form" (ngSubmit)="guardar()" class="tarjeta" style="padding: 1.5rem; margin-bottom: 2rem; display: grid; gap: 12px;">
+    <h2 class="titulo" style="font-size: 1.1rem;">{{ editandoId ? 'Editar película' : 'Nueva película' }}</h2>
+
+    <label>
+      Nombre
+      <input formControlName="nombre" style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid var(--borde);" />
+    </label>
+
+    <label>
+      Sinopsis
+      <textarea formControlName="sinopsis" rows="3" style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid var(--borde);"></textarea>
+    </label>
+
+    <div style="display: flex; gap: 12px;">
+      <label style="flex: 1;">
+        Duración (min)
+        <input type="number" formControlName="duracion_minutos" style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid var(--borde);" />
+      </label>
+      <label style="flex: 1;">
+        Fecha de estreno
+        <input type="date" formControlName="fecha_estreno" style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid var(--borde);" />
+      </label>
+    </div>
+
+    <label>
+      URL de imagen
+      <input formControlName="imagen_url" style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid var(--borde);" />
+    </label>
+
+    <label>
+      Restricción de edad
+      <select formControlName="restriccion_edad" style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid var(--borde);">
+        <option [ngValue]="null">Sin restricción</option>
+        <option [ngValue]="13">+13</option>
+        <option [ngValue]="18">+18</option>
+      </select>
+    </label>
+
+    <div>
+      <p style="margin: 0 0 6px;">Géneros</p>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+        <label *ngFor="let g of generos" class="chip" [class.chip--activo]="generoSeleccionado(g.id)" style="cursor: pointer;">
+          <input
+            type="checkbox"
+            [checked]="generoSeleccionado(g.id)"
+            (change)="toggleGenero(g.id, $any($event.target).checked)"
+            style="margin-right: 4px;"
+          />
+          {{ g.nombre }}
+        </label>
+      </div>
+    </div>
+
+    <label style="display: flex; align-items: center; gap: 6px;">
+      <input type="checkbox" formControlName="activa" />
+      Visible en el catálogo
+    </label>
+
+    <div style="display: flex; gap: 12px; margin-top: 8px;">
+      <button type="submit" class="boton" [disabled]="cargando">Guardar</button>
+      <button type="button" (click)="cancelar()" style="background: transparent; border: 1px solid var(--borde); border-radius: 999px; padding: 10px 20px; cursor: pointer;">
+        Cancelar
+      </button>
+    </div>
+  </form>
+
+  <!-- Listado -->
+  <div *ngIf="!mostrarFormulario" style="display: grid; gap: 12px;">
+    <div *ngFor="let p of peliculas" class="tarjeta" style="padding: 1rem 1.25rem; display: flex; justify-content: space-between; align-items: center; gap: 12px;">
+      <div>
+        <p class="titulo" style="font-size: 1rem; margin-bottom: 4px;">
+          {{ p.nombre }}
+          <span *ngIf="!p.activa" style="font-size: 0.75rem; color: var(--texto-muted);">(oculta)</span>
+        </p>
+        <p style="font-size: 0.8rem; color: var(--texto-secundario); margin: 0;">
+          {{ p.duracion_minutos }} min · {{ p.fecha_estreno }}
+          <span *ngIf="p.restriccion_edad"> · +{{ p.restriccion_edad }}</span>
+          <span *ngIf="p.generos.length"> · {{ generosTexto(p) }}</span>
+        </p>
+      </div>
+      <div style="display: flex; gap: 8px; flex-shrink: 0;">
+        <button (click)="editarPelicula(p)" style="background: transparent; border: 1px solid var(--borde); border-radius: 999px; padding: 6px 14px; cursor: pointer; font-size: 0.8rem;">
+          Editar
+        </button>
+        <button (click)="toggleActiva(p)" style="background: transparent; border: 1px solid var(--borde); border-radius: 999px; padding: 6px 14px; cursor: pointer; font-size: 0.8rem;">
+          {{ p.activa ? 'Ocultar' : 'Mostrar' }}
+        </button>
+      </div>
+    </div>
+
+    <p *ngIf="!cargando && peliculas.length === 0" style="color: var(--texto-secundario);">
+      Todavía no cargaste ninguna película.
+    </p>
+  </div>
+</div>

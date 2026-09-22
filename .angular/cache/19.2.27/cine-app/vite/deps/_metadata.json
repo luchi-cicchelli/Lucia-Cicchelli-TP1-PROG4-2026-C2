@@ -1,34 +1,58 @@
 {
-  "hash": "69dae6c5",
-  "configHash": "dc63149a",
-  "lockfileHash": "0825a69e",
-  "browserHash": "24fa2a9c",
+  "hash": "9b13c4ba",
+  "configHash": "d9b92b23",
+  "lockfileHash": "e41ef55f",
+  "browserHash": "8dfb4f17",
   "optimized": {
+    "@angular/common": {
+      "src": "../../../../../../node_modules/@angular/common/fesm2022/common.mjs",
+      "file": "@angular_common.js",
+      "fileHash": "e246eb8a",
+      "needsInterop": false
+    },
     "@angular/core": {
       "src": "../../../../../../node_modules/@angular/core/fesm2022/core.mjs",
       "file": "@angular_core.js",
-      "fileHash": "de5db7ba",
+      "fileHash": "e99ea7d4",
+      "needsInterop": false
+    },
+    "@angular/forms": {
+      "src": "../../../../../../node_modules/@angular/forms/fesm2022/forms.mjs",
+      "file": "@angular_forms.js",
+      "fileHash": "d0cb894f",
       "needsInterop": false
     },
     "@angular/platform-browser": {
       "src": "../../../../../../node_modules/@angular/platform-browser/fesm2022/platform-browser.mjs",
       "file": "@angular_platform-browser.js",
-      "fileHash": "b580824b",
+      "fileHash": "da2496a2",
       "needsInterop": false
     },
     "@angular/router": {
       "src": "../../../../../../node_modules/@angular/router/fesm2022/router.mjs",
       "file": "@angular_router.js",
-      "fileHash": "f3b2e351",
+      "fileHash": "b5328d69",
+      "needsInterop": false
+    },
+    "@supabase/supabase-js": {
+      "src": "../../../../../../node_modules/@supabase/supabase-js/dist/index.mjs",
+      "file": "@supabase_supabase-js.js",
+      "fileHash": "c46adb62",
       "needsInterop": false
     }
   },
   "chunks": {
-    "chunk-2YWVJXZJ": {
-      "file": "chunk-2YWVJXZJ.js"
+    "chunk-KPGGHCCC": {
+      "file": "chunk-KPGGHCCC.js"
     },
-    "chunk-I3CU5RX3": {
-      "file": "chunk-I3CU5RX3.js"
+    "chunk-CWEADZEV": {
+      "file": "chunk-CWEADZEV.js"
+    },
+    "chunk-ZTSDAE26": {
+      "file": "chunk-ZTSDAE26.js"
+    },
+    "chunk-7GM7P4DU": {
+      "file": "chunk-7GM7P4DU.js"
     }
   }
 }

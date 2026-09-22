@@ -37,6 +37,13 @@ export const routes: Routes = [
         (m) => m.AdminDashboardComponent
       )
   },
+  {
+    path: 'admin/peliculas',
+    loadComponent: () =>
+      import('./features/admin/peliculas-admin/peliculas-admin.component').then(
+        (m) => m.PeliculasAdminComponent
+      )
+  },
 
   // --- Empleado ---
   // TODO: agregar canActivate: [authGuard, roleGuard(['empleado', 'admin'])]
