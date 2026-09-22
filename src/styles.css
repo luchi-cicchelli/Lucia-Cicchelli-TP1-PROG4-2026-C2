@@ -1,1 +1,104 @@
-/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=Inter:wght@400;500&display=swap');
+
+:root {
+  --rosa-acento: #D4537E;
+  --rosa-suave: #F4C0D1;
+  --rosa-fondo: #FBEAF0;
+  --rosa-texto: #72243E;
+
+  --fondo: #FDF9F7;
+  --superficie: #FFFFFF;
+  --superficie-alt: #F7F1EE;
+  --texto: #2E2A2C;
+  --texto-secundario: #7A7476;
+  --texto-muted: #A79FA1;
+  --borde: #EAE2E0;
+
+  --fuente-titulo: 'Playfair Display', serif;
+  --fuente-texto: 'Inter', system-ui, sans-serif;
+
+  --radio: 12px;
+  --radio-chip: 999px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --rosa-fondo: #72243E;
+    --rosa-texto: #F4C0D1;
+    --rosa-suave: #993556;
+
+    --fondo: #1C1517;
+    --superficie: #241B1E;
+    --superficie-alt: #2C2224;
+    --texto: #F4EDEE;
+    --texto-secundario: #C7BCBE;
+    --texto-muted: #8F8385;
+    --borde: #3A2E31;
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--fondo);
+  color: var(--texto);
+  font-family: var(--fuente-texto);
+}
+
+h1, h2, h3, .titulo {
+  font-family: var(--fuente-titulo);
+  font-weight: 500;
+  margin: 0;
+}
+
+.tarjeta {
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  overflow: hidden;
+}
+
+.chip {
+  font-size: 0.75rem;
+  padding: 5px 12px;
+  border-radius: var(--radio-chip);
+  border: 1px solid var(--borde);
+  color: var(--texto-secundario);
+  background: transparent;
+}
+
+.chip--activo {
+  border-color: var(--rosa-acento);
+  color: var(--rosa-acento);
+}
+
+.banner-destacado {
+  background: var(--rosa-fondo);
+  color: var(--rosa-texto);
+  border-radius: var(--radio);
+  padding: 16px 18px;
+}
+
+.rating {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  color: var(--rosa-acento);
+}
+
+.boton {
+  font-family: var(--fuente-texto);
+  font-weight: 500;
+  border: none;
+  border-radius: var(--radio-chip);
+  padding: 10px 20px;
+  background: var(--rosa-acento);
+  color: #FFFFFF;
+  cursor: pointer;
+}
+
+.boton:hover {
+  opacity: 0.9;
+}
