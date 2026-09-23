@@ -1,0 +1,107 @@
+.usuarios {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2rem 1rem 3rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.usuarios__volver {
+  color: var(--texto-secundario);
+  text-decoration: none;
+  font-size: 0.85rem;
+}
+
+.usuarios__volver:hover {
+  color: var(--rosa-acento);
+}
+
+.usuarios__encabezado h1 {
+  font-size: 1.5rem;
+  margin-bottom: 4px;
+}
+
+.usuarios__encabezado p {
+  margin: 0;
+  color: var(--texto-secundario);
+  font-size: 0.9rem;
+}
+
+.usuarios__filtros {
+  display: grid;
+  grid-template-columns: 1fr 200px;
+  gap: 10px;
+}
+
+.usuarios__lista {
+  display: grid;
+  gap: 10px;
+}
+
+.usuarios__fila {
+  padding: 0.9rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.usuarios__info {
+  min-width: 0;
+}
+
+.usuarios__nombre {
+  margin: 0 0 2px;
+  font-weight: 500;
+}
+
+.usuarios__vos {
+  font-size: 0.75rem;
+  color: var(--texto-muted);
+  font-weight: 400;
+}
+
+.usuarios__detalle {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--texto-secundario);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.usuarios__rol {
+  width: 160px;
+  flex-shrink: 0;
+  font-size: 0.85rem;
+  padding: 8px 10px;
+}
+
+.usuarios__rol--admin {
+  border-color: var(--rosa-acento);
+  color: var(--rosa-acento);
+}
+
+.usuarios__rol--empleado {
+  border-color: var(--rosa-suave);
+}
+
+.usuarios__vacio {
+  color: var(--texto-secundario);
+  text-align: center;
+}
+
+@media (max-width: 600px) {
+  .usuarios__filtros {
+    grid-template-columns: 1fr;
+  }
+
+  .usuarios__fila {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .usuarios__rol {
+    width: 100%;
+  }
+}

@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { authGuard, invitadoGuard, rolGuard } from './core/guards/auth.guards';
 
 export const routes: Routes = [
   // --- Público ---
@@ -15,40 +16,67 @@ export const routes: Routes = [
       )
   },
   {
+    // Se puede comprar sin estar registrado, por eso no lleva guard.
     path: 'checkout/:funcionId',
     loadComponent: () =>
       import('./features/checkout/checkout.component').then((m) => m.CheckoutComponent)
   },
 
+  // --- Auth (solo si NO está logueado) ---
+  {
+    path: 'login',
+    canActivate: [invitadoGuard],
+    loadComponent: () =>
+      import('./features/auth/login/login.component').then((m) => m.LoginComponent)
+  },
+  {
+    path: 'registro',
+    canActivate: [invitadoGuard],
+    loadComponent: () =>
+      import('./features/auth/registro/registro.component').then((m) => m.RegistroComponent)
+  },
+
   // --- Cliente logueado ---
-  // TODO: agregar canActivate: [authGuard] cuando armemos auth (paso 3)
   {
     path: 'perfil',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./features/perfil/perfil.component').then((m) => m.PerfilComponent)
   },
 
   // --- Admin ---
-  // TODO: agregar canActivate: [authGuard, roleGuard(['admin'])]
   {
     path: 'admin',
-    loadComponent: () =>
-      import('./features/admin/admin-dashboard/admin-dashboard.component').then(
-        (m) => m.AdminDashboardComponent
-      )
-  },
-  {
-    path: 'admin/peliculas',
-    loadComponent: () =>
-      import('./features/admin/peliculas-admin/peliculas-admin.component').then(
-        (m) => m.PeliculasAdminComponent
-      )
+    canActivate: [rolGuard(['admin'])],
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./features/admin/admin-dashboard/admin-dashboard.component').then(
+            (m) => m.AdminDashboardComponent
+          )
+      },
+      {
+        path: 'peliculas',
+        loadComponent: () =>
+          import('./features/admin/peliculas-admin/peliculas-admin.component').then(
+            (m) => m.PeliculasAdminComponent
+          )
+      },
+      {
+        path: 'usuarios',
+        loadComponent: () =>
+          import('./features/admin/usuarios-admin/usuarios-admin.component').then(
+            (m) => m.UsuariosAdminComponent
+          )
+      }
+    ]
   },
 
-  // --- Empleado ---
-  // TODO: agregar canActivate: [authGuard, roleGuard(['empleado', 'admin'])]
+  // --- Empleado (el admin también puede entrar) ---
   {
     path: 'empleado/escaner',
+    canActivate: [rolGuard(['empleado', 'admin'])],
     loadComponent: () =>
       import('./features/empleado/escaner/escaner.component').then(
         (m) => m.EscanerComponent

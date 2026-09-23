@@ -1,1 +1,115 @@
-<p>perfil works!</p>
+<section class="perfil">
+  @if (auth.perfil(); as p) {
+    <header class="perfil__encabezado">
+      <div>
+        <h1 class="titulo">Hola, {{ p.nombre }}</h1>
+        <p>{{ p.email }}</p>
+      </div>
+      @if (p.rol !== 'cliente') {
+        <span class="chip chip--activo">{{ etiquetaRol() }}</span>
+      }
+    </header>
+
+    <!-- Resumen: puntos, crédito, cupón -->
+    <div class="perfil__resumen">
+      <div class="tarjeta perfil__dato">
+        <span class="perfil__dato-valor">{{ p.puntos_acumulados }}</span>
+        <span class="perfil__dato-label">Puntos acumulados</span>
+      </div>
+      <div class="tarjeta perfil__dato">
+        <span class="perfil__dato-valor">{{ p.credito_disponible | currency: 'ARS' : 'symbol-narrow' : '1.0-2' }}</span>
+        <span class="perfil__dato-label">Crédito disponible</span>
+      </div>
+      <div class="tarjeta perfil__dato">
+        <span class="perfil__dato-valor">{{ p.cupon_bienvenida_usado ? 'Usado' : '20% off' }}</span>
+        <span class="perfil__dato-label">Cupón de bienvenida</span>
+      </div>
+    </div>
+
+    @if (mensaje()) {
+      <p class="alerta alerta--ok">{{ mensaje() }}</p>
+    }
+    @if (error()) {
+      <p class="alerta alerta--error">{{ error() }}</p>
+    }
+
+    <!-- Datos personales -->
+    <div class="tarjeta perfil__datos">
+      <div class="perfil__datos-titulo">
+        <h2 class="titulo">Mis datos</h2>
+        @if (!editando()) {
+          <button type="button" class="boton boton--secundario perfil__editar" (click)="empezarEdicion()">
+            Editar
+          </button>
+        }
+      </div>
+
+      @if (!editando()) {
+        <dl class="perfil__lista">
+          <div><dt>Nombre</dt><dd>{{ p.nombre }} {{ p.apellido }}</dd></div>
+          <div><dt>Fecha de nacimiento</dt><dd>{{ p.fecha_nacimiento | date: 'dd/MM/yyyy' }}</dd></div>
+          <div><dt>Tipo de sangre</dt><dd>{{ p.tipo_sangre || '—' }}</dd></div>
+          <div><dt>Color de ojos</dt><dd>{{ p.color_ojos || '—' }}</dd></div>
+          <div><dt>Días de vacaciones</dt><dd>{{ p.dias_vacaciones_anuales ?? '—' }}</dd></div>
+          <div><dt>Miembro desde</dt><dd>{{ p.created_at | date: 'MM/yyyy' }}</dd></div>
+        </dl>
+      } @else {
+        <form [formGroup]="form" (ngSubmit)="guardar()" class="perfil__form" novalidate>
+          <div class="perfil__fila">
+            <label class="campo">
+              Nombre
+              <input class="input" formControlName="nombre" />
+            </label>
+            <label class="campo">
+              Apellido
+              <input class="input" formControlName="apellido" />
+            </label>
+          </div>
+
+          <div class="perfil__fila">
+            <label class="campo">
+              Fecha de nacimiento
+              <input class="input" type="date" formControlName="fecha_nacimiento" min="1900-01-01" [max]="hoy" />
+            </label>
+            <label class="campo">
+              Días de vacaciones por año
+              <input class="input" type="number" min="0" max="365" formControlName="dias_vacaciones_anuales" />
+            </label>
+          </div>
+
+          <div class="perfil__fila">
+            <label class="campo">
+              Tipo de sangre
+              <select class="input" formControlName="tipo_sangre">
+                @for (t of tiposSangre; track t) {
+                  <option [value]="t">{{ t }}</option>
+                }
+              </select>
+            </label>
+            <label class="campo">
+              Color de ojos
+              <select class="input" formControlName="color_ojos">
+                @for (c of coloresOjos; track c) {
+                  <option [value]="c">{{ c }}</option>
+                }
+              </select>
+            </label>
+          </div>
+
+          @if (form.invalid && form.touched) {
+            <p class="error-texto">Revisá los campos: todos son obligatorios y la fecha no puede ser futura.</p>
+          }
+
+          <div class="perfil__acciones">
+            <button type="submit" class="boton" [disabled]="guardando()">
+              {{ guardando() ? 'Guardando…' : 'Guardar' }}
+            </button>
+            <button type="button" class="boton boton--secundario" (click)="editando.set(false)">Cancelar</button>
+          </div>
+        </form>
+      }
+    </div>
+  } @else {
+    <p class="perfil__cargando">Cargando tu perfil…</p>
+  }
+</section>

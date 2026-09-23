@@ -1,0 +1,36 @@
+<header class="navbar">
+  <div class="navbar__contenido">
+    <a routerLink="/" class="navbar__marca">Bijou</a>
+
+    <button
+      type="button"
+      class="navbar__hamburguesa"
+      (click)="toggleMenu()"
+      [attr.aria-expanded]="menuAbierto()"
+      aria-label="Abrir menú"
+    >
+      <span></span><span></span><span></span>
+    </button>
+
+    <nav class="navbar__links" [class.navbar__links--abierto]="menuAbierto()">
+      <a routerLink="/" routerLinkActive="activo" [routerLinkActiveOptions]="{ exact: true }">Cartelera</a>
+
+      @if (auth.esEmpleado()) {
+        <a routerLink="/empleado/escaner" routerLinkActive="activo">Escáner</a>
+      }
+      @if (auth.esAdmin()) {
+        <a routerLink="/admin" routerLinkActive="activo">Administración</a>
+      }
+
+      @if (auth.estaLogueado()) {
+        <a routerLink="/perfil" routerLinkActive="activo" class="navbar__usuario">
+          {{ auth.perfil()?.nombre || 'Mi perfil' }}
+        </a>
+        <button type="button" class="navbar__salir" (click)="salir()">Salir</button>
+      } @else {
+        <a routerLink="/login" routerLinkActive="activo">Ingresar</a>
+        <a routerLink="/registro" class="boton navbar__cta">Crear cuenta</a>
+      }
+    </nav>
+  </div>
+</header>

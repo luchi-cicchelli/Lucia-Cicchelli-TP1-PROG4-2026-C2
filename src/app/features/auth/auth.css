@@ -1,0 +1,97 @@
+.auth {
+  min-height: calc(100vh - 64px);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 3rem 1rem;
+}
+
+.auth__tarjeta {
+  width: 100%;
+  max-width: 420px;
+  padding: 2rem;
+  display: grid;
+  gap: 16px;
+}
+
+.auth__tarjeta--ancha {
+  max-width: 560px;
+}
+
+.auth__encabezado h1 {
+  font-size: 1.75rem;
+  margin-bottom: 6px;
+}
+
+.auth__encabezado p {
+  margin: 0;
+  color: var(--texto-secundario);
+  font-size: 0.9rem;
+}
+
+.auth__fila {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.auth__password {
+  position: relative;
+}
+
+.auth__password .input {
+  padding-right: 72px;
+}
+
+.auth__ojo {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  font-size: 0.75rem;
+  color: var(--texto-secundario);
+  cursor: pointer;
+  padding: 6px 8px;
+}
+
+.auth__enviar {
+  width: 100%;
+  padding: 12px;
+  margin-top: 4px;
+}
+
+.auth__pie {
+  margin: 0;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--texto-secundario);
+}
+
+.auth__pie a {
+  color: var(--rosa-acento);
+  font-weight: 500;
+}
+
+.auth__seccion {
+  margin: 8px 0 0;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--texto-muted);
+}
+
+@media (max-width: 520px) {
+  .auth {
+    padding: 1.5rem 0.75rem;
+  }
+
+  .auth__tarjeta {
+    padding: 1.5rem 1.25rem;
+  }
+
+  .auth__fila {
+    grid-template-columns: 1fr;
+  }
+}

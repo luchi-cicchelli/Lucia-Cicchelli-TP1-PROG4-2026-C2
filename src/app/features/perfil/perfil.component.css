@@ -1,0 +1,114 @@
+.perfil {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 2rem 1rem 3rem;
+  display: grid;
+  gap: 1.25rem;
+}
+
+.perfil__encabezado {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.perfil__encabezado h1 {
+  font-size: 1.75rem;
+  margin-bottom: 4px;
+}
+
+.perfil__encabezado p {
+  margin: 0;
+  color: var(--texto-secundario);
+  font-size: 0.9rem;
+}
+
+.perfil__resumen {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.perfil__dato {
+  padding: 1rem 1.25rem;
+  display: grid;
+  gap: 4px;
+}
+
+.perfil__dato-valor {
+  font-family: var(--fuente-titulo);
+  font-size: 1.5rem;
+  color: var(--rosa-acento);
+}
+
+.perfil__dato-label {
+  font-size: 0.8rem;
+  color: var(--texto-secundario);
+}
+
+.perfil__datos {
+  padding: 1.5rem;
+}
+
+.perfil__datos-titulo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.perfil__datos-titulo h2 {
+  font-size: 1.15rem;
+}
+
+.perfil__editar {
+  padding: 6px 16px;
+  font-size: 0.85rem;
+}
+
+.perfil__lista {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px 24px;
+}
+
+.perfil__lista dt {
+  font-size: 0.75rem;
+  color: var(--texto-muted);
+  margin-bottom: 2px;
+}
+
+.perfil__lista dd {
+  margin: 0;
+}
+
+.perfil__form {
+  display: grid;
+  gap: 14px;
+}
+
+.perfil__fila {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.perfil__acciones {
+  display: flex;
+  gap: 10px;
+}
+
+.perfil__cargando {
+  color: var(--texto-secundario);
+  text-align: center;
+}
+
+@media (max-width: 600px) {
+  .perfil__resumen,
+  .perfil__lista,
+  .perfil__fila {
+    grid-template-columns: 1fr;
+  }
+}

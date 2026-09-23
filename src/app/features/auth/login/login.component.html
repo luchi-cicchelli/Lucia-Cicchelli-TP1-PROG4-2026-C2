@@ -1,0 +1,46 @@
+<section class="auth">
+  <form class="tarjeta auth__tarjeta" [formGroup]="form" (ngSubmit)="ingresar()" novalidate>
+    <header class="auth__encabezado">
+      <h1 class="titulo">Hola de nuevo</h1>
+      <p>Ingresá para ver tus entradas, puntos y más.</p>
+    </header>
+
+    @if (error()) {
+      <p class="alerta alerta--error" role="alert">{{ error() }}</p>
+    }
+
+    <label class="campo">
+      Mail
+      <input class="input" type="email" formControlName="email" autocomplete="email" />
+      @if (form.controls.email.touched && form.controls.email.invalid) {
+        <span class="error-texto">Ingresá un mail válido.</span>
+      }
+    </label>
+
+    <label class="campo">
+      Contraseña
+      <div class="auth__password">
+        <input
+          class="input"
+          [type]="verPassword() ? 'text' : 'password'"
+          formControlName="password"
+          autocomplete="current-password"
+        />
+        <button type="button" class="auth__ojo" (click)="verPassword.set(!verPassword())">
+          {{ verPassword() ? 'Ocultar' : 'Ver' }}
+        </button>
+      </div>
+      @if (form.controls.password.touched && form.controls.password.invalid) {
+        <span class="error-texto">Ingresá tu contraseña.</span>
+      }
+    </label>
+
+    <button type="submit" class="boton auth__enviar" [disabled]="cargando()">
+      {{ cargando() ? 'Ingresando…' : 'Ingresar' }}
+    </button>
+
+    <p class="auth__pie">
+      ¿No tenés cuenta? <a routerLink="/registro">Registrate</a> y obtené 20% off en tu primera compra.
+    </p>
+  </form>
+</section>
