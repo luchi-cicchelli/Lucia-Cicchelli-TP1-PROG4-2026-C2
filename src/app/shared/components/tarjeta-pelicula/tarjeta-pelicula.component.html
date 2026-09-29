@@ -1,0 +1,33 @@
+<a class="tarjeta-peli" [routerLink]="['/pelicula', pelicula().id]">
+  <div class="tarjeta-peli__poster">
+    @if (pelicula().imagen_url && !imagenRota()) {
+      <img
+        [src]="pelicula().imagen_url"
+        [alt]="'Póster de ' + pelicula().nombre"
+        loading="lazy"
+        (error)="imagenRota.set(true)"
+      />
+    } @else {
+      <div class="tarjeta-peli__sin-imagen">
+        <span class="titulo">{{ pelicula().nombre }}</span>
+      </div>
+    }
+
+    @if (posicion()) {
+      <span class="tarjeta-peli__ranking">#{{ posicion() }}</span>
+    }
+    @if (pelicula().restriccion_edad) {
+      <span class="tarjeta-peli__edad">+{{ pelicula().restriccion_edad }}</span>
+    }
+  </div>
+
+  <div class="tarjeta-peli__info">
+    <h3 class="titulo tarjeta-peli__nombre">{{ pelicula().nombre }}</h3>
+    @if (proximamente()) {
+      <p class="tarjeta-peli__estreno">Estrena el {{ fechaEstreno() | date: "d 'de' MMMM" }}</p>
+    } @else {
+      <app-estrellas [valor]="pelicula().promedio" />
+    }
+    <p class="tarjeta-peli__meta">{{ pelicula().duracion_minutos }} min · {{ generos() }}</p>
+  </div>
+</a>

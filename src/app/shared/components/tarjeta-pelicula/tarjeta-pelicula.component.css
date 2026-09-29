@@ -1,0 +1,92 @@
+:host {
+  display: block;
+}
+
+.tarjeta-peli {
+  display: grid;
+  gap: 10px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.tarjeta-peli__poster {
+  position: relative;
+  aspect-ratio: 2 / 3;
+  border-radius: var(--radio);
+  overflow: hidden;
+  background: var(--superficie-alt);
+  border: 1px solid var(--borde);
+}
+
+.tarjeta-peli__poster img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.tarjeta-peli:hover img {
+  transform: scale(1.04);
+}
+
+.tarjeta-peli__sin-imagen {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  padding: 1rem;
+  background: linear-gradient(160deg, var(--rosa-fondo), var(--rosa-suave));
+}
+
+.tarjeta-peli__sin-imagen .titulo {
+  font-size: 1.25rem;
+  color: var(--rosa-texto);
+}
+
+.tarjeta-peli__ranking,
+.tarjeta-peli__edad {
+  position: absolute;
+  top: 10px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 3px 10px;
+  border-radius: var(--radio-chip);
+}
+
+.tarjeta-peli__ranking {
+  left: 10px;
+  background: var(--rosa-acento);
+  color: #fff;
+}
+
+.tarjeta-peli__edad {
+  right: 10px;
+  background: rgba(0, 0, 0, 0.65);
+  color: #fff;
+}
+
+.tarjeta-peli__info {
+  display: grid;
+  gap: 4px;
+}
+
+.tarjeta-peli__nombre {
+  font-size: 1.05rem;
+  line-height: 1.25;
+}
+
+.tarjeta-peli:hover .tarjeta-peli__nombre {
+  color: var(--rosa-acento);
+}
+
+.tarjeta-peli__estreno {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--rosa-acento);
+}
+
+.tarjeta-peli__meta {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--texto-secundario);
+}

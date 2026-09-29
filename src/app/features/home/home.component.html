@@ -1,1 +1,82 @@
-<p>home works!</p>
+<div class="home">
+  @if (error()) {
+    <p class="alerta alerta--error">{{ error() }}</p>
+  }
+
+  @if (cargando()) {
+    <p class="home__vacio">Cargando cartelera…</p>
+  } @else {
+    @if (destacadas().length) {
+      <section class="home__seccion">
+        <header class="home__encabezado">
+          <h1 class="titulo">{{ hayVentas() ? 'Las más vistas' : 'Recién estrenadas' }}</h1>
+          <p>{{ hayVentas() ? 'Las tres películas que más entradas vendieron.' : 'Lo último que llegó a nuestras salas.' }}</p>
+        </header>
+        <div class="home__destacadas">
+          @for (p of destacadas(); track p.id; let i = $index) {
+            <app-tarjeta-pelicula [pelicula]="p" [posicion]="hayVentas() ? i + 1 : null" />
+          }
+        </div>
+      </section>
+    }
+
+    <section class="home__seccion">
+      <header class="home__encabezado">
+        <h2 class="titulo">En cartel</h2>
+      </header>
+
+      <div class="home__filtros">
+        <input
+          class="input home__buscador"
+          type="search"
+          placeholder="Buscar por título o sinopsis"
+          [value]="busqueda()"
+          (input)="alBuscar($event)"
+          aria-label="Buscar películas"
+        />
+        @if (generosDisponibles().length) {
+          <div class="home__generos" role="group" aria-label="Filtrar por género">
+            @for (g of generosDisponibles(); track g.id) {
+              <button
+                type="button"
+                class="chip"
+                [class.chip--activo]="generosElegidos().has(g.id)"
+                [attr.aria-pressed]="generosElegidos().has(g.id)"
+                (click)="toggleGenero(g.id)"
+              >
+                {{ g.nombre }}
+              </button>
+            }
+            @if (hayFiltros()) {
+              <button type="button" class="home__limpiar" (click)="limpiarFiltros()">Limpiar</button>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="home__grilla">
+        @for (p of filtradas(); track p.id) {
+          <app-tarjeta-pelicula [pelicula]="p" />
+        } @empty {
+          <p class="home__vacio">
+            {{ hayFiltros() ? 'No hay películas que coincidan con la búsqueda.' : 'Todavía no hay películas en cartel.' }}
+          </p>
+        }
+      </div>
+    </section>
+
+    @if (proximamente().length) {
+      <section class="home__seccion">
+        <header class="home__encabezado">
+          <h2 class="titulo">Próximamente</h2>
+          <p>Estrenos de las próximas semanas.</p>
+        </header>
+        <div class="home__grilla">
+          @for (p of proximamente(); track p.id) {
+            <app-tarjeta-pelicula [pelicula]="p" [proximamente]="true" />
+          }
+        </div>
+      </section>
+    }
+  }
+</div>

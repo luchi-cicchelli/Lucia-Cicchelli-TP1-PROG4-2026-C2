@@ -1,0 +1,88 @@
+.home {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+  display: grid;
+  gap: 3rem;
+}
+
+.home__seccion {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.home__encabezado h1,
+.home__encabezado h2 {
+  font-size: 1.75rem;
+  margin-bottom: 4px;
+}
+
+.home__encabezado p {
+  margin: 0;
+  color: var(--texto-secundario);
+  font-size: 0.9rem;
+}
+
+.home__destacadas {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.5rem;
+  max-width: 820px;
+}
+
+.home__filtros {
+  display: grid;
+  gap: 12px;
+}
+
+.home__buscador {
+  max-width: 420px;
+}
+
+.home__generos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.home__generos .chip {
+  cursor: pointer;
+}
+
+.home__limpiar {
+  background: none;
+  border: none;
+  color: var(--rosa-acento);
+  font-size: 0.8rem;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.home__grilla {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 1.5rem 1.25rem;
+}
+
+.home__vacio {
+  grid-column: 1 / -1;
+  color: var(--texto-secundario);
+  text-align: center;
+  padding: 2rem 0;
+}
+
+@media (max-width: 700px) {
+  .home {
+    padding: 1.25rem 1rem 3rem;
+    gap: 2.25rem;
+  }
+
+  .home__destacadas {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+
+  .home__grilla {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

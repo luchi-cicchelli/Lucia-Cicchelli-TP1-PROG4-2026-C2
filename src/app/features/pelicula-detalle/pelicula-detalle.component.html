@@ -1,1 +1,135 @@
-<p>pelicula-detalle works!</p>
+<div class="detalle">
+  <a routerLink="/" class="detalle__volver">← Cartelera</a>
+
+  @if (cargando()) {
+    <p class="detalle__vacio">Cargando…</p>
+  } @else if (error()) {
+    <p class="alerta alerta--error">{{ error() }}</p>
+  } @else if (!pelicula()) {
+    <div class="detalle__vacio">
+      <p>Esta película no está disponible.</p>
+      <a routerLink="/" class="boton">Ver la cartelera</a>
+    </div>
+  } @else {
+    @let p = pelicula()!;
+
+    <section class="detalle__cabecera">
+      <div class="detalle__poster">
+        @if (p.imagen_url && !imagenRota()) {
+          <img [src]="p.imagen_url" [alt]="'Póster de ' + p.nombre" (error)="imagenRota.set(true)" />
+        } @else {
+          <div class="detalle__sin-imagen"><span class="titulo">{{ p.nombre }}</span></div>
+        }
+      </div>
+
+      <div class="detalle__info">
+        <h1 class="titulo">{{ p.nombre }}</h1>
+
+        <div class="detalle__puntaje">
+          <app-estrellas [valor]="p.promedio" />
+          <span>{{ p.cantidadResenas ? p.cantidadResenas + ' reseñas' : 'Sin reseñas todavía' }}</span>
+        </div>
+
+        <div class="detalle__datos">
+          <span class="chip">{{ p.duracion_minutos }} min</span>
+          @if (p.restriccion_edad) {
+            <span class="chip chip--activo">+{{ p.restriccion_edad }}</span>
+          } @else {
+            <span class="chip">ATP</span>
+          }
+          <span class="chip">Estreno {{ fechaEstreno() | date: 'd/MM/yyyy' }}</span>
+        </div>
+
+        @if (generos()) {
+          <p class="detalle__generos">{{ generos() }}</p>
+        }
+
+        <p class="detalle__sinopsis">{{ p.sinopsis }}</p>
+
+        @if (p.restriccion_edad) {
+          <p class="banner-destacado detalle__aviso">
+            @if (bloqueadaPorEdad()) {
+              Esta película es para mayores de {{ p.restriccion_edad }} años, así que no podés comprar entradas.
+            } @else {
+              Apta para mayores de {{ p.restriccion_edad }} años. Los menores deben ir acompañados por un adulto.
+            }
+          </p>
+        }
+      </div>
+    </section>
+
+    <section class="detalle__seccion">
+      <h2 class="titulo">Funciones</h2>
+
+      @if (dias().length) {
+        <div class="detalle__dias" role="tablist">
+          @for (d of dias(); track d.clave) {
+            <button
+              type="button"
+              role="tab"
+              class="detalle__dia"
+              [class.detalle__dia--activo]="diaActual()?.clave === d.clave"
+              [attr.aria-selected]="diaActual()?.clave === d.clave"
+              (click)="diaElegido.set(d.clave)"
+            >
+              <span>{{ d.fecha | date: 'EEE' }}</span>
+              <strong>{{ d.fecha | date: 'd' }}</strong>
+              <span>{{ d.fecha | date: 'MMM' }}</span>
+            </button>
+          }
+        </div>
+
+        @if (diaActual(); as dia) {
+          <div class="detalle__grupos">
+            @for (g of dia.grupos; track g.etiqueta) {
+              <div class="detalle__grupo">
+                <p class="detalle__grupo-titulo">{{ g.etiqueta }}</p>
+                <div class="detalle__horarios">
+                  @for (f of g.funciones; track f.id) {
+                    @if (bloqueadaPorEdad()) {
+                      <span class="detalle__horario detalle__horario--bloqueado">
+                        {{ f.fecha_hora_inicio | date: 'HH:mm' }}
+                      </span>
+                    } @else {
+                      <a class="detalle__horario" [routerLink]="['/checkout', f.id]">
+                        <strong>{{ f.fecha_hora_inicio | date: 'HH:mm' }}</strong>
+                        <span>{{ f.sala?.nombre }}</span>
+                        @if (enPreventa(f)) {
+                          <span class="detalle__preventa">
+                            Preventa {{ f.precio_preventa | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }}
+                          </span>
+                        } @else {
+                          <span>{{ f.precio_base | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }}</span>
+                        }
+                      </a>
+                    }
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        }
+      } @else {
+        <p class="detalle__nota">Todavía no hay funciones programadas para esta película.</p>
+      }
+    </section>
+
+    <section class="detalle__seccion">
+      <h2 class="titulo">Reseñas</h2>
+      @for (r of resenas(); track r.id) {
+        <article class="tarjeta detalle__resena">
+          <div class="detalle__resena-cabecera">
+            <app-estrellas [valor]="r.estrellas" [mostrarNumero]="false" />
+            <strong>{{ r.autor }}</strong>
+            <span>{{ r.fecha | date: 'd/MM/yyyy' }}</span>
+          </div>
+          @if (r.comentario) {
+            <p>{{ r.comentario }}</p>
+          }
+        </article>
+      } @empty {
+        <p class="detalle__nota">Nadie dejó una reseña todavía.</p>
+      }
+    </section>
+  }
+</div>

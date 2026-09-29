@@ -1,0 +1,259 @@
+.detalle {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 1.5rem 1.5rem 4rem;
+  display: grid;
+  gap: 2.5rem;
+}
+
+.detalle__volver {
+  color: var(--texto-secundario);
+  text-decoration: none;
+  font-size: 0.85rem;
+  margin-bottom: -1.5rem;
+}
+
+.detalle__volver:hover {
+  color: var(--rosa-acento);
+}
+
+.detalle__vacio {
+  text-align: center;
+  color: var(--texto-secundario);
+  display: grid;
+  gap: 1rem;
+  justify-items: center;
+}
+
+.detalle__vacio .boton {
+  text-decoration: none;
+}
+
+.detalle__cabecera {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 2.5rem;
+  align-items: start;
+}
+
+.detalle__poster {
+  aspect-ratio: 2 / 3;
+  border-radius: var(--radio);
+  overflow: hidden;
+  border: 1px solid var(--borde);
+  background: var(--superficie-alt);
+}
+
+.detalle__poster img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.detalle__sin-imagen {
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  padding: 1.25rem;
+  background: linear-gradient(160deg, var(--rosa-fondo), var(--rosa-suave));
+}
+
+.detalle__sin-imagen .titulo {
+  font-size: 1.5rem;
+  color: var(--rosa-texto);
+}
+
+.detalle__info {
+  display: grid;
+  gap: 14px;
+}
+
+.detalle__info h1 {
+  font-size: 2.25rem;
+  line-height: 1.15;
+}
+
+.detalle__puntaje {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+  color: var(--texto-secundario);
+}
+
+.detalle__datos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.detalle__generos {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--rosa-acento);
+}
+
+.detalle__sinopsis {
+  margin: 0;
+  line-height: 1.65;
+  color: var(--texto);
+}
+
+.detalle__aviso {
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+.detalle__seccion {
+  display: grid;
+  gap: 1rem;
+}
+
+.detalle__seccion h2 {
+  font-size: 1.4rem;
+}
+
+.detalle__dias {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.detalle__dia {
+  flex-shrink: 0;
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  min-width: 62px;
+  padding: 8px 10px;
+  border-radius: var(--radio);
+  border: 1px solid var(--borde);
+  background: var(--superficie);
+  cursor: pointer;
+  text-transform: capitalize;
+}
+
+.detalle__dia span {
+  font-size: 0.7rem;
+  color: var(--texto-secundario);
+}
+
+.detalle__dia strong {
+  font-family: var(--fuente-titulo);
+  font-size: 1.3rem;
+  font-weight: 500;
+}
+
+.detalle__dia--activo {
+  border-color: var(--rosa-acento);
+  background: var(--rosa-fondo);
+}
+
+.detalle__dia--activo strong,
+.detalle__dia--activo span {
+  color: var(--rosa-texto);
+}
+
+.detalle__grupos {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.detalle__grupo-titulo {
+  margin: 0 0 8px;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--texto-muted);
+}
+
+.detalle__horarios {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.detalle__horario {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  min-width: 96px;
+  padding: 10px 14px;
+  border-radius: var(--radio);
+  border: 1px solid var(--borde);
+  background: var(--superficie);
+  color: var(--texto);
+  text-decoration: none;
+  transition: border-color 0.15s;
+}
+
+.detalle__horario:hover {
+  border-color: var(--rosa-acento);
+}
+
+.detalle__horario strong {
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.detalle__horario span {
+  font-size: 0.72rem;
+  color: var(--texto-secundario);
+}
+
+.detalle__horario--bloqueado {
+  color: var(--texto-muted);
+  text-decoration: line-through;
+}
+
+.detalle__preventa {
+  color: var(--rosa-acento) !important;
+  font-weight: 500;
+}
+
+.detalle__nota {
+  margin: 0;
+  color: var(--texto-secundario);
+}
+
+.detalle__resena {
+  padding: 1rem 1.25rem;
+}
+
+.detalle__resena-cabecera {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+}
+
+.detalle__resena-cabecera span {
+  color: var(--texto-muted);
+  font-size: 0.75rem;
+}
+
+.detalle__resena p {
+  margin: 8px 0 0;
+  line-height: 1.55;
+}
+
+@media (max-width: 700px) {
+  .detalle {
+    padding: 1rem 1rem 3rem;
+  }
+
+  .detalle__cabecera {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .detalle__poster {
+    width: 60%;
+    max-width: 240px;
+  }
+
+  .detalle__info h1 {
+    font-size: 1.75rem;
+  }
+}
