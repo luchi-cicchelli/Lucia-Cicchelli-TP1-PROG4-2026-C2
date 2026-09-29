@@ -1,0 +1,86 @@
+<div class="exito">
+  @if (cargando()) {
+    <p class="exito__vacio">Cargando tu compra…</p>
+  } @else if (!compra()) {
+    <div class="exito__vacio">
+      <p>{{ error() || 'No encontramos esta compra.' }}</p>
+      <a routerLink="/" class="boton">Volver a la cartelera</a>
+    </div>
+  } @else {
+    @let c = compra()!;
+
+    <header class="exito__encabezado">
+      <span class="exito__check" aria-hidden="true">✓</span>
+      <h1 class="titulo">¡Listo! Tus entradas están confirmadas</h1>
+      <p>
+        {{ c.pelicula.nombre }} · {{ c.funcion.inicio | date: "EEEE d 'de' MMMM, HH:mm" }} · {{ c.funcion.sala }}
+      </p>
+    </header>
+
+    @if (error()) {
+      <p class="alerta alerta--error">{{ error() }}</p>
+    }
+
+    <div class="exito__acciones">
+      <button type="button" class="boton" (click)="descargarPdf()" [disabled]="generandoPdf()">
+        {{ generandoPdf() ? 'Generando…' : 'Descargar PDF' }}
+      </button>
+      <button type="button" class="boton boton--secundario" (click)="copiarLink()">
+        {{ linkCopiado() ? '¡Link copiado!' : 'Copiar link de la compra' }}
+      </button>
+    </div>
+
+    @if (!auth.estaLogueado()) {
+      <p class="banner-destacado exito__aviso">
+        Compraste sin cuenta: guardá el PDF o este link, es la forma de recuperar tus entradas.
+      </p>
+    }
+
+    @if (c.pelicula.restriccion_edad) {
+      <p class="banner-destacado exito__aviso">
+        Película +{{ c.pelicula.restriccion_edad }}: los menores deben ingresar acompañados por un adulto.
+      </p>
+    }
+
+    <div class="exito__entradas">
+      @for (e of c.entradas; track e.id) {
+        <article class="tarjeta exito__entrada">
+          <div class="exito__entrada-info">
+            <p class="exito__butaca">{{ etiquetaButaca(e) }}</p>
+            @if (e.tipo === 'vip') {
+              <span class="exito__tag exito__tag--vip">VIP</span>
+            }
+            @if (e.tipo === 'accesible') {
+              <span class="exito__tag exito__tag--acc">Accesible</span>
+            }
+            <p class="exito__precio">{{ e.precio_pagado | currency: 'ARS' : 'symbol-narrow' : '1.0-2' }}</p>
+          </div>
+          @if (qrs()[e.id]) {
+            <img class="exito__qr" [src]="qrs()[e.id]" [alt]="'Código QR de ' + etiquetaButaca(e)" />
+          }
+          <p class="exito__codigo">
+            <span>Código manual</span>
+            <strong>{{ e.codigo_manual }}</strong>
+          </p>
+        </article>
+      }
+    </div>
+
+    <section class="tarjeta exito__resumen">
+      <h2 class="titulo">Resumen del pago</h2>
+      <dl>
+        <div><dt>Subtotal</dt><dd>{{ c.subtotal | currency: 'ARS' : 'symbol-narrow' : '1.0-2' }}</dd></div>
+        @if (c.descuento > 0) {
+          <div class="exito__descuento"><dt>Cupón de bienvenida</dt><dd>−{{ c.descuento | currency: 'ARS' : 'symbol-narrow' : '1.0-2' }}</dd></div>
+        }
+        <div class="exito__total"><dt>Total</dt><dd>{{ c.total | currency: 'ARS' : 'symbol-narrow' : '1.0-2' }}</dd></div>
+        <div><dt>Medio de pago</dt><dd>{{ metodoPago(c.metodo_pago) }}</dd></div>
+        @if (c.puntos_ganados > 0) {
+          <div><dt>Puntos ganados</dt><dd>+{{ c.puntos_ganados }}</dd></div>
+        }
+      </dl>
+    </section>
+
+    <a routerLink="/" class="exito__volver">← Volver a la cartelera</a>
+  }
+</div>

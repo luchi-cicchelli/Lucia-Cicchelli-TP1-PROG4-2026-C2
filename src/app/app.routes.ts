@@ -22,6 +22,12 @@ export const routes: Routes = [
       import('./features/checkout/checkout.component').then((m) => m.CheckoutComponent)
   },
 
+  {
+    path: 'compra/:id',
+    loadComponent: () =>
+      import('./features/compra-exitosa/compra-exitosa.component').then((m) => m.CompraExitosaComponent)
+  },
+
   // --- Auth (solo si NO está logueado) ---
   {
     path: 'login',

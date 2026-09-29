@@ -1,1 +1,142 @@
-<p>checkout works!</p>
+<div class="checkout">
+  @if (cargando()) {
+    <p class="checkout__vacio">Cargando función…</p>
+  } @else if (!funcion()) {
+    <div class="checkout__vacio">
+      <p>{{ error() || 'No encontramos esta función.' }}</p>
+      <a routerLink="/" class="boton">Volver a la cartelera</a>
+    </div>
+  } @else {
+    @let f = funcion()!;
+
+    <a [routerLink]="['/pelicula', f.pelicula_id]" class="checkout__volver">← {{ f.pelicula?.nombre }}</a>
+
+    <header class="checkout__encabezado">
+      <h1 class="titulo">{{ f.pelicula?.nombre }}</h1>
+      <p>
+        {{ f.fecha_hora_inicio | date: "EEEE d 'de' MMMM, HH:mm" }} · {{ f.sala?.nombre }} ·
+        {{ f.formato.toUpperCase() }} · {{ f.idioma === 'castellano' ? 'Castellano' : 'Subtitulada' }}
+      </p>
+    </header>
+
+    <div class="checkout__cuerpo">
+      <section class="tarjeta checkout__mapa">
+        <h2 class="titulo">Elegí tus butacas</h2>
+        @if (bloqueadaPorEdad()) {
+          <p class="alerta alerta--error">
+            Esta película es para mayores de {{ f.pelicula?.restriccion_edad }} años, así que no podés comprar entradas.
+          </p>
+        }
+        <app-mapa-butacas
+          [butacas]="butacas()"
+          [ocupadas]="ocupadas()"
+          [seleccionadas]="seleccionadas()"
+          [soloLectura]="bloqueadaPorEdad()"
+          (elegir)="elegir($event)"
+        />
+        <p class="checkout__nota">El mapa se actualiza solo: si alguien elige una butaca, la vas a ver ocupada al instante.</p>
+      </section>
+
+      <aside class="tarjeta checkout__resumen">
+        <h2 class="titulo">Tu compra</h2>
+
+        @if (aviso()) {
+          <p class="alerta alerta--ok">{{ aviso() }}</p>
+        }
+        @if (error()) {
+          <p class="alerta alerta--error" role="alert">{{ error() }}</p>
+        }
+
+        @if (misButacas().length === 0) {
+          <p class="checkout__nota">Tocá una butaca libre en el mapa para agregarla.</p>
+        } @else {
+          @if (tiempoRestante()) {
+            <p class="checkout__timer" [class.checkout__timer--urgente]="(segundosRestantes() ?? 0) < 60">
+              Te guardamos las butacas por <strong>{{ tiempoRestante() }}</strong>
+            </p>
+          }
+
+          <ul class="checkout__lista">
+            @for (m of misButacas(); track m.butaca.id) {
+              <li>
+                <span>
+                  {{ etiquetaButaca(m.butaca) }}
+                  @if (m.butaca.tipo === 'vip') {
+                    <span class="checkout__vip">VIP</span>
+                  }
+                  @if (m.butaca.tipo === 'accesible') {
+                    <span class="checkout__acc">Accesible</span>
+                  }
+                </span>
+                <span class="checkout__precio">{{ m.precio | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }}</span>
+                <button
+                  type="button"
+                  class="checkout__quitar"
+                  (click)="elegir(m.butaca)"
+                  [attr.aria-label]="'Quitar ' + etiquetaButaca(m.butaca)"
+                >×</button>
+              </li>
+            }
+          </ul>
+
+          @if (hayVip()) {
+            <p class="banner-destacado checkout__aviso-vip">
+              Elegiste butacas <strong>VIP</strong> (filas R, S y T): cuestan
+              {{ f.precio_vip | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }} cada una.
+            </p>
+          }
+          @if (enPreventa()) {
+            <p class="checkout__nota">Precio de preventa aplicado a las butacas normales y accesibles.</p>
+          }
+
+          <dl class="checkout__totales">
+            <div><dt>Subtotal</dt><dd>{{ subtotal() | currency: 'ARS' : 'symbol-narrow' : '1.0-2' }}</dd></div>
+            @if (aplicaBienvenida()) {
+              <div class="checkout__descuento">
+                <dt>Cupón de bienvenida ({{ porcentajeBienvenida() }}%)</dt>
+                <dd>−{{ descuento() | currency: 'ARS' : 'symbol-narrow' : '1.0-2' }}</dd>
+              </div>
+            }
+            <div class="checkout__total"><dt>Total</dt><dd>{{ total() | currency: 'ARS' : 'symbol-narrow' : '1.0-2' }}</dd></div>
+          </dl>
+
+          @if (auth.estaLogueado()) {
+            <p class="checkout__nota">Con esta compra sumás <strong>{{ puntos() }} puntos</strong>.</p>
+          } @else {
+            <p class="checkout__nota">
+              Estás comprando sin cuenta. <a routerLink="/registro">Registrate</a> para sumar puntos
+              y tener {{ porcentajeBienvenida() || 20 }}% off en tu primera compra.
+            </p>
+          }
+
+          @if (f.pelicula?.restriccion_edad && !bloqueadaPorEdad()) {
+            <p class="checkout__nota">
+              Película +{{ f.pelicula?.restriccion_edad }}: los menores deben ir acompañados por un adulto.
+            </p>
+          }
+
+          <fieldset class="checkout__pago">
+            <legend>Medio de pago</legend>
+            @for (m of metodosPago; track m.valor) {
+              <label class="chip" [class.chip--activo]="metodoPago() === m.valor">
+                <input
+                  type="radio"
+                  name="metodo"
+                  [value]="m.valor"
+                  [checked]="metodoPago() === m.valor"
+                  (change)="metodoPago.set(m.valor)"
+                />
+                {{ m.etiqueta }}
+              </label>
+            }
+          </fieldset>
+
+          <button type="button" class="boton checkout__pagar" [disabled]="pagando()" (click)="pagar()">
+            {{ pagando() ? 'Procesando…' : 'Pagar ' + (total() | currency: 'ARS' : 'symbol-narrow' : '1.0-2') }}
+          </button>
+          <p class="checkout__simulado">Pago simulado: no se realiza ningún cobro real.</p>
+        }
+      </aside>
+    </div>
+  }
+</div>

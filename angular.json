@@ -29,7 +29,14 @@
             "styles": [
               "src/styles.css"
             ],
-            "scripts": []
+            "scripts": [],
+            "allowedCommonJsDependencies": [
+              "qrcode",
+              "core-js",
+              "raf",
+              "rgbcolor",
+              "html2canvas"
+            ]
           },
           "configurations": {
             "production": {

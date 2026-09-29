@@ -8,7 +8,7 @@
     </div>
   </header>
 
-  <form class="tarjeta salas__nueva" (ngSubmit)="crear()">
+  <form class="tarjeta salas__nueva" (submit)="$event.preventDefault(); crear()">
     <input class="input" [value]="nuevoNombre()" (input)="alEscribirNombre($event)" aria-label="Nombre de la sala" />
     <button type="submit" class="boton" [disabled]="cargando() || !nuevoNombre().trim()">+ Crear sala</button>
   </form>
