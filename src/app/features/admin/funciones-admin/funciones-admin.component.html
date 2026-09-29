@@ -1,0 +1,240 @@
+<section class="admin">
+  <a routerLink="/admin" class="admin__volver">← Panel</a>
+
+  <header class="admin__encabezado funciones__encabezado">
+    <div>
+      <h1 class="titulo">Funciones</h1>
+      <p>Elegí días y horarios: la sala se asigna sola, siempre con 30 minutos libres entre funciones.</p>
+    </div>
+    @if (!mostrarFormulario()) {
+      <button type="button" class="boton" (click)="abrirFormulario()">+ Programar funciones</button>
+    }
+  </header>
+
+  @if (error()) {
+    <p class="alerta alerta--error" role="alert">{{ error() }}</p>
+  }
+
+  @if (creadas().length) {
+    <div class="alerta alerta--ok">
+      <strong>Se crearon {{ creadas().length }} funciones.</strong>
+      <ul class="funciones__creadas">
+        @for (c of creadas().slice(0, 6); track c.funcion_id) {
+          <li>{{ c.inicio | date: 'EEE d/MM HH:mm' }} → {{ c.sala_nombre }}</li>
+        }
+        @if (creadas().length > 6) {
+          <li>y {{ creadas().length - 6 }} más…</li>
+        }
+      </ul>
+    </div>
+  }
+
+  @if (mostrarFormulario()) {
+    <form class="tarjeta funciones__form" [formGroup]="form" (ngSubmit)="crear()" novalidate>
+      <h2 class="titulo">Programar funciones</h2>
+
+      <label class="campo">
+        Película
+        <select class="input" formControlName="peliculaId" (change)="alElegirPelicula()">
+          <option value="" disabled>Elegí una película</option>
+          @for (p of peliculas(); track p.id) {
+            <option [value]="p.id">{{ p.nombre }} ({{ p.duracion_minutos }} min)</option>
+          }
+        </select>
+        @if (form.controls.peliculaId.touched && form.controls.peliculaId.invalid) {
+          <span class="error-texto">Elegí una película.</span>
+        }
+      </label>
+
+      <div class="funciones__fila">
+        <div class="campo">
+          Formato
+          <div class="funciones__chips">
+            @for (f of formatos; track f) {
+              <label class="chip" [class.chip--activo]="form.controls.formato.value === f">
+                <input type="radio" formControlName="formato" [value]="f" class="oculto" />
+                {{ f | uppercase }}
+              </label>
+            }
+          </div>
+        </div>
+
+        <div class="campo">
+          Idioma
+          <div class="funciones__chips">
+            @for (i of idiomas; track i.valor) {
+              <label class="chip" [class.chip--activo]="form.controls.idioma.value === i.valor">
+                <input type="radio" formControlName="idioma" [value]="i.valor" class="oculto" />
+                {{ i.etiqueta }}
+              </label>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="funciones__fila">
+        <label class="campo">
+          Precio entrada
+          <input class="input" type="number" min="1" formControlName="precioBase" placeholder="$" />
+        </label>
+        <label class="campo">
+          Precio butaca VIP
+          <input class="input" type="number" min="1" formControlName="precioVip" placeholder="$" />
+        </label>
+      </div>
+
+      <div class="campo">
+        Días de la semana
+        <div class="funciones__chips">
+          @for (d of diasSemana; track d.valor) {
+            <button
+              type="button"
+              class="chip"
+              [class.chip--activo]="diaElegido(d.valor)"
+              [attr.aria-pressed]="diaElegido(d.valor)"
+              (click)="toggleDia(d.valor)"
+            >
+              {{ d.etiqueta }}
+            </button>
+          }
+        </div>
+        @if (form.controls.dias.touched && form.controls.dias.invalid) {
+          <span class="error-texto">Elegí al menos un día.</span>
+        }
+      </div>
+
+      <div class="campo">
+        Horarios
+        <div class="funciones__horarios" formArrayName="horarios">
+          @for (h of horarios.controls; track $index) {
+            <div class="funciones__horario">
+              <input class="input" type="time" [formControlName]="$index" step="300" />
+              @if (horarios.length > 1) {
+                <button type="button" class="funciones__quitar" (click)="quitarHorario($index)" aria-label="Quitar horario">×</button>
+              }
+            </div>
+          }
+          <button type="button" class="boton boton--secundario boton--chico" (click)="agregarHorario()">+ Horario</button>
+        </div>
+      </div>
+
+      <div class="funciones__fila">
+        <label class="campo">
+          Desde
+          <input class="input" type="date" formControlName="desde" [min]="hoy" />
+        </label>
+        <label class="campo">
+          Hasta
+          <input class="input" type="date" formControlName="hasta" [min]="form.controls.desde.value" />
+        </label>
+      </div>
+      @if (form.hasError('rangoInvertido')) {
+        <span class="error-texto">La fecha "hasta" tiene que ser posterior a "desde".</span>
+      }
+      @if (form.hasError('rangoLargo')) {
+        <span class="error-texto">El rango puede ser de hasta 90 días.</span>
+      }
+
+      <label class="funciones__check">
+        <input type="checkbox" formControlName="esPreventa" />
+        Precio especial de preventa
+      </label>
+
+      @if (form.controls.esPreventa.value) {
+        <div class="funciones__fila">
+          <label class="campo">
+            Precio de preventa
+            <input class="input" type="number" min="1" formControlName="precioPreventa" placeholder="$" />
+          </label>
+          <label class="campo">
+            Vale hasta el (inclusive)
+            <input class="input" type="date" formControlName="fechaFinPreventa" [min]="hoy" />
+          </label>
+        </div>
+        @if (form.hasError('preventaIncompleta') && form.touched) {
+          <span class="error-texto">Completá el precio y la fecha de la preventa.</span>
+        }
+      }
+
+      <div class="funciones__resumen">
+        @if (inicios().length) {
+          <p>
+            Se van a crear <strong>{{ inicios().length }} funciones</strong>
+            @if (peliculaElegida(); as p) {
+              de <strong>{{ p.nombre }}</strong>
+            }
+          </p>
+          <div class="funciones__previa">
+            @for (i of inicios().slice(0, 12); track i.getTime()) {
+              <span class="chip">{{ i | date: 'EEE d/MM HH:mm' }}</span>
+            }
+            @if (inicios().length > 12) {
+              <span class="chip">+{{ inicios().length - 12 }}</span>
+            }
+          </div>
+        } @else {
+          <p>Elegí días, horarios y fechas para ver las funciones que se van a crear.</p>
+        }
+      </div>
+
+      <div class="funciones__acciones">
+        <button type="submit" class="boton" [disabled]="guardando()">
+          {{ guardando() ? 'Asignando salas…' : 'Crear funciones' }}
+        </button>
+        <button type="button" class="boton boton--secundario" (click)="mostrarFormulario.set(false)">Cancelar</button>
+      </div>
+    </form>
+  }
+
+  <div class="funciones__listado-encabezado">
+    <h2 class="titulo">Próximas funciones</h2>
+    <select class="input funciones__filtro" [value]="filtroPelicula()" (change)="filtrar($event)" aria-label="Filtrar por película">
+      <option value="">Todas las películas</option>
+      @for (p of peliculas(); track p.id) {
+        <option [value]="p.id">{{ p.nombre }}</option>
+      }
+    </select>
+  </div>
+
+  @for (grupo of funcionesPorDia(); track grupo.dia) {
+    <div class="funciones__dia">
+      <h3 class="funciones__dia-titulo">{{ fechaDesdeIso(grupo.dia) | date: 'EEEE d \'de\' MMMM' }}</h3>
+      <div class="admin__lista">
+        @for (f of grupo.funciones; track f.id) {
+          <div class="tarjeta funciones__item">
+            <div class="funciones__hora">
+              <strong>{{ f.fecha_hora_inicio | date: 'HH:mm' }}</strong>
+              <span>a {{ f.fecha_hora_fin | date: 'HH:mm' }}</span>
+            </div>
+            <div class="funciones__info">
+              <p class="funciones__pelicula">{{ f.pelicula?.nombre }}</p>
+              <p class="funciones__detalle">
+                {{ f.sala?.nombre }} · {{ f.formato | uppercase }} · {{ f.idioma === 'castellano' ? 'Castellano' : 'Subtitulada' }}
+                · {{ f.precio_base | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }}
+                (VIP {{ f.precio_vip | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }})
+                @if (f.es_preventa) {
+                  <span class="chip chip--activo funciones__preventa">
+                    Preventa {{ f.precio_preventa | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }}
+                  </span>
+                }
+              </p>
+            </div>
+            <button
+              type="button"
+              class="boton boton--secundario boton--chico"
+              [class.boton--peligro]="confirmarBorrarId() === f.id"
+              (click)="eliminar(f)"
+              (blur)="confirmarBorrarId.set(null)"
+            >
+              {{ confirmarBorrarId() === f.id ? '¿Seguro?' : 'Borrar' }}
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+  } @empty {
+    @if (!cargando()) {
+      <p class="admin__vacio">No hay funciones programadas.</p>
+    }
+  }
+</section>

@@ -64,6 +64,20 @@ export const routes: Routes = [
           )
       },
       {
+        path: 'salas',
+        loadComponent: () =>
+          import('./features/admin/salas-admin/salas-admin.component').then(
+            (m) => m.SalasAdminComponent
+          )
+      },
+      {
+        path: 'funciones',
+        loadComponent: () =>
+          import('./features/admin/funciones-admin/funciones-admin.component').then(
+            (m) => m.FuncionesAdminComponent
+          )
+      },
+      {
         path: 'usuarios',
         loadComponent: () =>
           import('./features/admin/usuarios-admin/usuarios-admin.component').then(

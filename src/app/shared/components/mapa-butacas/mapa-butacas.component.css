@@ -1,0 +1,149 @@
+:host {
+  --butaca: 14px;
+  --separacion: 3px;
+  --pasillo: 14px;
+  --color-vip: #C9A227;
+  --color-accesible: #4F8FBF;
+  display: block;
+}
+
+.mapa {
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
+
+.mapa__pantalla {
+  margin: 0 auto 18px;
+  width: min(420px, 80%);
+  text-align: center;
+  font-size: 0.7rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--texto-muted);
+  border-top: 3px solid var(--rosa-suave);
+  border-radius: 50% 50% 0 0 / 12px 12px 0 0;
+  padding-top: 6px;
+}
+
+.mapa__sala {
+  display: grid;
+  gap: var(--separacion);
+  justify-content: center;
+  width: max-content;
+  margin: 0 auto;
+}
+
+.mapa__fila {
+  display: flex;
+  align-items: center;
+  gap: var(--pasillo);
+}
+
+.mapa__fila--acc {
+  margin: 8px 0;
+}
+
+.mapa__letra {
+  width: 16px;
+  text-align: center;
+  font-size: 0.65rem;
+  color: var(--texto-muted);
+}
+
+.mapa__grupo {
+  display: flex;
+  justify-content: center;
+  gap: var(--separacion);
+  width: calc(4 * var(--butaca) + 3 * var(--separacion));
+}
+
+.mapa__grupo--centro {
+  width: calc(20 * var(--butaca) + 19 * var(--separacion));
+}
+
+.butaca {
+  width: var(--butaca);
+  height: var(--butaca);
+  padding: 0;
+  border-radius: 4px 4px 2px 2px;
+  border: 1.5px solid var(--borde);
+  background: var(--superficie-alt);
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.butaca:not(:disabled):hover {
+  transform: scale(1.2);
+  border-color: var(--rosa-acento);
+}
+
+.butaca:disabled {
+  cursor: default;
+}
+
+.butaca--vip {
+  border-color: var(--color-vip);
+  background: color-mix(in srgb, var(--color-vip) 25%, transparent);
+}
+
+.butaca--accesible {
+  border-color: var(--color-accesible);
+  background: color-mix(in srgb, var(--color-accesible) 25%, transparent);
+}
+
+.butaca--seleccionada {
+  background: var(--rosa-acento);
+  border-color: var(--rosa-acento);
+}
+
+.butaca--ocupada {
+  background: var(--texto-muted);
+  border-color: var(--texto-muted);
+  opacity: 0.45;
+}
+
+.mapa__leyenda {
+  list-style: none;
+  padding: 0;
+  margin: 18px 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 18px;
+  font-size: 0.75rem;
+  color: var(--texto-secundario);
+}
+
+.mapa__leyenda li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.butaca--muestra {
+  display: inline-block;
+  cursor: default;
+}
+
+@media (max-width: 600px) {
+  :host {
+    --butaca: 9px;
+    --separacion: 2px;
+    --pasillo: 6px;
+  }
+
+  .butaca {
+    border-width: 1px;
+    border-radius: 3px 3px 1px 1px;
+  }
+
+  .mapa__letra {
+    width: 10px;
+    font-size: 0.55rem;
+  }
+
+  .butaca--muestra {
+    width: 12px;
+    height: 12px;
+  }
+}

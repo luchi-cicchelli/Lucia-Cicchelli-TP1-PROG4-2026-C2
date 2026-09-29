@@ -3,7 +3,6 @@ import { CanActivateFn, Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 import { Rol } from '../models/perfil.model';
 
-/** Solo usuarios logueados. Si no, va a /login y después vuelve a donde quería ir. */
 export const authGuard: CanActivateFn = async (_route, state) => {
   const auth = inject(AuthService);
   const router = inject(Router);
@@ -14,7 +13,6 @@ export const authGuard: CanActivateFn = async (_route, state) => {
     : router.createUrlTree(['/login'], { queryParams: { volver: state.url } });
 };
 
-/** Solo usuarios logueados con alguno de los roles indicados. */
 export function rolGuard(roles: Rol[]): CanActivateFn {
   return async (_route, state) => {
     const auth = inject(AuthService);
@@ -29,7 +27,6 @@ export function rolGuard(roles: Rol[]): CanActivateFn {
   };
 }
 
-/** Para /login y /registro: si ya está logueado, no tiene sentido mostrarlas. */
 export const invitadoGuard: CanActivateFn = async () => {
   const auth = inject(AuthService);
   const router = inject(Router);

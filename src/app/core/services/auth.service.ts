@@ -21,10 +21,6 @@ export class AuthService {
     return p ? calcularEdad(p.fecha_nacimiento) : null;
   });
 
-  /**
-   * Se resuelve cuando Supabase ya recuperó la sesión guardada (y el perfil).
-   * Los guards esperan esto para no redirigir antes de tiempo al recargar la página.
-   */
   readonly listo: Promise<void>;
 
   constructor(
@@ -35,8 +31,6 @@ export class AuthService {
       this.supabase.client.auth.onAuthStateChange((evento, session) => {
         this._session.set(session);
 
-        // Supabase recomienda no hacer otras consultas dentro de este callback
-        // (puede trabar el lock de la sesión), por eso se difiere con setTimeout.
         setTimeout(async () => {
           if (!session) {
             this._perfil.set(null);
@@ -55,12 +49,8 @@ export class AuthService {
     await this.cargarPerfil(data.user.id);
   }
 
-  /** Devuelve true si Supabase pide confirmar el mail antes de poder ingresar. */
   async registrar(datos: RegistroDatos): Promise<{ requiereConfirmacion: boolean }> {
     const { email, password, ...perfil } = datos;
-
-    // Los datos del perfil viajan como metadata; el trigger `crear_perfil_nuevo_usuario`
-    // (supabase/auth.sql) los copia a la tabla perfiles. El rol NO se manda: siempre es 'cliente'.
     const { data, error } = await this.supabase.client.auth.signUp({
       email,
       password,
@@ -68,8 +58,6 @@ export class AuthService {
     });
     if (error) throw new Error(this.traducirError(error));
 
-    // Si el mail ya existía y la confirmación está activa, Supabase no devuelve error
-    // pero el usuario viene sin identidades.
     if (data.user && data.user.identities?.length === 0) {
       throw new Error('Ya existe una cuenta con ese mail.');
     }
@@ -101,7 +89,6 @@ export class AuthService {
     this._perfil.set(data as Perfil);
   }
 
-  /** A dónde mandar al usuario después de loguearse, según su rol. */
   rutaInicio(): string {
     switch (this.rol()) {
       case 'admin':

@@ -1,16 +1,7 @@
--- ============================================================
--- BIJOU CINEMA — Auth, roles y seguridad (RLS)
--- Correr DESPUÉS de schema.sql y seed_generos.sql.
--- Se puede volver a correr sin romper nada (es idempotente).
--- ============================================================
-
 -- ---------- 1. Email en perfiles (para listar usuarios en el admin) ----------
 alter table public.perfiles add column if not exists email text;
 
-
 -- ---------- 2. Crear el perfil automáticamente al registrarse ----------
--- El front manda nombre, apellido, etc. como metadata en signUp().
--- El rol NUNCA viene del front: siempre arranca como 'cliente'.
 create or replace function public.crear_perfil_nuevo_usuario()
 returns trigger
 language plpgsql
@@ -43,7 +34,6 @@ create trigger al_crear_usuario
 
 
 -- ---------- 3. Helper: rol del usuario logueado ----------
--- security definer para poder leer perfiles sin caer en recursión de RLS.
 create or replace function public.rol_actual()
 returns rol_usuario
 language sql
@@ -53,7 +43,6 @@ set search_path = public
 as $$
   select rol from public.perfiles where id = auth.uid();
 $$;
-
 
 -- ---------- 4. RLS en perfiles ----------
 alter table public.perfiles enable row level security;
@@ -71,12 +60,9 @@ create policy "perfiles: editar el propio"
   using (id = auth.uid())
   with check (id = auth.uid());
 
--- El usuario solo puede editar sus datos personales.
--- rol, puntos, crédito y cupón NO se pueden tocar desde el front.
 revoke update on public.perfiles from authenticated, anon;
 grant update (nombre, apellido, fecha_nacimiento, tipo_sangre, color_ojos, dias_vacaciones_anuales)
   on public.perfiles to authenticated;
-
 
 -- ---------- 5. Cambio de rol (solo admin) ----------
 create or replace function public.asignar_rol(p_usuario_id uuid, p_rol rol_usuario)
@@ -104,10 +90,7 @@ $$;
 revoke execute on function public.asignar_rol(uuid, rol_usuario) from anon, public;
 grant execute on function public.asignar_rol(uuid, rol_usuario) to authenticated;
 
-
 -- ---------- 6. RLS en películas y géneros ----------
--- Cualquiera (incluso anónimo) ve las películas activas; solo admin ve las
--- ocultas y puede crear / editar.
 alter table public.peliculas enable row level security;
 alter table public.generos enable row level security;
 alter table public.pelicula_generos enable row level security;
@@ -148,7 +131,6 @@ create policy "pelicula_generos: admin escribe"
   using (public.rol_actual() = 'admin')
   with check (public.rol_actual() = 'admin');
 
-
 -- ---------- 7. Log de actividad: solo admin lee ----------
 alter table public.logs_actividad enable row level security;
 
@@ -157,14 +139,3 @@ create policy "logs: admin lee"
   on public.logs_actividad for select
   to authenticated
   using (public.rol_actual() = 'admin');
-
-
--- ============================================================
--- PRIMER ADMIN
--- Registrate desde la app y después corré esto UNA vez con tu mail:
---
---   update public.perfiles set rol = 'admin' where email = 'TU_MAIL_ACA';
---
--- A partir de ahí, los demás roles (empleado / admin) se asignan
--- desde /admin/usuarios.
--- ============================================================

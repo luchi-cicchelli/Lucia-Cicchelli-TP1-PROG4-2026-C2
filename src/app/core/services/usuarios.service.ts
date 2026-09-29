@@ -4,7 +4,6 @@ import { Perfil, Rol } from '../models/perfil.model';
 
 export type UsuarioResumen = Pick<Perfil, 'id' | 'email' | 'nombre' | 'apellido' | 'rol' | 'created_at'>;
 
-/** Gestión de usuarios para el panel de admin (RLS solo deja listar a un admin). */
 @Injectable({ providedIn: 'root' })
 export class UsuariosService {
   constructor(private supabase: SupabaseService) {}
@@ -17,8 +16,7 @@ export class UsuariosService {
     if (error) throw error;
     return data as UsuarioResumen[];
   }
-
-  /** Usa la función `asignar_rol` de Postgres, que valida que quien llama sea admin. */
+  
   async cambiarRol(usuarioId: string, rol: Rol): Promise<void> {
     const { error } = await this.supabase.client.rpc('asignar_rol', {
       p_usuario_id: usuarioId,

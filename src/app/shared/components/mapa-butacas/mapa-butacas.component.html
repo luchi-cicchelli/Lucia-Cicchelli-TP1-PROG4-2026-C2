@@ -1,0 +1,43 @@
+<div class="mapa">
+  <div class="mapa__pantalla">Pantalla</div>
+
+  <div class="mapa__sala">
+    @for (f of filas(); track f.fila) {
+      <div class="mapa__fila" [class.mapa__fila--acc]="f.fila === 'ACC'">
+        <span class="mapa__letra">{{ f.fila === 'ACC' ? '♿' : f.fila }}</span>
+
+        @for (grupo of f.grupos; track $index) {
+          <div class="mapa__grupo" [class.mapa__grupo--centro]="$index === 1">
+            @for (b of grupo; track b.id) {
+              <button
+                type="button"
+                class="butaca"
+                [class.butaca--vip]="b.tipo === 'vip'"
+                [class.butaca--accesible]="b.tipo === 'accesible'"
+                [class.butaca--ocupada]="estado(b) === 'ocupada'"
+                [class.butaca--seleccionada]="estado(b) === 'seleccionada'"
+                [disabled]="soloLectura() || estado(b) === 'ocupada'"
+                [attr.aria-label]="etiqueta(b)"
+                [attr.aria-pressed]="estado(b) === 'seleccionada'"
+                [title]="etiqueta(b)"
+                (click)="click(b)"
+              ></button>
+            }
+          </div>
+        }
+
+        <span class="mapa__letra">{{ f.fila === 'ACC' ? '♿' : f.fila }}</span>
+      </div>
+    }
+  </div>
+
+  <ul class="mapa__leyenda">
+    <li><span class="butaca butaca--muestra"></span> Normal</li>
+    <li><span class="butaca butaca--muestra butaca--vip"></span> VIP</li>
+    <li><span class="butaca butaca--muestra butaca--accesible"></span> Accesible</li>
+    @if (!soloLectura()) {
+      <li><span class="butaca butaca--muestra butaca--seleccionada"></span> Tu elección</li>
+      <li><span class="butaca butaca--muestra butaca--ocupada"></span> Ocupada</li>
+    }
+  </ul>
+</div>

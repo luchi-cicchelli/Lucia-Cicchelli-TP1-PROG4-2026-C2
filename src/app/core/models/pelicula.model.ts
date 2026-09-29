@@ -9,8 +9,8 @@ export interface Pelicula {
   sinopsis: string;
   duracion_minutos: number;
   imagen_url: string | null;
-  restriccion_edad: number | null; // null | 13 | 18
-  fecha_estreno: string; // ISO date
+  restriccion_edad: number | null;
+  fecha_estreno: string; 
   activa: boolean;
 }
 

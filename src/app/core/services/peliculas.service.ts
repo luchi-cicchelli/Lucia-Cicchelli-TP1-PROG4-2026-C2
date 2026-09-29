@@ -15,7 +15,6 @@ export class PeliculasService {
     return data as Genero[];
   }
 
-  // Trae todas las películas (activas e inactivas) con sus géneros, para el panel de admin.
   async listarPeliculas(): Promise<PeliculaConGeneros[]> {
     const { data, error } = await this.supabase.client
       .from('peliculas')
@@ -58,8 +57,6 @@ export class PeliculasService {
     await this.sincronizarGeneros(id, generoIds);
   }
 
-  // Soft delete: nunca borramos una película de verdad (puede tener funciones/entradas
-  // asociadas), solo la desactivamos para que deje de aparecer en el catálogo público.
   async cambiarActiva(id: string, activa: boolean): Promise<void> {
     const { error } = await this.supabase.client
       .from('peliculas')

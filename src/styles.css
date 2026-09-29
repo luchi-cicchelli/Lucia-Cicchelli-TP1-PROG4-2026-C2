@@ -1,9 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=Inter:wght@400;500&display=swap');
 
 :root {
-  color-scheme: light dark; /* inputs nativos (fecha, select) siguen el tema */
-
-  /* Paleta — Bijou */
+  color-scheme: light dark; 
   --rosa-acento: #D4537E;
   --rosa-suave: #F4C0D1;
   --rosa-fondo: #FBEAF0;
@@ -123,7 +121,6 @@ button {
   color: inherit;
 }
 
-/* ---------- Formularios ---------- */
 .campo {
   display: grid;
   gap: 6px;
@@ -174,4 +171,54 @@ button {
   background: var(--superficie-alt);
   color: var(--texto);
   border: 1px solid var(--borde);
+}
+
+.boton--chico {
+  padding: 6px 14px;
+  font-size: 0.8rem;
+}
+
+.boton--peligro {
+  border-color: var(--rosa-acento);
+  color: var(--rosa-acento);
+}
+
+/* ---------- Pantallas de admin ---------- */
+.admin {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2rem 1rem 3rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.admin__volver {
+  color: var(--texto-secundario);
+  text-decoration: none;
+  font-size: 0.85rem;
+}
+
+.admin__volver:hover {
+  color: var(--rosa-acento);
+}
+
+.admin__encabezado h1 {
+  font-size: 1.5rem;
+  margin-bottom: 4px;
+}
+
+.admin__encabezado p {
+  margin: 0;
+  color: var(--texto-secundario);
+  font-size: 0.9rem;
+}
+
+.admin__lista {
+  display: grid;
+  gap: 10px;
+}
+
+.admin__vacio {
+  color: var(--texto-secundario);
+  text-align: center;
 }

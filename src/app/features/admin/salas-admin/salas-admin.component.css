@@ -1,0 +1,49 @@
+.salas__nueva {
+  padding: 1rem;
+  display: flex;
+  gap: 10px;
+}
+
+.salas__nueva .input {
+  flex: 1;
+}
+
+.salas__item {
+  padding: 1rem 1.25rem;
+}
+
+.salas__fila {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.salas__nombre {
+  font-size: 1.05rem;
+  margin: 0 0 2px;
+}
+
+.salas__renombrar {
+  padding: 6px 10px;
+  margin-bottom: 4px;
+}
+
+.salas__detalle {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--texto-secundario);
+}
+
+.salas__acciones {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.salas__mapa {
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--borde);
+}

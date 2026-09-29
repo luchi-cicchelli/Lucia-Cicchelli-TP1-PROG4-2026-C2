@@ -1,0 +1,73 @@
+<section class="admin">
+  <a routerLink="/admin" class="admin__volver">← Panel</a>
+
+  <header class="admin__encabezado">
+    <div>
+      <h1 class="titulo">Salas</h1>
+      <p>Todas las salas tienen la misma distribución: 518 butacas, con la fila accesible y las filas R, S y T VIP.</p>
+    </div>
+  </header>
+
+  <form class="tarjeta salas__nueva" (ngSubmit)="crear()">
+    <input class="input" [value]="nuevoNombre()" (input)="alEscribirNombre($event)" aria-label="Nombre de la sala" />
+    <button type="submit" class="boton" [disabled]="cargando() || !nuevoNombre().trim()">+ Crear sala</button>
+  </form>
+
+  @if (error()) {
+    <p class="alerta alerta--error">{{ error() }}</p>
+  }
+
+  <div class="admin__lista">
+    @for (s of salas(); track s.id) {
+      <div class="tarjeta salas__item">
+        <div class="salas__fila">
+          <div>
+            @if (editandoId() === s.id) {
+              <input
+                #nombre
+                class="input salas__renombrar"
+                [value]="s.nombre"
+                (keydown.enter)="guardarNombre(s, nombre.value)"
+                (keydown.escape)="editandoId.set(null)"
+                (blur)="guardarNombre(s, nombre.value)"
+              />
+            } @else {
+              <p class="titulo salas__nombre">{{ s.nombre }}</p>
+            }
+            <p class="salas__detalle">{{ s.totalButacas }} butacas · 84 VIP · 14 accesibles</p>
+          </div>
+
+          <div class="salas__acciones">
+            <button type="button" class="boton boton--secundario boton--chico" (click)="verMapa(s)">
+              {{ salaAbierta() === s.id ? 'Ocultar mapa' : 'Ver mapa' }}
+            </button>
+            <button type="button" class="boton boton--secundario boton--chico" (click)="editandoId.set(s.id)">Renombrar</button>
+            <button
+              type="button"
+              class="boton boton--secundario boton--chico"
+              [class.boton--peligro]="confirmarBorrarId() === s.id"
+              (click)="eliminar(s)"
+              (blur)="confirmarBorrarId.set(null)"
+            >
+              {{ confirmarBorrarId() === s.id ? '¿Seguro?' : 'Eliminar' }}
+            </button>
+          </div>
+        </div>
+
+        @if (salaAbierta() === s.id) {
+          <div class="salas__mapa">
+            @if (butacas().length) {
+              <app-mapa-butacas [butacas]="butacas()" [soloLectura]="true" />
+            } @else {
+              <p class="salas__detalle">Cargando mapa…</p>
+            }
+          </div>
+        }
+      </div>
+    } @empty {
+      @if (!cargando()) {
+        <p class="admin__vacio">Todavía no hay salas. Creá la primera arriba.</p>
+      }
+    }
+  </div>
+</section>
