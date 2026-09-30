@@ -74,7 +74,7 @@ export class PeliculaDetalleComponent implements OnInit {
       const [pelicula, funciones, resenas] = await Promise.all([
         this.cartelera.obtener(this.id()),
         this.funcionesService.listarProximas(this.id()),
-        this.cartelera.resenas(this.id())
+        this.cartelera.resenas(this.id()).catch(() => [])
       ]);
       this.pelicula.set(pelicula);
       this.funciones.set(funciones);

@@ -89,6 +89,11 @@ export class AuthService {
     this._perfil.set(data as Perfil);
   }
 
+  async recargarPerfil(): Promise<void> {
+    const id = this._session()?.user.id;
+    if (id) await this.cargarPerfil(id);
+  }
+
   rutaInicio(): string {
     switch (this.rol()) {
       case 'admin':

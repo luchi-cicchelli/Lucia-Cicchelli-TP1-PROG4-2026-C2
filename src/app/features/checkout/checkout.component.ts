@@ -185,6 +185,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     try {
       const compraId = await this.compras.confirmar(this.funcionId(), this.metodoPago());
       this.compraConfirmada = true;
+      await this.auth.recargarPerfil();
       if (this.canal) this.compras.avisarCambio(this.canal);
       await this.router.navigate(['/compra', compraId]);
     } catch (e: any) {
