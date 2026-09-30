@@ -7,7 +7,6 @@ const CLAVE_SESION = 'bijou-sesion-compra';
 
 @Injectable({ providedIn: 'root' })
 export class ComprasService {
-  // Identifica las reservas de esta pestaña (sirve también para compras anónimas).
   readonly sesion: string;
 
   constructor(private supabase: SupabaseService) {
@@ -89,8 +88,6 @@ export class ComprasService {
     return data as CompraDetalle | null;
   }
 
-  // Tiempo real: cada cliente avisa por un canal de la función cuando cambia algo,
-  // y los demás vuelven a pedir el estado de las butacas.
   escucharCambios(funcionId: string, alCambiar: () => void): RealtimeChannel {
     return this.supabase.client
       .channel(`funcion-${funcionId}`)

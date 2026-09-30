@@ -15,7 +15,6 @@ export class NavbarComponent {
   readonly menuAbierto = signal(false);
 
   constructor() {
-    // Cierra el menú mobile al navegar.
     inject(Router)
       .events.pipe(filter((e) => e instanceof NavigationEnd))
       .subscribe(() => this.menuAbierto.set(false));

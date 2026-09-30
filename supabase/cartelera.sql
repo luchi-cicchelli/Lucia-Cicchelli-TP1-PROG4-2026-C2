@@ -1,11 +1,3 @@
--- ============================================================
--- BIJOU CINEMA — Datos públicos para la cartelera
--- Correr DESPUÉS de salas_funciones.sql. Se puede volver a correr.
--- ============================================================
-
--- Entradas vendidas y puntaje promedio de cada película activa.
--- security definer: el público no puede leer entradas ni reseñas ajenas,
--- pero sí ver estos totales.
 create or replace function public.resumen_peliculas()
 returns table (pelicula_id uuid, entradas_vendidas bigint, promedio numeric, cantidad_resenas bigint)
 language sql
@@ -27,8 +19,6 @@ $$;
 
 grant execute on function public.resumen_peliculas() to anon, authenticated;
 
-
--- Reseñas de una película con el nombre del autor abreviado ("Lucía C.").
 create or replace function public.resenas_de_pelicula(p_pelicula_id uuid)
 returns table (id uuid, estrellas int, comentario text, fecha timestamptz, autor text)
 language sql

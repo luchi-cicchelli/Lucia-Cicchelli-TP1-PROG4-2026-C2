@@ -12,7 +12,6 @@ import { AuthService } from '../../../core/services/auth.service';
 import { COLORES_OJOS, TIPOS_SANGRE } from '../../../core/models/perfil.model';
 import { fechaNacimientoValida } from '../../../core/validators/fecha.validators';
 
-/** Validador de grupo: las dos contraseñas tienen que coincidir. */
 const passwordsIguales: ValidatorFn = (grupo: AbstractControl): ValidationErrors | null => {
   const password = grupo.get('password')?.value;
   const confirmar = grupo.get('confirmarPassword')?.value;
@@ -57,7 +56,6 @@ export class RegistroComponent {
   readonly mailEnviado = signal(false);
   readonly verPassword = signal(false);
 
-  /** Para mostrar errores solo después de que el usuario tocó el campo. */
   mostrarError(campo: string): boolean {
     const c = this.form.get(campo);
     return !!c && c.touched && c.invalid;

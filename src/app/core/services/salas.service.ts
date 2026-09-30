@@ -20,7 +20,6 @@ export class SalasService {
     }));
   }
 
-  // Las butacas las genera un trigger en la base al insertar la sala.
   async crear(nombre: string): Promise<void> {
     const { error } = await this.supabase.client.from('salas').insert({ nombre });
     if (error) throw error;

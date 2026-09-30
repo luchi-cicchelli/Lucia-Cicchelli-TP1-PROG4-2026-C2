@@ -9,7 +9,6 @@
   <p *ngIf="error" style="color: #D4537E;">{{ error }}</p>
   <p *ngIf="cargando">Cargando...</p>
 
-  <!-- Formulario de alta / edición -->
   <form *ngIf="mostrarFormulario" [formGroup]="form" (ngSubmit)="guardar()" class="tarjeta" style="padding: 1.5rem; margin-bottom: 2rem; display: grid; gap: 12px;">
     <h2 class="titulo" style="font-size: 1.1rem;">{{ editandoId ? 'Editar película' : 'Nueva película' }}</h2>
 
@@ -75,8 +74,7 @@
       </button>
     </div>
   </form>
-
-  <!-- Listado -->
+  
   <div *ngIf="!mostrarFormulario" style="display: grid; gap: 12px;">
     <div *ngFor="let p of peliculas" class="tarjeta" style="padding: 1rem 1.25rem; display: flex; justify-content: space-between; align-items: center; gap: 12px;">
       <div>

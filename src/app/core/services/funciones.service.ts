@@ -19,8 +19,7 @@ export class FuncionesService {
     if (error) throw error;
     return data as FuncionConDetalle[];
   }
-
-  // La sala la elige la base (crear_funciones en salas_funciones.sql).
+  
   async crear(datos: NuevasFunciones): Promise<FuncionCreada[]> {
     const { data, error } = await this.supabase.client.rpc('crear_funciones', {
       p_pelicula_id: datos.peliculaId,

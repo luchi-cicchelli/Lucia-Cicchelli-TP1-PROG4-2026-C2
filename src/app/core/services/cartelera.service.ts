@@ -16,7 +16,6 @@ export class CarteleraService {
       this.supabase.client.rpc('resumen_peliculas')
     ]);
     if (peliculas.error) throw peliculas.error;
-    // Si falla el resumen (ventas y puntajes), igual se muestran las películas.
     if (resumen.error) console.error('No se pudo cargar el resumen de películas', resumen.error);
 
     const porId = new Map<string, any>((resumen.data ?? []).map((r: any) => [r.pelicula_id, r]));

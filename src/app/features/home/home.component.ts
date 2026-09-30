@@ -40,7 +40,6 @@ export class HomeComponent implements OnInit {
 
   readonly hayVentas = computed(() => this.enCartel().some((p) => p.entradasVendidas > 0));
 
-  // Las 3 más vendidas; si todavía no hay ventas, los 3 estrenos más recientes.
   readonly destacadas = computed(() => {
     const lista = [...this.enCartel()];
     if (this.hayVentas()) {

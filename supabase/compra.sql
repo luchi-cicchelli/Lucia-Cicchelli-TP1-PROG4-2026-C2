@@ -1,25 +1,16 @@
--- ============================================================
--- BIJOU CINEMA — Compra de entradas
--- Correr DESPUÉS de cartelera.sql. Se puede volver a correr.
--- ============================================================
-
 -- ---------- 1. Ajustes de tablas ----------
 alter table public.compras add column if not exists subtotal numeric(10,2);
 alter table public.compras add column if not exists descuento numeric(10,2) not null default 0;
 
--- Una butaca no se puede vender dos veces para la misma función.
 create unique index if not exists entradas_butaca_unica
   on public.entradas (funcion_id, butaca_id)
   where estado <> 'cancelada';
 
--- Cupón de bienvenida: el admin puede cambiar el porcentaje en la tabla cupones.
 insert into public.cupones (codigo, tipo, porcentaje_descuento)
 values ('BIENVENIDA', 'general', 20)
 on conflict (codigo) do nothing;
 
-
 -- ---------- 2. Estado de las butacas de una función ----------
--- 'vendida', 'reservada' (por otra persona) o 'mia' (reservada por esta sesión).
 drop function if exists public.estado_butacas(uuid, text);
 create or replace function public.estado_butacas(p_funcion_id uuid, p_sesion text)
 returns table (butaca_id uuid, estado text, expira_en timestamptz)
@@ -76,7 +67,6 @@ begin
     raise exception 'Podés elegir hasta 10 butacas por compra';
   end if;
 
-  -- Todas las butacas de la sesión vencen juntas, a los 10 minutos de la primera.
   select coalesce(min(expira_en), now() + interval '10 minutes') into v_expira
   from reservas_temporales
   where funcion_id = p_funcion_id and session_id = p_sesion;
@@ -163,7 +153,6 @@ begin
     raise exception 'Tu reserva venció. Volvé a elegir las butacas.';
   end if;
 
-  -- Restricción de edad (solo se puede validar si está logueado).
   select restriccion_edad into v_restriccion from peliculas where id = v_funcion.pelicula_id;
   if v_usuario is not null then
     select * into v_perfil from perfiles where id = v_usuario;
@@ -173,7 +162,6 @@ begin
     end if;
   end if;
 
-  -- Subtotal: VIP paga precio VIP; el resto, preventa (si sigue vigente) o precio normal.
   select coalesce(sum(
     case
       when b.tipo = 'vip' then v_funcion.precio_vip
@@ -185,7 +173,6 @@ begin
   join butacas b on b.id = r.butaca_id
   where r.funcion_id = p_funcion_id and r.session_id = p_sesion;
 
-  -- Cupón de bienvenida en la primera compra de un usuario registrado.
   if v_usuario is not null and not v_perfil.cupon_bienvenida_usado then
     select * into v_cupon from cupones
     where codigo = 'BIENVENIDA' and activo
@@ -244,8 +231,6 @@ $$;
 
 
 -- ---------- 6. Detalle de una compra (para la pantalla final y el PDF) ----------
--- El id de la compra es un UUID imposible de adivinar: funciona como link privado,
--- así también lo puede ver quien compró sin registrarse.
 create or replace function public.detalle_compra(p_compra_id uuid)
 returns json
 language sql
