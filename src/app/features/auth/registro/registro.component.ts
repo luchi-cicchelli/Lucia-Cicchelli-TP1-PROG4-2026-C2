@@ -11,6 +11,7 @@ import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { COLORES_OJOS, TIPOS_SANGRE } from '../../../core/models/perfil.model';
 import { fechaNacimientoValida } from '../../../core/validators/fecha.validators';
+import { soloLetras } from '../../../core/validators/nombre.validators';
 
 const passwordsIguales: ValidatorFn = (grupo: AbstractControl): ValidationErrors | null => {
   const password = grupo.get('password')?.value;
@@ -35,8 +36,8 @@ export class RegistroComponent {
 
   readonly form = inject(FormBuilder).nonNullable.group(
     {
-      nombre: ['', [Validators.required, Validators.maxLength(60)]],
-      apellido: ['', [Validators.required, Validators.maxLength(60)]],
+      nombre: ['', [Validators.required, Validators.maxLength(60), soloLetras]],
+      apellido: ['', [Validators.required, Validators.maxLength(60), soloLetras]],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       confirmarPassword: ['', Validators.required],

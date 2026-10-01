@@ -58,10 +58,16 @@
             <label class="campo">
               Nombre
               <input class="input" formControlName="nombre" />
+              @if (form.controls.nombre.hasError('soloLetras')) {
+                <span class="error-texto">Solo letras, sin números ni símbolos.</span>
+              }
             </label>
             <label class="campo">
               Apellido
               <input class="input" formControlName="apellido" />
+              @if (form.controls.apellido.hasError('soloLetras')) {
+                <span class="error-texto">Solo letras, sin números ni símbolos.</span>
+              }
             </label>
           </div>
 

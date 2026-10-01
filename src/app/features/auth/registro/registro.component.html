@@ -39,7 +39,13 @@
           Nombre
           <input class="input" formControlName="nombre" autocomplete="given-name" />
           @if (mostrarError('nombre')) {
-            <span class="error-texto">Ingresá tu nombre.</span>
+            <span class="error-texto">
+              @if (form.controls.nombre.hasError('soloLetras')) {
+                Solo letras, sin números ni símbolos.
+              } @else {
+                Ingresá tu nombre.
+              }
+            </span>
           }
         </label>
 
@@ -47,7 +53,13 @@
           Apellido
           <input class="input" formControlName="apellido" autocomplete="family-name" />
           @if (mostrarError('apellido')) {
-            <span class="error-texto">Ingresá tu apellido.</span>
+            <span class="error-texto">
+              @if (form.controls.apellido.hasError('soloLetras')) {
+                Solo letras, sin números ni símbolos.
+              } @else {
+                Ingresá tu apellido.
+              }
+            </span>
           }
         </label>
       </div>

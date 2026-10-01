@@ -4,6 +4,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../core/services/auth.service';
 import { COLORES_OJOS, ROLES, TIPOS_SANGRE } from '../../core/models/perfil.model';
 import { fechaNacimientoValida } from '../../core/validators/fecha.validators';
+import { soloLetras } from '../../core/validators/nombre.validators';
 
 @Component({
   selector: 'app-perfil',
@@ -25,8 +26,8 @@ export class PerfilComponent {
   readonly mensaje = signal('');
 
   readonly form = inject(FormBuilder).nonNullable.group({
-    nombre: ['', [Validators.required, Validators.maxLength(60)]],
-    apellido: ['', [Validators.required, Validators.maxLength(60)]],
+    nombre: ['', [Validators.required, Validators.maxLength(60), soloLetras]],
+    apellido: ['', [Validators.required, Validators.maxLength(60), soloLetras]],
     fecha_nacimiento: ['', [Validators.required, fechaNacimientoValida]],
     tipo_sangre: ['', Validators.required],
     color_ojos: ['', Validators.required],
