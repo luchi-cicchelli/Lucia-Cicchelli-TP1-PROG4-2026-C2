@@ -1,1 +1,107 @@
-<p>escaner works!</p>
+<section class="escaner">
+  <header class="escaner__encabezado">
+    <h1 class="titulo">Validar entradas</h1>
+    <p>Escaneá el QR o ingresá el código de 8 caracteres. Cada entrada se puede usar una sola vez.</p>
+  </header>
+
+  <div class="escaner__cuerpo">
+    <div class="escaner__lector">
+      <div class="tarjeta escaner__camara">
+        @if (camaraActiva()) {
+          <video #video class="escaner__video" playsinline muted></video>
+          <div class="escaner__marco" aria-hidden="true"></div>
+          <button type="button" class="boton boton--secundario boton--chico escaner__apagar" (click)="detenerCamara()">
+            Apagar cámara
+          </button>
+        } @else {
+          <div class="escaner__apagada">
+            <span class="escaner__icono" aria-hidden="true">▣</span>
+            <button type="button" class="boton" (click)="activarCamara()">Activar cámara</button>
+            @if (errorCamara()) {
+              <p class="error-texto">{{ errorCamara() }}</p>
+            }
+          </div>
+        }
+      </div>
+
+      <form class="tarjeta escaner__manual" (submit)="validarManual($event)">
+        <label class="campo">
+          Código manual
+          <div class="escaner__manual-fila">
+            <input
+              class="input escaner__input"
+              [value]="codigoManual()"
+              (input)="alEscribirCodigo($event)"
+              placeholder="Ej: 7F3A9C21"
+              autocomplete="off"
+              spellcheck="false"
+            />
+            <button type="submit" class="boton" [disabled]="procesando() || !codigoManual().trim()">Validar</button>
+          </div>
+        </label>
+      </form>
+    </div>
+
+    <div class="escaner__panel">
+      @let r = resultado();
+      @if (procesando()) {
+        <div class="tarjeta escaner__resultado">
+          <p class="escaner__esperando">Validando…</p>
+        </div>
+      } @else if (r) {
+        <div class="tarjeta escaner__resultado" [class.escaner__resultado--ok]="r.ok" [class.escaner__resultado--error]="!r.ok" role="status">
+          @if (r.ok) {
+            <p class="escaner__estado"><span aria-hidden="true">✓</span> Entrada válida</p>
+            <p class="titulo escaner__pelicula">{{ r.entrada.pelicula }}</p>
+            <p class="escaner__butaca">
+              {{ butaca(r) }}
+              @if (r.entrada.tipo === 'vip') {
+                <span class="escaner__tag escaner__tag--vip">VIP</span>
+              }
+              @if (r.entrada.tipo === 'accesible') {
+                <span class="escaner__tag escaner__tag--acc">Accesible</span>
+              }
+            </p>
+            <p class="escaner__detalle">
+              {{ r.entrada.sala }} · {{ r.entrada.inicio | date: 'HH:mm' }} hs ·
+              {{ r.entrada.formato.toUpperCase() }} · {{ r.entrada.idioma === 'castellano' ? 'Castellano' : 'Subtitulada' }}
+            </p>
+            @if (r.entrada.restriccion_edad) {
+              <p class="escaner__aviso">
+                Película +{{ r.entrada.restriccion_edad }}: si es menor, tiene que ingresar con un adulto.
+              </p>
+            }
+          } @else {
+            <p class="escaner__estado"><span aria-hidden="true">✕</span> No válida</p>
+            <p class="escaner__mensaje">{{ r.mensaje }}</p>
+          }
+        </div>
+      } @else {
+        <div class="tarjeta escaner__resultado">
+          <p class="escaner__esperando">Esperando una entrada…</p>
+        </div>
+      }
+
+      @if (historial().length) {
+        <div class="tarjeta escaner__historial">
+          <h2 class="titulo">Últimas lecturas</h2>
+          <ul>
+            @for (h of historial(); track $index) {
+              <li [class.escaner__h--ok]="h.ok" [class.escaner__h--error]="!h.ok">
+                <span class="escaner__h-hora">{{ h.momento | date: 'HH:mm:ss' }}</span>
+                <span class="escaner__h-icono" aria-hidden="true">{{ h.ok ? '✓' : '✕' }}</span>
+                <span class="escaner__h-texto">
+                  @if (h.ok) {
+                    {{ h.entrada.pelicula }} · {{ butaca(h) }}
+                  } @else {
+                    {{ h.mensaje }}
+                  }
+                </span>
+              </li>
+            }
+          </ul>
+        </div>
+      }
+    </div>
+  </div>
+</section>

@@ -1,0 +1,249 @@
+:host {
+  --ok: #2f8f5b;
+  --error: #c4413b;
+  display: block;
+}
+
+.escaner {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem 1rem 3rem;
+  display: grid;
+  gap: 1.25rem;
+}
+
+.escaner__encabezado h1 {
+  font-size: 1.6rem;
+  margin-bottom: 4px;
+}
+
+.escaner__encabezado p {
+  margin: 0;
+  color: var(--texto-secundario);
+  font-size: 0.9rem;
+}
+
+.escaner__cuerpo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.escaner__lector,
+.escaner__panel {
+  display: grid;
+  gap: 1rem;
+}
+
+.escaner__camara {
+  position: relative;
+  aspect-ratio: 1;
+  background: #111;
+  display: grid;
+  place-items: center;
+}
+
+.escaner__video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.escaner__marco {
+  position: absolute;
+  inset: 18%;
+  border: 3px solid rgba(255, 255, 255, 0.85);
+  border-radius: 16px;
+  box-shadow: 0 0 0 999px rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+}
+
+.escaner__apagar {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.escaner__apagada {
+  display: grid;
+  gap: 14px;
+  justify-items: center;
+  text-align: center;
+  padding: 1.5rem;
+}
+
+.escaner__apagada .error-texto {
+  max-width: 260px;
+}
+
+.escaner__icono {
+  font-size: 3rem;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.escaner__manual {
+  padding: 1rem 1.25rem;
+}
+
+.escaner__manual-fila {
+  display: flex;
+  gap: 8px;
+}
+
+.escaner__input {
+  font-family: ui-monospace, 'Courier New', monospace;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.escaner__resultado {
+  padding: 1.5rem;
+  min-height: 190px;
+  display: grid;
+  align-content: center;
+  gap: 8px;
+  border-width: 2px;
+}
+
+.escaner__resultado--ok {
+  border-color: var(--ok);
+  background: color-mix(in srgb, var(--ok) 10%, var(--superficie));
+}
+
+.escaner__resultado--error {
+  border-color: var(--error);
+  background: color-mix(in srgb, var(--error) 10%, var(--superficie));
+}
+
+.escaner__esperando {
+  margin: 0;
+  text-align: center;
+  color: var(--texto-muted);
+}
+
+.escaner__estado {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.escaner__resultado--ok .escaner__estado {
+  color: var(--ok);
+}
+
+.escaner__resultado--error .escaner__estado {
+  color: var(--error);
+}
+
+.escaner__pelicula {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.escaner__butaca {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.escaner__detalle,
+.escaner__mensaje {
+  margin: 0;
+  color: var(--texto-secundario);
+}
+
+.escaner__mensaje {
+  font-size: 1rem;
+  color: var(--texto);
+}
+
+.escaner__aviso {
+  margin: 4px 0 0;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: var(--rosa-fondo);
+  color: var(--rosa-texto);
+  font-size: 0.85rem;
+}
+
+.escaner__tag {
+  font-size: 0.7rem;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: var(--radio-chip);
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
+.escaner__tag--vip {
+  background: color-mix(in srgb, #c9a227 25%, transparent);
+  border: 1px solid #c9a227;
+  color: #9a7a12;
+}
+
+.escaner__tag--acc {
+  background: color-mix(in srgb, #4f8fbf 20%, transparent);
+  border: 1px solid #4f8fbf;
+  color: #3b76a3;
+}
+
+.escaner__historial {
+  padding: 1rem 1.25rem;
+}
+
+.escaner__historial h2 {
+  font-size: 1rem;
+  margin-bottom: 8px;
+}
+
+.escaner__historial ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.escaner__historial li {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  gap: 8px;
+  font-size: 0.8rem;
+  align-items: baseline;
+}
+
+.escaner__h-hora {
+  color: var(--texto-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.escaner__h--ok .escaner__h-icono {
+  color: var(--ok);
+}
+
+.escaner__h--error .escaner__h-icono {
+  color: var(--error);
+}
+
+.escaner__h-texto {
+  color: var(--texto-secundario);
+}
+
+@media (max-width: 760px) {
+  .escaner {
+    padding: 1.25rem 1rem 2.5rem;
+  }
+
+  .escaner__cuerpo {
+    grid-template-columns: 1fr;
+  }
+
+  .escaner__camara {
+    aspect-ratio: 4 / 3;
+  }
+}

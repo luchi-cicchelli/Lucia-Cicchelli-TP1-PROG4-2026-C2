@@ -35,7 +35,8 @@
               "core-js",
               "raf",
               "rgbcolor",
-              "html2canvas"
+              "html2canvas",
+              "jsqr"
             ]
           },
           "configurations": {
