@@ -238,6 +238,47 @@
   line-height: 1.55;
 }
 
+.detalle__mi-resena {
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.detalle__mi-resena p {
+  margin: 0 0 0.75rem;
+}
+
+.detalle__elegir-estrellas {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 0.75rem;
+}
+
+.detalle__elegir-estrellas button {
+  background: none;
+  border: none;
+  font-size: 1.75rem;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--borde);
+  padding: 0;
+}
+
+.detalle__elegir-estrellas button.activa {
+  color: var(--rosa-acento);
+}
+
+.detalle__contador {
+  align-self: flex-end;
+  font-size: 0.75rem;
+  color: var(--texto-muted);
+}
+
+.detalle__acciones-resena {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
 @media (max-width: 700px) {
   .detalle {
     padding: 1rem 1rem 3rem;

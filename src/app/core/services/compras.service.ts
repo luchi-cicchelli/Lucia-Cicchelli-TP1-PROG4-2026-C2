@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
 import { RealtimeChannel } from '@supabase/supabase-js';
 import { SupabaseService } from './supabase.service';
-import { CompraDetalle, EstadoButaca, FuncionCheckout, MetodoPago } from '../models/compra.model';
-import { ItemCarrito } from '../models/candy.model';
+import { CompraDetalle, EstadoButaca, FuncionCheckout, MetodoPago, MiCompra, OpcionesCompra } from '../models/compra.model';
 
 const CLAVE_SESION = 'bijou-sesion-compra';
 
@@ -73,15 +72,38 @@ export class ComprasService {
     return Number(data ?? 0);
   }
 
-  async confirmar(funcionId: string, metodoPago: MetodoPago, items: ItemCarrito[] = []): Promise<string> {
+  async confirmar(funcionId: string, metodoPago: MetodoPago, opciones: OpcionesCompra): Promise<string> {
     const { data, error } = await this.supabase.client.rpc('confirmar_compra', {
       p_funcion_id: funcionId,
       p_sesion: this.sesion,
       p_metodo_pago: metodoPago,
-      p_items: items
+      p_items: opciones.items,
+      p_cupon: opciones.cupon,
+      p_usar_credito: opciones.usarCredito,
+      p_canjes: opciones.canjes
     });
     if (error) throw new Error(error.message);
     return data as string;
+  }
+
+  async misCompras(usuarioId: string): Promise<MiCompra[]> {
+    const { data, error } = await this.supabase.client
+      .from('compras')
+      .select(
+        'id, fecha, total, cancelada_en, candy_retirado, ' +
+          'entradas(id, estado, funcion:funciones(id, fecha_hora_inicio, pelicula:peliculas(id, nombre, imagen_url), sala:salas(nombre)))'
+      )
+      .eq('usuario_id', usuarioId)
+      .order('fecha', { ascending: false });
+    if (error) throw error;
+    return data as unknown as MiCompra[];
+  }
+
+  /** Devuelve el crédito que se acreditó. La base valida las 2 horas y que sea del usuario. */
+  async cancelar(compraId: string): Promise<number> {
+    const { data, error } = await this.supabase.client.rpc('cancelar_compra', { p_compra_id: compraId });
+    if (error) throw new Error(error.message);
+    return Number(data);
   }
 
   async detalle(compraId: string): Promise<CompraDetalle | null> {

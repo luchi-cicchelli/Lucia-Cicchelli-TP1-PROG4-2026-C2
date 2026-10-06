@@ -1,0 +1,37 @@
+@if (error()) {
+  <p class="alerta alerta--error">{{ error() }}</p>
+}
+
+@if (recompensas().length) {
+  <div class="pts__recompensas">
+    <p class="pts__subtitulo">Podés canjear al comprar tus entradas:</p>
+    <ul>
+      @for (r of recompensas(); track r.id) {
+        <li [class.pts__alcanza]="(auth.perfil()?.puntos_acumulados ?? 0) >= r.puntos_requeridos">
+          {{ r.nombre }} <span>{{ r.puntos_requeridos }} pts</span>
+        </li>
+      }
+    </ul>
+  </div>
+}
+
+<h3 class="pts__titulo">Historial de puntos y canjes</h3>
+@if (cargando()) {
+  <p class="pts__vacio">Cargando…</p>
+} @else {
+  <ul class="pts__lista">
+    @for (m of movimientos(); track m.id) {
+      <li class="tarjeta">
+        <span>
+          {{ etiqueta(m) }}
+          <small>{{ m.fecha | date: 'd/MM/yyyy HH:mm' }}</small>
+        </span>
+        <strong [class.pts__mas]="suma(m)" [class.pts__menos]="!suma(m)">
+          {{ suma(m) ? '+' : '−' }}{{ m.cantidad }}
+        </strong>
+      </li>
+    } @empty {
+      <p class="pts__vacio">Todavía no tenés movimientos. Cada peso que gastás suma 1 punto.</p>
+    }
+  </ul>
+}

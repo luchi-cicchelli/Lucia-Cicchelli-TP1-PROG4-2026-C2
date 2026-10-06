@@ -1,0 +1,75 @@
+<section class="admin">
+  <a routerLink="/admin" class="admin__volver">← Panel</a>
+
+  <header class="admin__encabezado">
+    <h1 class="titulo">Recompensas</h1>
+    <p>Cada peso gastado suma 1 punto. Acá definís cuántos puntos cuesta cada recompensa; se canjean al comprar.</p>
+  </header>
+
+  @if (error()) {
+    <p class="alerta alerta--error">{{ error() }}</p>
+  }
+
+  @if (formAbierto()) {
+    <form class="tarjeta cupones__form" [formGroup]="form" (ngSubmit)="guardar()" novalidate>
+      <h2 class="titulo">{{ editandoId() ? 'Editar recompensa' : 'Nueva recompensa' }}</h2>
+      <div class="cupones__fila">
+        <label class="campo">
+          Nombre
+          <input class="input" formControlName="nombre" placeholder="Entrada gratis" />
+        </label>
+        <label class="campo">
+          Puntos necesarios
+          <input class="input" type="number" min="1" formControlName="puntos_requeridos" />
+        </label>
+      </div>
+      <div class="cupones__fila">
+        <label class="campo">
+          Tipo
+          <select class="input" formControlName="tipo">
+            <option value="entrada_gratis">Entrada general gratis</option>
+            <option value="producto_candy">Producto del candy gratis</option>
+          </select>
+        </label>
+        @if (form.controls.tipo.value === 'producto_candy') {
+          <label class="campo">
+            Producto
+            <select class="input" formControlName="producto_id">
+              <option value="" disabled>Elegí un producto</option>
+              @for (p of productos(); track p.id) {
+                <option [value]="p.id">{{ p.nombre }}</option>
+              }
+            </select>
+          </label>
+        }
+      </div>
+      <label class="cupones__check"><input type="checkbox" formControlName="activo" /> Disponible para canjear</label>
+      <div class="cupones__acciones">
+        <button type="submit" class="boton">Guardar</button>
+        <button type="button" class="boton boton--secundario" (click)="formAbierto.set(false)">Cancelar</button>
+      </div>
+    </form>
+  } @else {
+    <button type="button" class="boton cupones__nuevo" (click)="nueva()">+ Nueva recompensa</button>
+  }
+
+  <div class="admin__lista">
+    @for (r of recompensas(); track r.id) {
+      <div class="tarjeta cupones__item" [class.cupones__item--inactivo]="!r.activo">
+        <div>
+          <p class="cupones__codigo">{{ r.nombre }} <span class="cupones__porc">{{ r.puntos_requeridos }} puntos</span></p>
+          <p class="cupones__detalle">
+            {{ r.tipo === 'entrada_gratis' ? 'Una entrada general sin cargo' : 'Producto: ' + nombreProducto(r.producto_id) }}
+            @if (!r.activo) { · <strong>pausada</strong> }
+          </p>
+        </div>
+        <div class="cupones__acciones">
+          <button type="button" class="boton boton--secundario boton--chico" (click)="editar(r)">Editar</button>
+          <button type="button" class="boton boton--secundario boton--chico" (click)="toggle(r)">{{ r.activo ? 'Pausar' : 'Activar' }}</button>
+        </div>
+      </div>
+    } @empty {
+      <p class="admin__vacio">Todavía no hay recompensas.</p>
+    }
+  </div>
+</section>

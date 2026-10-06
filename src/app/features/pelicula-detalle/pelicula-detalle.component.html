@@ -114,8 +114,63 @@
       }
     </section>
 
-    <section class="detalle__seccion">
+    <section class="detalle__seccion" id="resenas">
       <h2 class="titulo">Reseñas</h2>
+
+      @if (puedeResenar()) {
+        <div class="tarjeta detalle__mi-resena">
+          @let mia = miResena();
+          @if (editandoResena()) {
+            <form [formGroup]="formResena" (ngSubmit)="guardarResena()" novalidate>
+              <p class="detalle__grupo-titulo">Tu calificación</p>
+              <div class="detalle__elegir-estrellas">
+                @for (n of estrellasOpciones; track n) {
+                  <button
+                    type="button"
+                    [class.activa]="n <= formResena.controls.estrellas.value"
+                    [attr.aria-label]="n + ' estrellas'"
+                    (click)="formResena.controls.estrellas.setValue(n)"
+                  >★</button>
+                }
+              </div>
+              <label class="campo">
+                Comentario (opcional)
+                <textarea class="input" rows="3" maxlength="280" formControlName="comentario"></textarea>
+                <span class="detalle__contador">{{ formResena.controls.comentario.value.length }}/280</span>
+              </label>
+              @if (errorResena()) {
+                <p class="error-texto">{{ errorResena() }}</p>
+              }
+              <div class="detalle__acciones-resena">
+                <button type="submit" class="boton" [disabled]="guardandoResena()">
+                  {{ guardandoResena() ? 'Guardando…' : 'Publicar' }}
+                </button>
+                <button type="button" class="boton boton--secundario" (click)="editandoResena.set(false)">Cancelar</button>
+              </div>
+            </form>
+          } @else if (mia) {
+            <div class="detalle__resena-cabecera">
+              <app-estrellas [valor]="mia.estrellas" [mostrarNumero]="false" />
+              <strong>Tu reseña</strong>
+            </div>
+            @if (mia.comentario) {
+              <p>{{ mia.comentario }}</p>
+            }
+            <div class="detalle__acciones-resena">
+              <button type="button" class="boton boton--secundario" (click)="empezarResena()">Editar</button>
+              <button type="button" class="boton boton--secundario" (click)="borrarResena()">Borrar</button>
+            </div>
+          } @else {
+            <p>¿Ya la viste? Contanos qué te pareció.</p>
+            <button type="button" class="boton" (click)="empezarResena()">Escribir reseña</button>
+          }
+          @if (errorResena() && !editandoResena()) {
+            <p class="error-texto">{{ errorResena() }}</p>
+          }
+        </div>
+      } @else if (auth.estaLogueado()) {
+        <p class="detalle__nota">Podés dejar tu reseña después de ver la película en Bijou.</p>
+      }
       @for (r of resenas(); track r.id) {
         <article class="tarjeta detalle__resena">
           <div class="detalle__resena-cabecera">

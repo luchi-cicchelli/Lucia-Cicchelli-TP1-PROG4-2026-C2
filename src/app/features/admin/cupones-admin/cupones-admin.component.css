@@ -1,0 +1,95 @@
+.cupones__bienvenida {
+  padding: 1rem 1.25rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  border-color: var(--rosa-suave);
+  background: var(--rosa-fondo);
+}
+
+.cupones__bienvenida-form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cupones__bienvenida-form .input {
+  width: 90px;
+}
+
+.cupones__nuevo {
+  justify-self: start;
+}
+
+.cupones__form {
+  padding: 1.5rem;
+  display: grid;
+  gap: 14px;
+}
+
+.cupones__form h2 {
+  font-size: 1.1rem;
+}
+
+.cupones__fila {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.cupones__mayus {
+  text-transform: uppercase;
+}
+
+.cupones__check {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+.cupones__acciones {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.cupones__item {
+  padding: 0.85rem 1.25rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.cupones__item--inactivo {
+  opacity: 0.6;
+}
+
+.cupones__codigo {
+  margin: 0 0 2px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+
+.cupones__porc {
+  color: var(--rosa-acento);
+  font-size: 0.85rem;
+  letter-spacing: 0;
+  margin-left: 6px;
+}
+
+.cupones__detalle {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--texto-secundario);
+}
+
+@media (max-width: 600px) {
+  .cupones__fila {
+    grid-template-columns: 1fr;
+  }
+}

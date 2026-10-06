@@ -1,0 +1,48 @@
+@if (mensaje()) {
+  <p class="alerta alerta--ok">{{ mensaje() }}</p>
+}
+@if (error()) {
+  <p class="alerta alerta--error">{{ error() }}</p>
+}
+
+@if (cargando()) {
+  <p class="mc__vacio">Cargando tus entradas…</p>
+} @else if (lista().length === 0) {
+  <p class="mc__vacio">Todavía no compraste entradas. <a routerLink="/">Ver la cartelera</a></p>
+} @else {
+  @for (g of grupos(); track g.titulo) {
+    @if (g.compras.length) {
+      <h3 class="mc__titulo">{{ g.titulo }}</h3>
+      @for (c of g.compras; track c.id) {
+        <article class="tarjeta mc__item" [class.mc__item--cancelada]="c.cancelada_en">
+          <div class="mc__info">
+            <p class="mc__pelicula">{{ funcion(c)?.pelicula?.nombre }}</p>
+            <p class="mc__detalle">
+              {{ inicio(c) | date: "EEE d 'de' MMMM, HH:mm" }} · {{ funcion(c)?.sala?.nombre }} ·
+              {{ c.entradas.length }} {{ c.entradas.length === 1 ? 'entrada' : 'entradas' }} ·
+              {{ c.total | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }}
+            </p>
+            @if (c.cancelada_en) {
+              <span class="chip mc__estado">Cancelada</span>
+            }
+          </div>
+          <div class="mc__acciones">
+            <a class="boton boton--secundario boton--chico" [routerLink]="['/compra', c.id]">Ver entradas</a>
+            @if (puedeCancelar(c)) {
+              <button
+                type="button"
+                class="boton boton--secundario boton--chico"
+                [class.boton--peligro]="confirmarId() === c.id"
+                [disabled]="cancelandoId() === c.id"
+                (click)="cancelar(c)"
+                (blur)="confirmarId.set(null)"
+              >
+                {{ confirmarId() === c.id ? '¿Seguro? Te queda como crédito' : 'Cancelar' }}
+              </button>
+            }
+          </div>
+        </article>
+      }
+    }
+  }
+}

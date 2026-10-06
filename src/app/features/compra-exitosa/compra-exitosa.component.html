@@ -17,6 +17,10 @@
       </p>
     </header>
 
+    @if (c.cancelada) {
+      <p class="alerta alerta--error">Esta compra fue cancelada: las entradas ya no son válidas.</p>
+    }
+
     @if (error()) {
       <p class="alerta alerta--error">{{ error() }}</p>
     }
@@ -96,8 +100,14 @@
       <h2 class="titulo">Resumen del pago</h2>
       <dl>
         <div><dt>Subtotal</dt><dd>{{ c.subtotal | currency: 'ARS' : 'symbol-narrow' : '1.0-2' }}</dd></div>
+        @if ((c.descuento_canjes ?? 0) > 0 || (c.puntos_usados ?? 0) > 0) {
+          <div class="exito__descuento"><dt>Canje de puntos ({{ c.puntos_usados }} pts)</dt><dd>−{{ c.descuento_canjes ?? 0 | currency: 'ARS' : 'symbol-narrow' : '1.0-2' }}</dd></div>
+        }
         @if (c.descuento > 0) {
-          <div class="exito__descuento"><dt>Cupón de bienvenida</dt><dd>−{{ c.descuento | currency: 'ARS' : 'symbol-narrow' : '1.0-2' }}</dd></div>
+          <div class="exito__descuento"><dt>Cupón {{ c.cupon === 'BIENVENIDA' || !c.cupon ? 'de bienvenida' : c.cupon }}</dt><dd>−{{ c.descuento | currency: 'ARS' : 'symbol-narrow' : '1.0-2' }}</dd></div>
+        }
+        @if ((c.credito_usado ?? 0) > 0) {
+          <div class="exito__descuento"><dt>Crédito a favor</dt><dd>−{{ c.credito_usado | currency: 'ARS' : 'symbol-narrow' : '1.0-2' }}</dd></div>
         }
         <div class="exito__total"><dt>Total</dt><dd>{{ c.total | currency: 'ARS' : 'symbol-narrow' : '1.0-2' }}</dd></div>
         <div><dt>Medio de pago</dt><dd>{{ metodoPago(c.metodo_pago) }}</dd></div>

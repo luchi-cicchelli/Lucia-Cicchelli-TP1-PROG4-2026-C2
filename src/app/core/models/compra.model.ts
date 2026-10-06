@@ -1,6 +1,7 @@
 import { Formato, Funcion, Idioma } from './funcion.model';
 import { TipoButaca } from './sala.model';
-import { ItemCandyCompra } from './candy.model';
+import { ItemCandyCompra, ItemCarrito } from './candy.model';
+import { Canje } from './beneficios.model';
 
 export type EstadoButaca = 'vendida' | 'reservada' | 'mia';
 
@@ -36,6 +37,37 @@ export interface CompraDetalle {
   entradas: EntradaDetalle[];
   candy?: ItemCandyCompra[];
   candy_retirado?: boolean;
+  descuento_canjes?: number;
+  credito_usado?: number;
+  puntos_usados?: number;
+  cupon?: string | null;
+  cancelada?: boolean;
+}
+
+export interface OpcionesCompra {
+  items: ItemCarrito[];
+  cupon: string | null;
+  usarCredito: boolean;
+  canjes: Canje[];
+}
+
+/** Una compra del usuario, para "Mis entradas" y "Mis películas". */
+export interface MiCompra {
+  id: string;
+  fecha: string;
+  total: number;
+  cancelada_en: string | null;
+  candy_retirado: boolean;
+  entradas: {
+    id: string;
+    estado: 'activa' | 'validada' | 'cancelada';
+    funcion: {
+      id: string;
+      fecha_hora_inicio: string;
+      pelicula: { id: string; nombre: string; imagen_url: string | null } | null;
+      sala: { nombre: string } | null;
+    } | null;
+  }[];
 }
 
 export interface FuncionCheckout extends Funcion {

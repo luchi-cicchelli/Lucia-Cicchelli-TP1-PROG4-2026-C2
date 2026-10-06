@@ -1,0 +1,111 @@
+<section class="admin">
+  <a routerLink="/admin" class="admin__volver">← Panel</a>
+
+  <header class="admin__encabezado">
+    <h1 class="titulo">Cupones</h1>
+    <p>En cada compra se aplica un solo cupón: el de mayor descuento.</p>
+  </header>
+
+  @if (error()) {
+    <p class="alerta alerta--error">{{ error() }}</p>
+  }
+  @if (mensaje()) {
+    <p class="alerta alerta--ok">{{ mensaje() }}</p>
+  }
+
+  @if (bienvenida()) {
+    <div class="tarjeta cupones__bienvenida">
+      <div>
+        <p class="cupones__codigo">Cupón de bienvenida</p>
+        <p class="cupones__detalle">Se aplica solo en la primera compra de cada usuario registrado.</p>
+      </div>
+      <form class="cupones__bienvenida-form" (submit)="$event.preventDefault(); guardarBienvenida()">
+        <input class="input" type="number" min="1" max="100" [formControl]="porcentajeBienvenida" aria-label="Porcentaje de bienvenida" />
+        <span>%</span>
+        <button type="submit" class="boton boton--chico" [disabled]="porcentajeBienvenida.invalid">Guardar</button>
+      </form>
+    </div>
+  }
+
+  @if (formAbierto()) {
+    <form class="tarjeta cupones__form" [formGroup]="form" (ngSubmit)="guardar()" novalidate>
+      <h2 class="titulo">{{ editandoId() ? 'Editar cupón' : 'Nuevo cupón' }}</h2>
+      <div class="cupones__fila">
+        <label class="campo">
+          Código
+          <input class="input cupones__mayus" formControlName="codigo" placeholder="PROMO30" />
+          @if (form.controls.codigo.touched && form.controls.codigo.invalid) {
+            <span class="error-texto">Entre 3 y 20 letras o números, sin espacios.</span>
+          }
+        </label>
+        <label class="campo">
+          Descuento (%)
+          <input class="input" type="number" min="1" max="100" formControlName="porcentaje_descuento" />
+        </label>
+      </div>
+      <div class="cupones__fila">
+        <label class="campo">
+          Para quién
+          <select class="input" formControlName="tipo">
+            <option value="general">Todos</option>
+            <option value="mayores_50">Solo mayores de cierta edad</option>
+          </select>
+        </label>
+        @if (form.controls.tipo.value === 'mayores_50') {
+          <label class="campo">
+            Edad mínima
+            <input class="input" type="number" min="18" max="120" formControlName="edad_minima" />
+          </label>
+        }
+      </div>
+      <div class="cupones__fila">
+        <label class="campo">
+          Válido desde
+          <input class="input" type="date" formControlName="desde" />
+        </label>
+        <label class="campo">
+          Válido hasta (opcional)
+          <input class="input" type="date" formControlName="hasta" [min]="form.controls.desde.value" />
+        </label>
+      </div>
+      @if (form.hasError('vigenciaInvertida')) {
+        <p class="error-texto">La fecha "hasta" tiene que ser posterior a "desde".</p>
+      }
+      <label class="cupones__check"><input type="checkbox" formControlName="activo" /> Activo</label>
+      <div class="cupones__acciones">
+        <button type="submit" class="boton">Guardar</button>
+        <button type="button" class="boton boton--secundario" (click)="formAbierto.set(false)">Cancelar</button>
+      </div>
+    </form>
+  } @else {
+    <button type="button" class="boton cupones__nuevo" (click)="nuevo()">+ Nuevo cupón</button>
+  }
+
+  <div class="admin__lista">
+    @for (c of otros(); track c.id) {
+      <div class="tarjeta cupones__item" [class.cupones__item--inactivo]="!vigente(c)">
+        <div>
+          <p class="cupones__codigo">{{ c.codigo }} <span class="cupones__porc">{{ c.porcentaje_descuento }}% off</span></p>
+          <p class="cupones__detalle">
+            {{ c.tipo === 'mayores_50' ? 'Mayores de ' + (c.edad_minima ?? 50) + ' años' : 'Para todos' }}
+            · desde {{ c.fecha_inicio | date: 'dd/MM/yyyy' }}
+            @if (c.fecha_fin) {
+              hasta {{ c.fecha_fin | date: 'dd/MM/yyyy' }}
+            }
+            @if (!vigente(c)) {
+              · <strong>no vigente</strong>
+            }
+          </p>
+        </div>
+        <div class="cupones__acciones">
+          <button type="button" class="boton boton--secundario boton--chico" (click)="editar(c)">Editar</button>
+          <button type="button" class="boton boton--secundario boton--chico" (click)="toggle(c)">{{ c.activo ? 'Pausar' : 'Activar' }}</button>
+        </div>
+      </div>
+    } @empty {
+      @if (!cargando()) {
+        <p class="admin__vacio">Todavía no hay otros cupones.</p>
+      }
+    }
+  </div>
+</section>

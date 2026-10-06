@@ -1,9 +1,11 @@
 import { Component, OnInit, computed, inject, input, signal } from '@angular/core';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../core/services/auth.service';
 import { CarteleraService } from '../../core/services/cartelera.service';
 import { FuncionesService } from '../../core/services/funciones.service';
+import { MiResena, ResenasService } from '../../core/services/resenas.service';
 import { PeliculaCartelera, Resena } from '../../core/models/cartelera.model';
 import { FuncionConDetalle } from '../../core/models/funcion.model';
 import { EstrellasComponent } from '../../shared/components/estrellas/estrellas.component';
@@ -21,13 +23,14 @@ function claveDia(d: Date): string {
 @Component({
   selector: 'app-pelicula-detalle',
   standalone: true,
-  imports: [RouterLink, DatePipe, CurrencyPipe, EstrellasComponent],
+  imports: [RouterLink, ReactiveFormsModule, DatePipe, CurrencyPipe, EstrellasComponent],
   templateUrl: './pelicula-detalle.component.html',
   styleUrl: './pelicula-detalle.component.css'
 })
 export class PeliculaDetalleComponent implements OnInit {
   private readonly cartelera = inject(CarteleraService);
   private readonly funcionesService = inject(FuncionesService);
+  private readonly resenasService = inject(ResenasService);
   readonly auth = inject(AuthService);
 
   // Viene del parámetro :id de la ruta (withComponentInputBinding).
@@ -40,6 +43,19 @@ export class PeliculaDetalleComponent implements OnInit {
   readonly error = signal('');
   readonly imagenRota = signal(false);
   readonly diaElegido = signal<string | null>(null);
+
+  // Mi reseña
+  readonly miResena = signal<MiResena | null>(null);
+  readonly puedeResenar = signal(false);
+  readonly editandoResena = signal(false);
+  readonly guardandoResena = signal(false);
+  readonly errorResena = signal('');
+  readonly estrellasOpciones = [1, 2, 3, 4, 5];
+
+  readonly formResena = inject(FormBuilder).nonNullable.group({
+    estrellas: [0, [Validators.min(1), Validators.max(5)]],
+    comentario: ['', Validators.maxLength(280)]
+  });
 
   readonly dias = computed<DiaFunciones[]>(() => {
     const porDia = new Map<string, DiaFunciones>();
@@ -79,11 +95,77 @@ export class PeliculaDetalleComponent implements OnInit {
       this.pelicula.set(pelicula);
       this.funciones.set(funciones);
       this.resenas.set(resenas);
+      await this.cargarMiResena();
     } catch (e: any) {
       this.error.set('No se pudo cargar la película: ' + e.message);
     } finally {
       this.cargando.set(false);
     }
+  }
+
+  private async cargarMiResena() {
+    const usuarioId = this.auth.perfil()?.id;
+    if (!usuarioId) return;
+    try {
+      const [mia, vio] = await Promise.all([
+        this.resenasService.mia(usuarioId, this.id()),
+        this.resenasService.vioPelicula(this.id())
+      ]);
+      this.miResena.set(mia);
+      this.puedeResenar.set(vio);
+    } catch {
+      this.puedeResenar.set(false);
+    }
+  }
+
+  empezarResena() {
+    const mia = this.miResena();
+    this.formResena.reset({ estrellas: mia?.estrellas ?? 0, comentario: mia?.comentario ?? '' });
+    this.errorResena.set('');
+    this.editandoResena.set(true);
+  }
+
+  async guardarResena() {
+    const usuarioId = this.auth.perfil()?.id;
+    if (!usuarioId || this.formResena.invalid || this.formResena.value.estrellas === 0) {
+      this.formResena.markAllAsTouched();
+      this.errorResena.set('Elegí de 1 a 5 estrellas.');
+      return;
+    }
+    this.guardandoResena.set(true);
+    this.errorResena.set('');
+    try {
+      const { estrellas, comentario } = this.formResena.getRawValue();
+      await this.resenasService.guardar(usuarioId, this.id(), estrellas, comentario);
+      this.editandoResena.set(false);
+      await this.recargarResenas();
+    } catch (e: any) {
+      this.errorResena.set('No se pudo guardar la reseña: ' + e.message);
+    } finally {
+      this.guardandoResena.set(false);
+    }
+  }
+
+  async borrarResena() {
+    const usuarioId = this.auth.perfil()?.id;
+    if (!usuarioId) return;
+    try {
+      await this.resenasService.borrar(usuarioId, this.id());
+      await this.recargarResenas();
+    } catch (e: any) {
+      this.errorResena.set('No se pudo borrar la reseña: ' + e.message);
+    }
+  }
+
+  // Recarga la lista y la película (para actualizar el promedio).
+  private async recargarResenas() {
+    const [pelicula, resenas] = await Promise.all([
+      this.cartelera.obtener(this.id()),
+      this.cartelera.resenas(this.id())
+    ]);
+    this.pelicula.set(pelicula);
+    this.resenas.set(resenas);
+    await this.cargarMiResena();
   }
 
   enPreventa(f: FuncionConDetalle): boolean {

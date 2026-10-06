@@ -1,0 +1,68 @@
+:host {
+  display: grid;
+  gap: 10px;
+}
+
+.mc__titulo {
+  font-family: var(--fuente-texto);
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--texto-muted);
+  margin: 0.75rem 0 0;
+}
+
+.mc__vacio {
+  color: var(--texto-secundario);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.mc__vacio a {
+  color: var(--rosa-acento);
+}
+
+.mc__item {
+  padding: 0.9rem 1.25rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.mc__item--cancelada {
+  opacity: 0.6;
+}
+
+.mc__pelicula {
+  margin: 0 0 2px;
+  font-weight: 500;
+}
+
+.mc__detalle {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--texto-secundario);
+}
+
+.mc__detalle::first-letter {
+  text-transform: uppercase;
+}
+
+.mc__estado {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 0.7rem;
+}
+
+.mc__acciones {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.mc__acciones a {
+  text-decoration: none;
+}

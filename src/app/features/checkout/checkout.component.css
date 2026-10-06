@@ -164,10 +164,12 @@
 .checkout__totales div {
   display: flex;
   justify-content: space-between;
+  gap: 1rem;
 }
 
 .checkout__totales dd {
   margin: 0;
+  white-space: nowrap;
 }
 
 .checkout__descuento {
@@ -337,5 +339,60 @@
 
 .checkout__producto-precio {
   color: var(--texto-secundario);
+  font-size: 0.85rem;
+}
+
+/* ---------- Cupón, canjes y crédito ---------- */
+.checkout__cupon-form {
+  display: flex;
+  gap: 8px;
+}
+
+.checkout__cupon-form .input {
+  text-transform: uppercase;
+  padding: 8px 10px;
+  font-size: 0.85rem;
+}
+
+.checkout__cupon-ok {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--rosa-acento);
+}
+
+.checkout__link {
+  background: none;
+  border: none;
+  padding: 0 4px;
+  color: var(--texto-secundario);
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+.checkout__subtitulo {
+  margin: 0 0 6px;
+  font-size: 0.85rem;
+}
+
+.checkout__subtitulo span,
+.checkout__canje small {
+  color: var(--texto-muted);
+  font-size: 0.75rem;
+}
+
+.checkout__canje {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  padding: 4px 0;
+}
+
+.checkout__credito {
+  display: flex;
+  gap: 8px;
+  align-items: center;
   font-size: 0.85rem;
 }

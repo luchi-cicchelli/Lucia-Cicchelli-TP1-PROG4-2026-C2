@@ -1,0 +1,35 @@
+@if (error()) {
+  <p class="alerta alerta--error">{{ error() }}</p>
+}
+
+@if (cargando()) {
+  <p class="mp__vacio">Cargando…</p>
+} @else {
+  <div class="mp__grilla">
+    @for (p of peliculas(); track p.id) {
+      <a class="mp__item" [routerLink]="['/pelicula', p.id]" [fragment]="p.miPuntaje ? undefined : 'resenas'">
+        <div class="mp__poster">
+          @if (p.imagen_url) {
+            <img [src]="p.imagen_url" [alt]="'Póster de ' + p.nombre" loading="lazy" />
+          } @else {
+            <span class="titulo">{{ p.nombre }}</span>
+          }
+        </div>
+        <p class="mp__nombre">{{ p.nombre }}</p>
+        <p class="mp__fecha">
+          La viste el {{ p.fechas[0] | date: 'd/MM/yyyy' }}
+          @if (p.fechas.length > 1) {
+            y {{ p.fechas.length - 1 }} {{ p.fechas.length === 2 ? 'vez' : 'veces' }} más
+          }
+        </p>
+        @if (p.miPuntaje) {
+          <app-estrellas [valor]="p.miPuntaje" [mostrarNumero]="false" />
+        } @else {
+          <span class="mp__calificar">Calificala →</span>
+        }
+      </a>
+    } @empty {
+      <p class="mp__vacio">Cuando veas una película, va a aparecer acá con tu calificación.</p>
+    }
+  </div>
+}

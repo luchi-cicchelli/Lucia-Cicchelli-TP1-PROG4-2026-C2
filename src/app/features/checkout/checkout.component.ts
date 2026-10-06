@@ -6,6 +6,9 @@ import { AuthService } from '../../core/services/auth.service';
 import { ComprasService } from '../../core/services/compras.service';
 import { SalasService } from '../../core/services/salas.service';
 import { CandyService } from '../../core/services/candy.service';
+import { CuponesService } from '../../core/services/cupones.service';
+import { RecompensasService } from '../../core/services/recompensas.service';
+import { CuponValido, Recompensa } from '../../core/models/beneficios.model';
 import { Combo, ItemCarrito, ProductoCandy, describirCombo } from '../../core/models/candy.model';
 import { EstadoButaca, FuncionCheckout, METODOS_PAGO, MetodoPago } from '../../core/models/compra.model';
 import { Butaca } from '../../core/models/sala.model';
@@ -22,6 +25,8 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   private readonly compras = inject(ComprasService);
   private readonly salas = inject(SalasService);
   private readonly candy = inject(CandyService);
+  private readonly cupones = inject(CuponesService);
+  private readonly recompensasService = inject(RecompensasService);
   private readonly router = inject(Router);
   readonly auth = inject(AuthService);
 
@@ -40,6 +45,15 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   readonly productos = signal<ProductoCandy[]>([]);
   readonly combos = signal<Combo[]>([]);
   readonly cantidades = signal<Map<string, number>>(new Map());
+
+  // Cupón, canje de puntos y crédito
+  readonly codigoCupon = signal('');
+  readonly cuponAplicado = signal<CuponValido | null>(null);
+  readonly errorCupon = signal('');
+  readonly validandoCupon = signal(false);
+  readonly recompensas = signal<Recompensa[]>([]);
+  readonly canjes = signal<Map<string, number>>(new Map());
+  readonly usarCredito = signal(false);
 
   readonly cargando = signal(true);
   readonly procesando = signal<string | null>(null);
@@ -124,10 +138,55 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     return !!perfil && !perfil.cupon_bienvenida_usado && this.porcentajeBienvenida() > 0;
   });
 
-  readonly descuento = computed(() =>
-    this.aplicaBienvenida() ? Math.round(this.subtotal() * this.porcentajeBienvenida()) / 100 : 0
+  // ---- Canje de puntos (mismo cálculo que confirmar_compra en la base) ----
+  readonly listaCanjes = computed(() =>
+    [...this.canjes().entries()]
+      .map(([id, cantidad]) => ({ recompensa: this.recompensas().find((r) => r.id === id)!, cantidad }))
+      .filter((c) => c.recompensa && c.cantidad > 0)
   );
-  readonly total = computed(() => this.subtotal() - this.descuento());
+
+  readonly puntosACanjear = computed(() =>
+    this.listaCanjes().reduce((suma, c) => suma + c.recompensa.puntos_requeridos * c.cantidad, 0)
+  );
+
+  readonly entradasGratis = computed(() =>
+    this.listaCanjes()
+      .filter((c) => c.recompensa.tipo === 'entrada_gratis')
+      .reduce((suma, c) => suma + c.cantidad, 0)
+  );
+
+  readonly descuentoCanjes = computed(() => this.entradasGratis() * this.precioGeneral());
+
+  readonly subtotalConCanjes = computed(() => this.subtotal() - this.descuentoCanjes());
+
+  // ---- Un solo cupón: el de mayor porcentaje ----
+  readonly cuponGanador = computed<'bienvenida' | 'codigo' | null>(() => {
+    const bienvenida = this.aplicaBienvenida() ? this.porcentajeBienvenida() : 0;
+    const codigo = this.cuponAplicado()?.porcentaje ?? 0;
+    if (bienvenida === 0 && codigo === 0) return null;
+    return codigo > bienvenida ? 'codigo' : 'bienvenida';
+  });
+
+  readonly porcentajeDescuento = computed(() => {
+    const ganador = this.cuponGanador();
+    if (ganador === 'codigo') return this.cuponAplicado()!.porcentaje;
+    if (ganador === 'bienvenida') return this.porcentajeBienvenida();
+    return 0;
+  });
+
+  readonly descuento = computed(
+    () => Math.round(this.subtotalConCanjes() * this.porcentajeDescuento()) / 100
+  );
+
+  readonly creditoDisponible = computed(() => Number(this.auth.perfil()?.credito_disponible ?? 0));
+
+  readonly creditoUsado = computed(() =>
+    this.usarCredito()
+      ? Math.min(this.creditoDisponible(), this.subtotalConCanjes() - this.descuento())
+      : 0
+  );
+
+  readonly total = computed(() => this.subtotalConCanjes() - this.descuento() - this.creditoUsado());
   readonly puntos = computed(() => (this.auth.estaLogueado() ? Math.floor(this.total()) : 0));
 
   readonly segundosRestantes = computed(() => {
@@ -166,13 +225,15 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       }
       this.funcion.set(funcion);
 
-      const [butacas, porcentaje, productos, combos] = await Promise.all([
+      const [butacas, porcentaje, productos, combos, recompensas] = await Promise.all([
         this.salas.butacas(funcion.sala_id),
         this.compras.porcentajeBienvenida(),
         this.candy.listarProductos(true).catch(() => []),
         this.candy.listarCombos(true).catch(() => []),
+        this.recompensasService.listar(true).catch(() => []),
         this.refrescar()
       ]);
+      this.recompensas.set(recompensas);
       this.butacas.set(butacas);
       this.porcentajeBienvenida.set(porcentaje);
       this.productos.set(productos);
@@ -242,8 +303,12 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     this.pagando.set(true);
     this.error.set('');
     try {
-      const items = this.carrito().map((c) => c.item);
-      const compraId = await this.compras.confirmar(this.funcionId(), this.metodoPago(), items);
+      const compraId = await this.compras.confirmar(this.funcionId(), this.metodoPago(), {
+        items: this.carrito().map((c) => c.item),
+        cupon: this.cuponAplicado()?.codigo ?? null,
+        usarCredito: this.usarCredito(),
+        canjes: this.listaCanjes().map((c) => ({ recompensa_id: c.recompensa.id, cantidad: c.cantidad }))
+      });
       this.compraConfirmada = true;
       await this.auth.recargarPerfil();
       if (this.canal) this.compras.avisarCambio(this.canal);
@@ -276,8 +341,64 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     });
   }
 
+  async aplicarCupon() {
+    const codigo = this.codigoCupon().trim();
+    if (!codigo) return;
+    this.validandoCupon.set(true);
+    this.errorCupon.set('');
+    try {
+      this.cuponAplicado.set(await this.cupones.validar(codigo));
+    } catch (e: any) {
+      this.cuponAplicado.set(null);
+      this.errorCupon.set(e.message);
+    } finally {
+      this.validandoCupon.set(false);
+    }
+  }
+
+  quitarCupon() {
+    this.cuponAplicado.set(null);
+    this.codigoCupon.set('');
+  }
+
+  alEscribirCupon(evento: Event) {
+    this.codigoCupon.set((evento.target as HTMLInputElement).value.toUpperCase());
+  }
+
+  cantidadCanje(id: string): number {
+    return this.canjes().get(id) ?? 0;
+  }
+
+  /** Se puede sumar otro canje si alcanzan los puntos (y si hay butacas para las entradas gratis). */
+  puedeCanjear(r: Recompensa): boolean {
+    const puntos = this.auth.perfil()?.puntos_acumulados ?? 0;
+    if (this.puntosACanjear() + r.puntos_requeridos > puntos) return false;
+    if (r.tipo === 'entrada_gratis') {
+      return this.entradasGratis() + this.totalCombos() < this.misButacas().length;
+    }
+    return this.misButacas().length > 0;
+  }
+
+  cambiarCanje(r: Recompensa, delta: number) {
+    if (delta > 0 && !this.puedeCanjear(r)) return;
+    this.canjes.update((mapa) => {
+      const nuevo = new Map(mapa);
+      const cantidad = Math.max(0, (nuevo.get(r.id) ?? 0) + delta);
+      if (cantidad === 0) nuevo.delete(r.id);
+      else nuevo.set(r.id, cantidad);
+      return nuevo;
+    });
+  }
+
   // Si se liberan butacas, no puede haber más combos que entradas.
   private ajustarCombos() {
+    if (this.entradasGratis() + this.totalCombos() > this.misButacas().length) {
+      this.canjes.update((mapa) => {
+        const nuevo = new Map(mapa);
+        for (const r of this.recompensas()) if (r.tipo === 'entrada_gratis') nuevo.delete(r.id);
+        return nuevo;
+      });
+    }
     let sobrantes = this.totalCombos() - this.misButacas().length;
     if (sobrantes <= 0) return;
     this.cantidades.update((mapa) => {

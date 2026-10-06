@@ -91,6 +91,20 @@ export const routes: Routes = [
           )
       },
       {
+        path: 'cupones',
+        loadComponent: () =>
+          import('./features/admin/cupones-admin/cupones-admin.component').then(
+            (m) => m.CuponesAdminComponent
+          )
+      },
+      {
+        path: 'recompensas',
+        loadComponent: () =>
+          import('./features/admin/recompensas-admin/recompensas-admin.component').then(
+            (m) => m.RecompensasAdminComponent
+          )
+      },
+      {
         path: 'usuarios',
         loadComponent: () =>
           import('./features/admin/usuarios-admin/usuarios-admin.component').then(

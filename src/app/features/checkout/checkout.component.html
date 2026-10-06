@@ -163,16 +163,79 @@
             <p class="checkout__nota">Precio de preventa aplicado a las butacas normales y accesibles.</p>
           }
 
+          <!-- Cupón -->
+          <div class="checkout__cupon">
+            @if (cuponAplicado(); as c) {
+              <p class="checkout__cupon-ok">
+                Cupón <strong>{{ c.codigo }}</strong> ({{ c.porcentaje }}%)
+                <button type="button" class="checkout__link" (click)="quitarCupon()">Quitar</button>
+              </p>
+            } @else {
+              <form class="checkout__cupon-form" (submit)="$event.preventDefault(); aplicarCupon()">
+                <input class="input" [value]="codigoCupon()" (input)="alEscribirCupon($event)"
+                       placeholder="Código de cupón" aria-label="Código de cupón" />
+                <button type="submit" class="boton boton--secundario boton--chico"
+                        [disabled]="validandoCupon() || !codigoCupon().trim()">Aplicar</button>
+              </form>
+            }
+            @if (errorCupon()) {
+              <p class="error-texto">{{ errorCupon() }}</p>
+            }
+          </div>
+
+          <!-- Canje de puntos (solo con cuenta) -->
+          @if (auth.estaLogueado() && recompensas().length) {
+            <div class="checkout__canjes">
+              <p class="checkout__subtitulo">Canjeá tus puntos <span>(tenés {{ auth.perfil()?.puntos_acumulados ?? 0 }})</span></p>
+              @for (r of recompensas(); track r.id) {
+                <div class="checkout__canje">
+                  <span>{{ r.nombre }} <small>{{ r.puntos_requeridos }} pts</small></span>
+                  <div class="stepper">
+                    <button type="button" (click)="cambiarCanje(r, -1)" [disabled]="cantidadCanje(r.id) === 0" [attr.aria-label]="'Quitar ' + r.nombre">−</button>
+                    <span>{{ cantidadCanje(r.id) }}</span>
+                    <button type="button" (click)="cambiarCanje(r, 1)" [disabled]="!puedeCanjear(r)" [attr.aria-label]="'Canjear ' + r.nombre">+</button>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+
+          <!-- Crédito a favor -->
+          @if (creditoDisponible() > 0) {
+            <label class="checkout__credito">
+              <input type="checkbox" [checked]="usarCredito()" (change)="usarCredito.set(!usarCredito())" />
+              Usar mi crédito ({{ creditoDisponible() | currency: 'ARS' : 'symbol-narrow' : '1.0-2' }})
+            </label>
+          }
+
           <dl class="checkout__totales">
             <div><dt>Subtotal</dt><dd>{{ subtotal() | currency: 'ARS' : 'symbol-narrow' : '1.0-2' }}</dd></div>
-            @if (aplicaBienvenida()) {
+            @for (c of listaCanjes(); track c.recompensa.id) {
               <div class="checkout__descuento">
-                <dt>Cupón de bienvenida ({{ porcentajeBienvenida() }}%)</dt>
+                <dt>{{ c.recompensa.nombre }}{{ c.cantidad > 1 ? ' ×' + c.cantidad : '' }} · {{ c.recompensa.puntos_requeridos * c.cantidad }} pts</dt>
+                <dd>{{ c.recompensa.tipo === 'entrada_gratis' ? '−' + (precioGeneral() * c.cantidad | currency: 'ARS' : 'symbol-narrow' : '1.0-0') : 'Gratis' }}</dd>
+              </div>
+            }
+            @if (cuponGanador()) {
+              <div class="checkout__descuento">
+                <dt>
+                  {{ cuponGanador() === 'codigo' ? 'Cupón ' + cuponAplicado()?.codigo : 'Cupón de bienvenida' }}
+                  ({{ porcentajeDescuento() }}%)
+                </dt>
                 <dd>−{{ descuento() | currency: 'ARS' : 'symbol-narrow' : '1.0-2' }}</dd>
+              </div>
+            }
+            @if (creditoUsado() > 0) {
+              <div class="checkout__descuento">
+                <dt>Crédito a favor</dt>
+                <dd>−{{ creditoUsado() | currency: 'ARS' : 'symbol-narrow' : '1.0-2' }}</dd>
               </div>
             }
             <div class="checkout__total"><dt>Total</dt><dd>{{ total() | currency: 'ARS' : 'symbol-narrow' : '1.0-2' }}</dd></div>
           </dl>
+          @if (aplicaBienvenida() && cuponGanador() === 'codigo') {
+            <p class="checkout__nota">Se aplica un solo cupón, el de mayor descuento: tu cupón de bienvenida queda para la próxima.</p>
+          }
 
           @if (auth.estaLogueado()) {
             <p class="checkout__nota">Con esta compra sumás <strong>{{ puntos() }} puntos</strong>.</p>
