@@ -10,7 +10,7 @@ export interface ProductoCandy {
 export interface ComboItem {
   producto_id: string;
   cantidad: number;
-  producto?: { nombre: string } | null;
+  producto?: { nombre: string; imagen_url?: string | null } | null;
 }
 
 export interface Combo {

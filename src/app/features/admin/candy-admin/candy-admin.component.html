@@ -72,7 +72,12 @@
         <div class="admin__lista">
           @for (p of grupo.productos; track p.id) {
             <div class="tarjeta candy__item" [class.candy__item--inactivo]="!p.activo">
-              <div>
+              @if (p.imagen_url) {
+                <img class="candy__foto" [src]="p.imagen_url" [alt]="p.nombre" loading="lazy" />
+              } @else {
+                <span class="candy__foto candy__foto--vacia">Sin foto</span>
+              }
+              <div class="candy__datos">
                 <p class="candy__nombre">
                   {{ p.nombre }}
                   @if (!p.activo) {

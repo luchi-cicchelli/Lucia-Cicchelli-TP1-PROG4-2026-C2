@@ -329,12 +329,33 @@
 
 .checkout__producto {
   display: grid;
-  grid-template-columns: 1fr auto auto;
+  grid-template-columns: 48px 1fr auto auto;
   align-items: center;
   gap: 12px;
   padding: 8px 0;
   border-bottom: 1px solid var(--borde);
   font-size: 0.9rem;
+}
+
+.checkout__producto-foto {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  object-fit: cover;
+  background: var(--rosa-fondo);
+}
+
+.checkout__combo-fotos {
+  display: flex;
+  gap: 6px;
+}
+
+.checkout__combo-fotos img {
+  width: 56px;
+  height: 56px;
+  border-radius: 10px;
+  object-fit: cover;
+  background: #fff;
 }
 
 .checkout__producto-precio {

@@ -54,6 +54,13 @@
               @for (c of combos(); track c.id) {
                 <div class="checkout__combo" [class.checkout__combo--elegido]="cantidad('combo', c.id) > 0">
                   <span class="checkout__combo-tag">Combo</span>
+                  @if (fotosCombo(c).length) {
+                    <div class="checkout__combo-fotos">
+                      @for (f of fotosCombo(c); track f) {
+                        <img [src]="f" alt="" loading="lazy" />
+                      }
+                    </div>
+                  }
                   <p class="titulo checkout__combo-nombre">{{ c.nombre }}</p>
                   <p class="checkout__combo-detalle">{{ describirCombo(c) }}</p>
                   <div class="checkout__combo-pie">
@@ -77,6 +84,11 @@
               <h3>{{ g.categoria }}</h3>
               @for (p of g.productos; track p.id) {
                 <div class="checkout__producto">
+                  @if (p.imagen_url) {
+                    <img class="checkout__producto-foto" [src]="p.imagen_url" [alt]="p.nombre" loading="lazy" />
+                  } @else {
+                    <span class="checkout__producto-foto" aria-hidden="true"></span>
+                  }
                   <span>{{ p.nombre }}</span>
                   <span class="checkout__producto-precio">{{ p.precio | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }}</span>
                   <div class="stepper">

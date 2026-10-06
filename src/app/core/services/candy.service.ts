@@ -34,7 +34,7 @@ export class CandyService {
   async listarCombos(soloActivos = false): Promise<Combo[]> {
     let consulta = this.supabase.client
       .from('combos')
-      .select('*, items:combo_items(producto_id, cantidad, producto:productos_candy(nombre))')
+      .select('*, items:combo_items(producto_id, cantidad, producto:productos_candy(nombre, imagen_url))')
       .order('precio_fijo');
     if (soloActivos) consulta = consulta.eq('activo', true);
     const { data, error } = await consulta;

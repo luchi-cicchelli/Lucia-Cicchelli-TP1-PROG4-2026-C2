@@ -36,6 +36,11 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   readonly metodosPago = METODOS_PAGO;
   readonly describirCombo = describirCombo;
 
+  // Fotos de los productos que trae un combo (los que tienen imagen).
+  fotosCombo(c: Combo): string[] {
+    return c.items.map((i) => i.producto?.imagen_url).filter((url): url is string => !!url);
+  }
+
   readonly funcion = signal<FuncionCheckout | null>(null);
   readonly butacas = signal<Butaca[]>([]);
   readonly estados = signal<Map<string, EstadoButaca>>(new Map());
