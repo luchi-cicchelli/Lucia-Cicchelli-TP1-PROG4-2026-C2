@@ -1,8 +1,10 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CarteleraService } from '../../core/services/cartelera.service';
 import { PeliculaCartelera } from '../../core/models/cartelera.model';
-import { Genero } from '../../core/models/pelicula.model';
+import { Genero, ventaAbierta } from '../../core/models/pelicula.model';
 import { TarjetaPeliculaComponent } from '../../shared/components/tarjeta-pelicula/tarjeta-pelicula.component';
+import { BotonAlertaComponent } from '../../shared/components/boton-alerta/boton-alerta.component';
+import { RouterLink } from '@angular/router';
 
 function hoyIso(): string {
   const d = new Date();
@@ -16,7 +18,7 @@ function normalizar(texto: string): string {
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [TarjetaPeliculaComponent],
+  imports: [TarjetaPeliculaComponent, BotonAlertaComponent, RouterLink],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
@@ -26,6 +28,8 @@ export class HomeComponent implements OnInit {
   readonly peliculas = signal<PeliculaCartelera[]>([]);
   readonly cargando = signal(true);
   readonly error = signal('');
+
+  readonly ventaAbierta = ventaAbierta;
 
   readonly busqueda = signal('');
   readonly generosElegidos = signal<ReadonlySet<number>>(new Set());

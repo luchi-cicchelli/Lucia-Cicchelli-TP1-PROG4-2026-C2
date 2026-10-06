@@ -1,0 +1,154 @@
+<section class="admin">
+  <a routerLink="/admin" class="admin__volver">← Panel</a>
+
+  <header class="admin__encabezado">
+    <h1 class="titulo">Reportes</h1>
+    <p>Facturación por día, entradas vendidas y lo más elegido por el público.</p>
+  </header>
+
+  @if (error()) {
+    <p class="alerta alerta--error">{{ error() }}</p>
+  }
+
+  <!-- ========== Facturación ========== -->
+  <div class="tarjeta rep__bloque">
+    <div class="rep__cabecera">
+      <h2 class="titulo">Facturación y entradas</h2>
+      <div class="rep__export">
+        <button type="button" class="boton boton--secundario boton--chico" [disabled]="exportando() || !ventas().length" (click)="exportar('pdf')">
+          Exportar PDF
+        </button>
+        <button type="button" class="boton boton--secundario boton--chico" [disabled]="exportando() || !ventas().length" (click)="exportar('excel')">
+          Exportar Excel
+        </button>
+      </div>
+    </div>
+
+    <form class="rep__rango" [formGroup]="form" (ngSubmit)="cargarVentas()" novalidate>
+      <label class="campo">
+        Desde
+        <input class="input" type="date" formControlName="desde" [max]="hoy" />
+      </label>
+      <label class="campo">
+        Hasta
+        <input class="input" type="date" formControlName="hasta" [max]="hoy" />
+      </label>
+      <button type="submit" class="boton boton--chico" [disabled]="cargando()">Ver</button>
+      <div class="rep__atajos">
+        <button type="button" class="chip" (click)="atajo('7dias')">Últimos 7 días</button>
+        <button type="button" class="chip" (click)="atajo('mes')">Este mes</button>
+        <button type="button" class="chip" (click)="atajo('mesPasado')">Mes pasado</button>
+      </div>
+    </form>
+    @if (form.hasError('rangoInvertido')) {
+      <span class="error-texto">"Hasta" tiene que ser posterior a "desde".</span>
+    }
+    @if (form.hasError('rangoLargo')) {
+      <span class="error-texto">El rango puede ser de hasta 3 meses.</span>
+    }
+
+    <div class="rep__resumen">
+      <div><span>{{ totales().facturacion | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }}</span>Facturado</div>
+      <div><span>{{ totales().entradas }}</span>Entradas vendidas</div>
+      <div><span>{{ totales().compras }}</span>Compras</div>
+      <div><span>{{ totales().promedio | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }}</span>Ticket promedio</div>
+    </div>
+
+    @if (ventas().length) {
+      <div class="rep__barras" role="img" aria-label="Facturación por día">
+        @for (v of ventas(); track v.dia) {
+          <div class="rep__barra" [title]="(fecha(v.dia) | date: 'EEE d/MM') + ': ' + (v.facturacion | currency: 'ARS' : 'symbol-narrow' : '1.0-0')">
+            <div class="rep__barra-relleno" [style.height.%]="(v.facturacion / maxFacturacion()) * 100"></div>
+          </div>
+        }
+      </div>
+      <div class="rep__barras-eje">
+        <span>{{ fecha(rangoMostrado().desde) | date: 'd/MM' }}</span>
+        <span>{{ fecha(rangoMostrado().hasta) | date: 'd/MM' }}</span>
+      </div>
+
+      <div class="rep__tabla-scroll">
+        <table class="rep__tabla">
+          <thead>
+            <tr><th>Fecha</th><th>Compras</th><th>Entradas</th><th>Facturación</th></tr>
+          </thead>
+          <tbody>
+            @for (v of ventas(); track v.dia) {
+              <tr [class.rep__fila-vacia]="!v.compras">
+                <td>{{ fecha(v.dia) | date: 'EEE d/MM' }}</td>
+                <td>{{ v.compras }}</td>
+                <td>{{ v.entradas }}</td>
+                <td>{{ v.facturacion | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }}</td>
+              </tr>
+            }
+          </tbody>
+          <tfoot>
+            <tr>
+              <td>Total</td>
+              <td>{{ totales().compras }}</td>
+              <td>{{ totales().entradas }}</td>
+              <td>{{ totales().facturacion | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }}</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    } @else if (!cargando()) {
+      <p class="admin__vacio">No hay datos para ese rango.</p>
+    }
+  </div>
+
+  <!-- ========== Rankings ========== -->
+  <div class="tarjeta rep__bloque">
+    <div class="rep__cabecera">
+      <h2 class="titulo">Lo más elegido</h2>
+      <div class="rep__periodo">
+        <button type="button" class="chip" [class.chip--activo]="periodo() === 'semana'" (click)="cambiarPeriodo('semana')">Semana</button>
+        <button type="button" class="chip" [class.chip--activo]="periodo() === 'mes'" (click)="cambiarPeriodo('mes')">Mes</button>
+      </div>
+    </div>
+
+    <div class="rep__navegar">
+      <button type="button" class="rep__flecha" (click)="mover(-1)" aria-label="Período anterior">‹</button>
+      <span>
+        @if (periodo() === 'semana') {
+          Semana del {{ rangoRanking().desde | date: 'd/MM' }} al {{ rangoRanking().hasta | date: 'd/MM' }}
+        } @else {
+          {{ rangoRanking().desde | date: 'MMMM yyyy' }}
+        }
+      </span>
+      <button type="button" class="rep__flecha" (click)="mover(1)" [disabled]="desplazamiento() === 0" aria-label="Período siguiente">›</button>
+    </div>
+
+    <div class="rep__rankings" [class.rep__rankings--cargando]="cargandoRanking()">
+      <div>
+        <h3 class="rep__subtitulo">Películas más vistas</h3>
+        @for (r of peliculas(); track r.nombre; let i = $index) {
+          <div class="rep__fila-ranking">
+            <span class="rep__nombre">{{ r.nombre }}</span>
+            <div class="rep__pista"><div class="rep__llena" [class.rep__llena--top]="i === 0" [style.width.%]="(r.cantidad / maxPeliculas()) * 100"></div></div>
+            <span class="rep__valor">{{ r.cantidad | number }}</span>
+          </div>
+        } @empty {
+          <p class="rep__nada">Sin entradas en este período.</p>
+        }
+      </div>
+
+      <div>
+        <h3 class="rep__subtitulo">Candy bar más vendido</h3>
+        @if (candy().length) {
+          <p class="rep__ganador">🍿 <strong>{{ candy()[0].nombre }}</strong> es el producto que más se vende.</p>
+        }
+        @for (r of candy(); track r.nombre; let i = $index) {
+          <div class="rep__fila-ranking">
+            <span class="rep__nombre">{{ r.nombre }}</span>
+            <div class="rep__pista"><div class="rep__llena" [class.rep__llena--top]="i === 0" [style.width.%]="(r.cantidad / maxCandy()) * 100"></div></div>
+            <span class="rep__valor">{{ r.cantidad | number }}</span>
+          </div>
+        } @empty {
+          <p class="rep__nada">Sin ventas de candy en este período.</p>
+        }
+        <p class="rep__nota">Incluye los productos que vienen dentro de los combos.</p>
+      </div>
+    </div>
+  </div>
+</section>

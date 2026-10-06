@@ -10,7 +10,7 @@
       <a class="mp__item" [routerLink]="['/pelicula', p.id]" [fragment]="p.miPuntaje ? undefined : 'resenas'">
         <div class="mp__poster">
           @if (p.imagen_url) {
-            <img [src]="p.imagen_url" [alt]="'Póster de ' + p.nombre" loading="lazy" />
+            <img [src]="p.imagen_url" [alt]="'Póster de ' + p.nombre" loading="lazy" appImagenRespaldo />
           } @else {
             <span class="titulo">{{ p.nombre }}</span>
           }

@@ -1,0 +1,122 @@
+.pelis__encabezado {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.pelis__form {
+  padding: 1.5rem;
+  display: grid;
+  gap: 14px;
+}
+
+.pelis__form h2 {
+  font-size: 1.1rem;
+}
+
+.pelis__fila {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.pelis__fila--dos {
+  grid-template-columns: 1fr 1fr;
+}
+
+.pelis__preventa {
+  display: grid;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--superficie-alt);
+}
+
+.pelis__ayuda {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--texto-muted);
+}
+
+.pelis__generos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pelis__generos .chip {
+  cursor: pointer;
+}
+
+.pelis__check {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+.pelis__acciones,
+.pelis__botones {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pelis__item {
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.pelis__item--oculta {
+  opacity: 0.6;
+}
+
+.pelis__poster {
+  width: 48px;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+.pelis__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.pelis__nombre {
+  margin: 0 0 2px;
+  font-weight: 500;
+}
+
+.pelis__oculta {
+  font-size: 0.75rem;
+  color: var(--texto-muted);
+  font-weight: 400;
+}
+
+.pelis__detalle,
+.pelis__sinopsis {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--texto-secundario);
+}
+
+.pelis__sinopsis {
+  margin-top: 4px;
+  color: var(--texto-muted);
+}
+
+@media (max-width: 640px) {
+  .pelis__fila {
+    grid-template-columns: 1fr;
+  }
+
+  .pelis__item {
+    flex-wrap: wrap;
+  }
+}

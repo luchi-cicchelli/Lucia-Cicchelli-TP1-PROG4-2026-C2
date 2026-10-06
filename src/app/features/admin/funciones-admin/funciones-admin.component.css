@@ -176,6 +176,7 @@
 }
 
 .funciones__preventa {
+  white-space: nowrap;
   font-size: 0.7rem;
   padding: 2px 8px;
   margin-left: 4px;
@@ -193,4 +194,30 @@
   .funciones__item {
     flex-wrap: wrap;
   }
+}
+
+.funciones__nota {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--texto-secundario);
+}
+
+.funciones__precio {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.funciones__precio label {
+  display: grid;
+  gap: 2px;
+  font-size: 0.7rem;
+  color: var(--texto-secundario);
+}
+
+.funciones__precio .input {
+  width: 90px;
+  padding: 6px 8px;
+  font-size: 0.85rem;
 }

@@ -1,0 +1,44 @@
+.panel__grupo {
+  display: grid;
+  gap: 10px;
+}
+
+.panel__titulo {
+  font-family: var(--fuente-texto);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--texto-muted);
+}
+
+.panel__grilla {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.panel__acceso {
+  display: grid;
+  gap: 4px;
+  padding: 1rem 1.25rem;
+  color: var(--texto);
+  text-decoration: none;
+  transition: border-color 0.15s, transform 0.15s;
+}
+
+.panel__acceso:hover {
+  border-color: var(--rosa-acento);
+  transform: translateY(-2px);
+}
+
+.panel__acceso strong {
+  font-family: var(--fuente-titulo);
+  font-weight: 500;
+  font-size: 1.05rem;
+}
+
+.panel__acceso span {
+  font-size: 0.8rem;
+  color: var(--texto-secundario);
+}

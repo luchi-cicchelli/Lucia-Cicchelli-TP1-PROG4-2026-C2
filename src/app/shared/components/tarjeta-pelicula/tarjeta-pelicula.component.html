@@ -1,11 +1,11 @@
 <a class="tarjeta-peli" [routerLink]="['/pelicula', pelicula().id]">
   <div class="tarjeta-peli__poster">
-    @if (pelicula().imagen_url && !imagenRota()) {
+    @if (pelicula().imagen_url) {
       <img
         [src]="pelicula().imagen_url"
         [alt]="'Póster de ' + pelicula().nombre"
         loading="lazy"
-        (error)="imagenRota.set(true)"
+        appImagenRespaldo
       />
     } @else {
       <div class="tarjeta-peli__sin-imagen">
@@ -16,6 +16,9 @@
     @if (posicion()) {
       <span class="tarjeta-peli__ranking">#{{ posicion() }}</span>
     }
+    @if (proximamente() && preventaAbierta()) {
+      <span class="tarjeta-peli__ranking">Preventa</span>
+    }
     @if (pelicula().restriccion_edad) {
       <span class="tarjeta-peli__edad">+{{ pelicula().restriccion_edad }}</span>
     }
@@ -24,10 +27,10 @@
   <div class="tarjeta-peli__info">
     <h3 class="titulo tarjeta-peli__nombre">{{ pelicula().nombre }}</h3>
     @if (proximamente()) {
-      <p class="tarjeta-peli__estreno">Estrena el {{ fechaEstreno() | date: "d 'de' MMMM" }}</p>
+      <p class="tarjeta-peli__estreno">Estrena el {{ estreno() | date: "d 'de' MMMM" }}</p>
     } @else {
       <app-estrellas [valor]="pelicula().promedio" />
     }
-    <p class="tarjeta-peli__meta">{{ pelicula().duracion_minutos }} min · {{ generos() }}</p>
+    <p class="tarjeta-peli__meta">{{ pelicula().duracion_minutos | duracion }} · {{ generos() }}</p>
   </div>
 </a>

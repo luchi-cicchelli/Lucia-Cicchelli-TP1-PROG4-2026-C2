@@ -46,10 +46,10 @@
             Precio
             <input class="input" type="number" min="1" formControlName="precio" placeholder="$" />
           </label>
-          <label class="campo">
-            URL de imagen (opcional)
-            <input class="input" formControlName="imagen_url" />
-          </label>
+        </div>
+        <div class="campo">
+          Imagen (opcional)
+          <app-subir-imagen carpeta="candy" [url]="formProducto.controls.imagen_url.value" (subida)="formProducto.controls.imagen_url.setValue($event)" />
         </div>
         <label class="candy__check">
           <input type="checkbox" formControlName="activo" /> Disponible para la venta

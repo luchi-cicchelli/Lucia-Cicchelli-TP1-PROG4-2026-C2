@@ -69,11 +69,18 @@
       <section class="home__seccion">
         <header class="home__encabezado">
           <h2 class="titulo">Próximamente</h2>
-          <p>Estrenos de las próximas semanas.</p>
+          <p>Estrenos de las próximas semanas. Activá la alerta y te avisamos cuando salgan las entradas.</p>
         </header>
         <div class="home__grilla">
           @for (p of proximamente(); track p.id) {
-            <app-tarjeta-pelicula [pelicula]="p" [proximamente]="true" />
+            <div class="home__proxima">
+              <app-tarjeta-pelicula [pelicula]="p" [proximamente]="true" />
+              @if (ventaAbierta(p)) {
+                <a class="boton boton--chico" [routerLink]="['/pelicula', p.id]">Comprar en preventa</a>
+              } @else {
+                <app-boton-alerta [peliculaId]="p.id" />
+              }
+            </div>
           }
         </div>
       </section>

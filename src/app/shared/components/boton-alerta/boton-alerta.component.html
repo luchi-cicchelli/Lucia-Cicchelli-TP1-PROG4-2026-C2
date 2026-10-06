@@ -1,0 +1,24 @@
+@if (auth.estaLogueado()) {
+  <button
+    type="button"
+    class="alerta-btn"
+    [class.alerta-btn--activa]="activa()"
+    [disabled]="ocupado()"
+    [attr.aria-pressed]="activa()"
+    (click)="alternar()"
+  >
+    @if (activa()) {
+      <span aria-hidden="true">✓</span>
+    } @else {
+      <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M12 22a2.5 2.5 0 0 0 2.45-2h-4.9A2.5 2.5 0 0 0 12 22Zm7-6V11a7 7 0 0 0-5.5-6.84V3.5a1.5 1.5 0 0 0-3 0v.66A7 7 0 0 0 5 11v5l-2 2v1h18v-1Z"/></svg>
+    }
+    {{ activa() ? 'Te vamos a avisar' : 'Avisarme cuando salgan las entradas' }}
+  </button>
+  @if (aviso()) {
+    <p class="alerta-btn__aviso">{{ aviso() }}</p>
+  }
+} @else {
+  <a class="alerta-btn" routerLink="/login">
+    <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M12 22a2.5 2.5 0 0 0 2.45-2h-4.9A2.5 2.5 0 0 0 12 22Zm7-6V11a7 7 0 0 0-5.5-6.84V3.5a1.5 1.5 0 0 0-3 0v.66A7 7 0 0 0 5 11v5l-2 2v1h18v-1Z"/></svg> Iniciá sesión para activar la alerta
+  </a>
+}

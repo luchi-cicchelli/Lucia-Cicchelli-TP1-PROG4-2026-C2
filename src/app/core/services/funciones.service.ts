@@ -27,13 +27,20 @@ export class FuncionesService {
       p_formato: datos.formato,
       p_idioma: datos.idioma,
       p_precio_base: datos.precioBase,
-      p_precio_vip: datos.precioVip,
-      p_es_preventa: datos.esPreventa,
-      p_fecha_fin_preventa: datos.fechaFinPreventa?.toISOString() ?? null,
-      p_precio_preventa: datos.precioPreventa
+      p_precio_vip: datos.precioVip
     });
     if (error) throw new Error(error.message);
     return data as FuncionCreada[];
+  }
+
+  // Por RPC para que quede en el log quién cambió el precio y de cuánto a cuánto.
+  async cambiarPrecio(id: string, precioBase: number, precioVip: number): Promise<void> {
+    const { error } = await this.supabase.client.rpc('cambiar_precio_funcion', {
+      p_funcion_id: id,
+      p_precio_base: precioBase,
+      p_precio_vip: precioVip
+    });
+    if (error) throw new Error(error.message);
   }
 
   async eliminar(id: string): Promise<void> {

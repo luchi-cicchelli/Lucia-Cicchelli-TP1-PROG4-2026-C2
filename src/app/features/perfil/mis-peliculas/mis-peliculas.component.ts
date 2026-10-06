@@ -5,6 +5,7 @@ import { AuthService } from '../../../core/services/auth.service';
 import { ComprasService } from '../../../core/services/compras.service';
 import { ResenasService } from '../../../core/services/resenas.service';
 import { EstrellasComponent } from '../../../shared/components/estrellas/estrellas.component';
+import { ImagenRespaldoDirective } from '../../../shared/directives/imagen-respaldo.directive';
 
 interface PeliculaVista {
   id: string;
@@ -17,7 +18,7 @@ interface PeliculaVista {
 @Component({
   selector: 'app-mis-peliculas',
   standalone: true,
-  imports: [RouterLink, DatePipe, EstrellasComponent],
+  imports: [RouterLink, DatePipe, EstrellasComponent, ImagenRespaldoDirective],
   templateUrl: './mis-peliculas.component.html',
   styleUrl: './mis-peliculas.component.css'
 })

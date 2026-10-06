@@ -36,7 +36,8 @@
               "raf",
               "rgbcolor",
               "html2canvas",
-              "jsqr"
+              "jsqr",
+              "exceljs"
             ]
           },
           "configurations": {

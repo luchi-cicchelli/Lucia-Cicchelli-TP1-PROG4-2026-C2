@@ -1,0 +1,15 @@
+<div class="subir">
+  @if (url()) {
+    <img class="subir__previa" [src]="url()" alt="Vista previa" appImagenRespaldo />
+  }
+  <div class="subir__acciones">
+    <label class="boton boton--secundario boton--chico subir__boton" [class.subir__boton--ocupado]="subiendo()">
+      {{ subiendo() ? 'Subiendo…' : url() ? 'Cambiar imagen' : 'Subir imagen' }}
+      <input type="file" accept="image/jpeg,image/png,image/webp" (change)="alElegir($event)" [disabled]="subiendo()" />
+    </label>
+    <span class="subir__ayuda">JPG, PNG o WEBP · hasta 2 MB</span>
+    @if (error()) {
+      <span class="error-texto">{{ error() }}</span>
+    }
+  </div>
+</div>

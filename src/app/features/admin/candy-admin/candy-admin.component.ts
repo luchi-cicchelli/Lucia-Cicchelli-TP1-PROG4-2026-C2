@@ -4,13 +4,14 @@ import { FormArray, FormBuilder, ReactiveFormsModule, Validators } from '@angula
 import { RouterLink } from '@angular/router';
 import { CandyService } from '../../../core/services/candy.service';
 import { Combo, ProductoCandy, describirCombo } from '../../../core/models/candy.model';
+import { SubirImagenComponent } from '../../../shared/components/subir-imagen/subir-imagen.component';
 
 type Pestania = 'productos' | 'combos';
 
 @Component({
   selector: 'app-candy-admin',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, CurrencyPipe],
+  imports: [ReactiveFormsModule, RouterLink, CurrencyPipe, SubirImagenComponent],
   templateUrl: './candy-admin.component.html',
   styleUrl: './candy-admin.component.css'
 })

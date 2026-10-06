@@ -105,6 +105,16 @@ export const routes: Routes = [
           )
       },
       {
+        path: 'reportes',
+        loadComponent: () =>
+          import('./features/admin/reportes/reportes.component').then((m) => m.ReportesComponent)
+      },
+      {
+        path: 'actividad',
+        loadComponent: () =>
+          import('./features/admin/actividad/actividad.component').then((m) => m.ActividadComponent)
+      },
+      {
         path: 'usuarios',
         loadComponent: () =>
           import('./features/admin/usuarios-admin/usuarios-admin.component').then(

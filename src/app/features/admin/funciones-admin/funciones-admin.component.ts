@@ -14,6 +14,7 @@ import { map, startWith } from 'rxjs';
 import { FuncionesService } from '../../../core/services/funciones.service';
 import { PeliculasService } from '../../../core/services/peliculas.service';
 import { PeliculaConGeneros } from '../../../core/models/pelicula.model';
+import { DuracionPipe } from '../../../shared/pipes/duracion.pipe';
 import {
   FORMATOS,
   Formato,
@@ -62,17 +63,10 @@ const rangoValido: ValidatorFn = (grupo: AbstractControl): ValidationErrors | nu
   return dias > MAX_DIAS_RANGO ? { rangoLargo: true } : null;
 };
 
-const preventaValida: ValidatorFn = (grupo: AbstractControl): ValidationErrors | null => {
-  if (!grupo.get('esPreventa')?.value) return null;
-  const fecha = grupo.get('fechaFinPreventa')?.value;
-  const precio = grupo.get('precioPreventa')?.value;
-  return !fecha || !precio || precio <= 0 ? { preventaIncompleta: true } : null;
-};
-
 @Component({
   selector: 'app-funciones-admin',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, DatePipe, CurrencyPipe, UpperCasePipe],
+  imports: [ReactiveFormsModule, RouterLink, DatePipe, CurrencyPipe, UpperCasePipe, DuracionPipe],
   templateUrl: './funciones-admin.component.html',
   styleUrl: './funciones-admin.component.css'
 })
@@ -95,6 +89,12 @@ export class FuncionesAdminComponent implements OnInit {
   readonly error = signal('');
   readonly creadas = signal<FuncionCreada[]>([]);
   readonly confirmarBorrarId = signal<string | null>(null);
+  readonly editandoPrecioId = signal<string | null>(null);
+
+  readonly formPrecio = this.fb.nonNullable.group({
+    base: [0, [Validators.required, Validators.min(1)]],
+    vip: [0, [Validators.required, Validators.min(1)]]
+  });
 
   readonly form = this.fb.nonNullable.group(
     {
@@ -106,12 +106,9 @@ export class FuncionesAdminComponent implements OnInit {
       dias: [[] as number[], Validators.required],
       horarios: this.fb.nonNullable.array([this.fb.nonNullable.control('18:00', Validators.required)]),
       desde: [this.hoy, Validators.required],
-      hasta: [aIso(sumarDias(new Date(), 13)), Validators.required],
-      esPreventa: [false],
-      fechaFinPreventa: [''],
-      precioPreventa: [null as number | null]
+      hasta: [aIso(sumarDias(new Date(), 13)), Validators.required]
     },
-    { validators: [rangoValido, preventaValida] }
+    { validators: rangoValido }
   );
 
   private readonly valores = toSignal(
@@ -200,7 +197,7 @@ export class FuncionesAdminComponent implements OnInit {
     if (!p) return;
     const estreno = fechaLocal(p.fecha_estreno);
     if (estreno > new Date()) {
-      this.form.patchValue({ desde: aIso(estreno), fechaFinPreventa: aIso(sumarDias(estreno, -1)) });
+      this.form.patchValue({ desde: aIso(estreno) });
     }
   }
 
@@ -247,10 +244,7 @@ export class FuncionesAdminComponent implements OnInit {
         formato: v.formato,
         idioma: v.idioma,
         precioBase: Number(v.precioBase),
-        precioVip: Number(v.precioVip),
-        esPreventa: v.esPreventa,
-        fechaFinPreventa: v.esPreventa ? new Date(`${v.fechaFinPreventa}T23:59:59`) : null,
-        precioPreventa: v.esPreventa ? Number(v.precioPreventa) : null
+        precioVip: Number(v.precioVip)
       });
       this.creadas.set(creadas);
       this.mostrarFormulario.set(false);
@@ -259,6 +253,26 @@ export class FuncionesAdminComponent implements OnInit {
       this.error.set(e.message);
     } finally {
       this.guardando.set(false);
+    }
+  }
+
+  editarPrecio(f: FuncionConDetalle) {
+    this.formPrecio.reset({ base: f.precio_base, vip: f.precio_vip });
+    this.editandoPrecioId.set(f.id);
+  }
+
+  async guardarPrecio(f: FuncionConDetalle) {
+    if (this.formPrecio.invalid) return;
+    const { base, vip } = this.formPrecio.getRawValue();
+    this.error.set('');
+    try {
+      await this.funcionesService.cambiarPrecio(f.id, Number(base), Number(vip));
+      this.funciones.update((lista) =>
+        lista.map((x) => (x.id === f.id ? { ...x, precio_base: Number(base), precio_vip: Number(vip) } : x))
+      );
+      this.editandoPrecioId.set(null);
+    } catch (e: any) {
+      this.error.set(e.message);
     }
   }
 

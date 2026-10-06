@@ -104,6 +104,12 @@
   font-size: 0.85rem;
 }
 
+.detalle__proximamente {
+  display: grid;
+  gap: 10px;
+  justify-items: start;
+}
+
 .detalle__seccion {
   display: grid;
   gap: 1rem;
@@ -205,6 +211,11 @@
 .detalle__horario--bloqueado {
   color: var(--texto-muted);
   text-decoration: line-through;
+}
+
+.detalle__horario--pronto {
+  color: var(--texto-muted);
+  cursor: default;
 }
 
 .detalle__preventa {

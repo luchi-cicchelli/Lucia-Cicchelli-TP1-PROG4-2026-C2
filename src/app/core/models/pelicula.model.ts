@@ -12,6 +12,9 @@ export interface Pelicula {
   restriccion_edad: number | null;
   fecha_estreno: string; 
   activa: boolean;
+  preventa: boolean;
+  precio_preventa: number | null;
+  dias_preventa: number;
 }
 
 export interface PeliculaConGeneros extends Pelicula {
@@ -26,5 +29,29 @@ export interface PeliculaFormValue {
   restriccion_edad: number | null;
   fecha_estreno: string;
   activa: boolean;
+  preventa: boolean;
+  precio_preventa: number | null;
+  dias_preventa: number;
   generoIds: number[];
+}
+
+export function fechaEstreno(p: Pelicula): Date {
+  const [a, m, d] = p.fecha_estreno.split('-').map(Number);
+  return new Date(a, m - 1, d);
+}
+
+// Misma regla que apertura_venta() en la base: con preventa abre X días antes del estreno,
+// sin preventa abre el día del estreno.
+export function aperturaVenta(p: Pelicula): Date {
+  const apertura = fechaEstreno(p);
+  if (p.preventa) apertura.setDate(apertura.getDate() - p.dias_preventa);
+  return apertura;
+}
+
+export function ventaAbierta(p: Pelicula): boolean {
+  return aperturaVenta(p) <= new Date();
+}
+
+export function enPreventa(p: Pelicula): boolean {
+  return p.preventa && ventaAbierta(p) && fechaEstreno(p) > new Date();
 }

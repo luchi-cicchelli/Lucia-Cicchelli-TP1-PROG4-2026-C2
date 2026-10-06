@@ -34,9 +34,6 @@ export interface NuevasFunciones {
   idioma: Idioma;
   precioBase: number;
   precioVip: number;
-  esPreventa: boolean;
-  fechaFinPreventa: Date | null;
-  precioPreventa: number | null;
 }
 
 export interface FuncionCreada {

@@ -1,26 +1,20 @@
-<div style="padding: 2rem; max-width: 960px; margin: 0 auto;">
-  <h1 class="titulo" style="font-size: 1.5rem; margin-bottom: 1.5rem;">Panel de administración</h1>
-  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px;">
-    <a routerLink="/admin/peliculas" class="tarjeta" style="padding: 1.25rem; text-decoration: none; color: var(--texto); display: block;">
-      Películas
-    </a>
-    <a routerLink="/admin/salas" class="tarjeta" style="padding: 1.25rem; text-decoration: none; color: var(--texto); display: block;">
-      Salas
-    </a>
-    <a routerLink="/admin/funciones" class="tarjeta" style="padding: 1.25rem; text-decoration: none; color: var(--texto); display: block;">
-      Funciones
-    </a>
-    <a routerLink="/admin/candy" class="tarjeta" style="padding: 1.25rem; text-decoration: none; color: var(--texto); display: block;">
-      Candy bar
-    </a>
-    <a routerLink="/admin/cupones" class="tarjeta" style="padding: 1.25rem; text-decoration: none; color: var(--texto); display: block;">
-      Cupones
-    </a>
-    <a routerLink="/admin/recompensas" class="tarjeta" style="padding: 1.25rem; text-decoration: none; color: var(--texto); display: block;">
-      Recompensas
-    </a>
-    <a routerLink="/admin/usuarios" class="tarjeta" style="padding: 1.25rem; text-decoration: none; color: var(--texto); display: block;">
-      Usuarios y roles
-    </a>
-  </div>
-</div>
+<section class="admin">
+  <header class="admin__encabezado">
+    <h1 class="titulo">Panel de administración</h1>
+    <p>Todo lo del cine, en un solo lugar.</p>
+  </header>
+
+  @for (g of grupos; track g.titulo) {
+    <div class="panel__grupo">
+      <h2 class="panel__titulo">{{ g.titulo }}</h2>
+      <div class="panel__grilla">
+        @for (a of g.accesos; track a.ruta) {
+          <a class="tarjeta panel__acceso" [routerLink]="a.ruta">
+            <strong>{{ a.titulo }}</strong>
+            <span>{{ a.descripcion }}</span>
+          </a>
+        }
+      </div>
+    </div>
+  }
+</section>

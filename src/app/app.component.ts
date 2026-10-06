@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { NavbarComponent } from './shared/components/navbar/navbar.component';
+import { CargandoService } from './core/services/cargando.service';
 
 @Component({
   selector: 'app-root',
@@ -9,5 +10,5 @@ import { NavbarComponent } from './shared/components/navbar/navbar.component';
   styleUrl: './app.component.css'
 })
 export class AppComponent {
-  title = 'cine-app';
+  readonly cargando = inject(CargandoService).cargando;
 }

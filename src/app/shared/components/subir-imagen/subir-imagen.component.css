@@ -1,0 +1,37 @@
+.subir {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.subir__previa {
+  width: 64px;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid var(--borde);
+}
+
+.subir__acciones {
+  display: grid;
+  gap: 4px;
+  justify-items: start;
+}
+
+.subir__boton {
+  cursor: pointer;
+}
+
+.subir__boton input {
+  display: none;
+}
+
+.subir__boton--ocupado {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.subir__ayuda {
+  font-size: 0.75rem;
+  color: var(--texto-muted);
+}

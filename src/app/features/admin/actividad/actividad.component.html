@@ -1,0 +1,56 @@
+<section class="admin">
+  <a routerLink="/admin" class="admin__volver">← Panel</a>
+
+  <header class="admin__encabezado">
+    <h1 class="titulo">Actividad</h1>
+    <p>Quién hizo qué y cuándo: funciones, precios, validaciones de QR y más.</p>
+  </header>
+
+  @if (error()) {
+    <p class="alerta alerta--error">{{ error() }}</p>
+  }
+
+  <div class="act__filtros">
+    @for (f of filtros; track f.etiqueta) {
+      <button type="button" class="chip" [class.chip--activo]="filtro() === f" (click)="elegirFiltro(f)">{{ f.etiqueta }}</button>
+    }
+  </div>
+  <input
+    class="input"
+    type="search"
+    placeholder="Buscar por persona o detalle"
+    [value]="busqueda()"
+    (input)="alBuscar($event)"
+    aria-label="Buscar en el log"
+  />
+
+  <ol class="act__lista">
+    @for (l of visibles(); track l.id) {
+      <li class="tarjeta act__item">
+        <span class="act__punto" [attr.data-accion]="l.accion"></span>
+        <div class="act__texto">
+          <p class="act__titulo">
+            <strong>{{ quien(l) }}</strong> · {{ accion(l.accion) }}
+          </p>
+          @if (l.detalle) {
+            <p class="act__detalle">{{ l.detalle }}</p>
+          }
+        </div>
+        <time class="act__fecha" [attr.datetime]="l.fecha_hora" [title]="l.fecha_hora | date: 'dd/MM/yyyy HH:mm:ss'">
+          <span>{{ l.fecha_hora | hace }}</span>
+          {{ l.fecha_hora | date: 'dd/MM/yyyy HH:mm' }}
+        </time>
+      </li>
+    } @empty {
+      @if (!cargando()) {
+        <p class="admin__vacio">No hay actividad registrada.</p>
+      }
+    }
+  </ol>
+
+  @if (cargando()) {
+    <p class="admin__vacio">Cargando…</p>
+  } @else if (hayMas()) {
+    <button type="button" class="boton boton--secundario act__mas" (click)="cargarMas()">Ver más</button>
+  }
+</section>

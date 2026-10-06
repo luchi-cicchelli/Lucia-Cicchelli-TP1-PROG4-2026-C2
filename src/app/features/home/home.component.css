@@ -86,3 +86,14 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+.home__proxima {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+}
+
+.home__proxima .boton {
+  text-align: center;
+  text-decoration: none;
+}

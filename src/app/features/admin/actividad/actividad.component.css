@@ -1,0 +1,94 @@
+.act__filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.act__filtros .chip {
+  cursor: pointer;
+}
+
+.act__lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.act__item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0.75rem 1rem;
+}
+
+.act__punto {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--texto-muted);
+}
+
+.act__punto[data-accion='modifico_precio'],
+.act__punto[data-accion='cancelo_compra'] {
+  background: var(--rosa-acento);
+}
+
+.act__punto[data-accion='valido_qr'],
+.act__punto[data-accion='entrego_candy'] {
+  background: #4f9d7a;
+}
+
+.act__punto[data-accion='creo_funciones'],
+.act__punto[data-accion='creo_pelicula'],
+.act__punto[data-accion='creo_cupon'] {
+  background: var(--rosa-suave);
+}
+
+.act__texto {
+  flex: 1;
+  min-width: 0;
+}
+
+.act__titulo,
+.act__detalle {
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+.act__detalle {
+  margin-top: 2px;
+  color: var(--texto-secundario);
+  font-size: 0.8rem;
+}
+
+.act__fecha {
+  display: grid;
+  text-align: right;
+  font-size: 0.7rem;
+  color: var(--texto-muted);
+  flex-shrink: 0;
+}
+
+.act__fecha span {
+  font-size: 0.8rem;
+  color: var(--texto-secundario);
+}
+
+.act__mas {
+  justify-self: center;
+}
+
+@media (max-width: 560px) {
+  .act__item {
+    flex-wrap: wrap;
+  }
+
+  .act__fecha {
+    text-align: left;
+    width: 100%;
+    padding-left: 22px;
+  }
+}

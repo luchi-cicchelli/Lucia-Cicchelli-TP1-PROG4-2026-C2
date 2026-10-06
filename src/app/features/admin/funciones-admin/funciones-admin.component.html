@@ -38,7 +38,7 @@
         <select class="input" formControlName="peliculaId" (change)="alElegirPelicula()">
           <option value="" disabled>Elegí una película</option>
           @for (p of peliculas(); track p.id) {
-            <option [value]="p.id">{{ p.nombre }} ({{ p.duracion_minutos }} min)</option>
+            <option [value]="p.id">{{ p.nombre }} ({{ p.duracion_minutos | duracion }})</option>
           }
         </select>
         @if (form.controls.peliculaId.touched && form.controls.peliculaId.invalid) {
@@ -135,25 +135,16 @@
         <span class="error-texto">El rango puede ser de hasta 90 días.</span>
       }
 
-      <label class="funciones__check">
-        <input type="checkbox" formControlName="esPreventa" />
-        Precio especial de preventa
-      </label>
-
-      @if (form.controls.esPreventa.value) {
-        <div class="funciones__fila">
-          <label class="campo">
-            Precio de preventa
-            <input class="input" type="number" min="1" formControlName="precioPreventa" placeholder="$" />
-          </label>
-          <label class="campo">
-            Vale hasta el (inclusive)
-            <input class="input" type="date" formControlName="fechaFinPreventa" [min]="hoy" />
-          </label>
-        </div>
-        @if (form.hasError('preventaIncompleta') && form.touched) {
-          <span class="error-texto">Completá el precio y la fecha de la preventa.</span>
-        }
+      @if (peliculaElegida(); as p) {
+        <p class="funciones__nota">
+          @if (p.preventa) {
+            {{ p.nombre }} tiene preventa: la venta abre {{ p.dias_preventa }} días antes del estreno a
+            {{ p.precio_preventa | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }}.
+          } @else {
+            {{ p.nombre }} no tiene preventa: la venta abre el día del estreno.
+          }
+          Se cambia desde Películas.
+        </p>
       }
 
       <div class="funciones__resumen">
@@ -219,6 +210,22 @@
                 }
               </p>
             </div>
+            @if (editandoPrecioId() === f.id) {
+              <form class="funciones__precio" [formGroup]="formPrecio" (ngSubmit)="guardarPrecio(f)">
+                <label>
+                  General
+                  <input class="input" type="number" min="1" formControlName="base" />
+                </label>
+                <label>
+                  VIP
+                  <input class="input" type="number" min="1" formControlName="vip" />
+                </label>
+                <button type="submit" class="boton boton--chico" [disabled]="formPrecio.invalid">Guardar</button>
+                <button type="button" class="boton boton--secundario boton--chico" (click)="editandoPrecioId.set(null)">×</button>
+              </form>
+            } @else {
+              <button type="button" class="boton boton--secundario boton--chico" (click)="editarPrecio(f)">Precio</button>
+            }
             <button
               type="button"
               class="boton boton--secundario boton--chico"

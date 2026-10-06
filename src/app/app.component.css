@@ -1,0 +1,15 @@
+.barra-carga {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 40%;
+  background: var(--rosa-acento);
+  z-index: 100;
+  animation: carga 1s ease-in-out infinite;
+}
+
+@keyframes carga {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(250%); }
+}

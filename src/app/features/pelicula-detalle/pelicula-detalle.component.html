@@ -15,8 +15,8 @@
 
     <section class="detalle__cabecera">
       <div class="detalle__poster">
-        @if (p.imagen_url && !imagenRota()) {
-          <img [src]="p.imagen_url" [alt]="'Póster de ' + p.nombre" (error)="imagenRota.set(true)" />
+        @if (p.imagen_url) {
+          <img [src]="p.imagen_url" [alt]="'Póster de ' + p.nombre" appImagenRespaldo />
         } @else {
           <div class="detalle__sin-imagen"><span class="titulo">{{ p.nombre }}</span></div>
         }
@@ -31,7 +31,7 @@
         </div>
 
         <div class="detalle__datos">
-          <span class="chip">{{ p.duracion_minutos }} min</span>
+          <span class="chip">{{ p.duracion_minutos | duracion }}</span>
           @if (p.restriccion_edad) {
             <span class="chip chip--activo">+{{ p.restriccion_edad }}</span>
           } @else {
@@ -45,6 +45,20 @@
         }
 
         <p class="detalle__sinopsis">{{ p.sinopsis }}</p>
+
+        @if (preventaAbierta()) {
+          <p class="banner-destacado detalle__aviso">
+            <strong>¡Preventa abierta!</strong> Hasta el estreno, la entrada general sale
+            {{ p.precio_preventa | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }}.
+          </p>
+        } @else if (!ventaAbierta()) {
+          <div class="detalle__proximamente">
+            <p class="detalle__aviso">
+              Las entradas salen a la venta el <strong>{{ apertura() | date: "EEEE d 'de' MMMM" }}</strong>{{ p.preventa ? ', con precio de preventa.' : '.' }}
+            </p>
+            <app-boton-alerta [peliculaId]="p.id" />
+          </div>
+        }
 
         @if (p.restriccion_edad) {
           <p class="banner-destacado detalle__aviso">
@@ -86,8 +100,8 @@
                 <p class="detalle__grupo-titulo">{{ g.etiqueta }}</p>
                 <div class="detalle__horarios">
                   @for (f of g.funciones; track f.id) {
-                    @if (bloqueadaPorEdad()) {
-                      <span class="detalle__horario detalle__horario--bloqueado">
+                    @if (bloqueadaPorEdad() || !ventaAbierta()) {
+                      <span class="detalle__horario" [class.detalle__horario--bloqueado]="bloqueadaPorEdad()" [class.detalle__horario--pronto]="!bloqueadaPorEdad()">
                         {{ f.fecha_hora_inicio | date: 'HH:mm' }}
                       </span>
                     } @else {

@@ -1,0 +1,40 @@
+:host {
+  display: grid;
+  gap: 6px;
+}
+
+.alerta-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: var(--radio-chip);
+  border: 1px solid var(--rosa-suave);
+  background: var(--superficie);
+  color: var(--rosa-acento);
+  font-size: 0.8rem;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.alerta-btn:hover {
+  border-color: var(--rosa-acento);
+}
+
+.alerta-btn--activa {
+  background: var(--rosa-fondo);
+  color: var(--rosa-texto);
+  border-color: transparent;
+}
+
+.alerta-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.alerta-btn__aviso {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--texto-secundario);
+}

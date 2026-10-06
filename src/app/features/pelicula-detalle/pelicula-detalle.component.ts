@@ -7,8 +7,12 @@ import { CarteleraService } from '../../core/services/cartelera.service';
 import { FuncionesService } from '../../core/services/funciones.service';
 import { MiResena, ResenasService } from '../../core/services/resenas.service';
 import { PeliculaCartelera, Resena } from '../../core/models/cartelera.model';
+import { aperturaVenta, enPreventa, fechaEstreno, ventaAbierta } from '../../core/models/pelicula.model';
 import { FuncionConDetalle } from '../../core/models/funcion.model';
 import { EstrellasComponent } from '../../shared/components/estrellas/estrellas.component';
+import { ImagenRespaldoDirective } from '../../shared/directives/imagen-respaldo.directive';
+import { DuracionPipe } from '../../shared/pipes/duracion.pipe';
+import { BotonAlertaComponent } from '../../shared/components/boton-alerta/boton-alerta.component';
 
 interface DiaFunciones {
   clave: string;
@@ -23,7 +27,7 @@ function claveDia(d: Date): string {
 @Component({
   selector: 'app-pelicula-detalle',
   standalone: true,
-  imports: [RouterLink, ReactiveFormsModule, DatePipe, CurrencyPipe, EstrellasComponent],
+  imports: [RouterLink, ReactiveFormsModule, DatePipe, CurrencyPipe, EstrellasComponent, ImagenRespaldoDirective, DuracionPipe, BotonAlertaComponent],
   templateUrl: './pelicula-detalle.component.html',
   styleUrl: './pelicula-detalle.component.css'
 })
@@ -41,7 +45,6 @@ export class PeliculaDetalleComponent implements OnInit {
   readonly resenas = signal<Resena[]>([]);
   readonly cargando = signal(true);
   readonly error = signal('');
-  readonly imagenRota = signal(false);
   readonly diaElegido = signal<string | null>(null);
 
   // Mi reseña
@@ -81,6 +84,24 @@ export class PeliculaDetalleComponent implements OnInit {
     const restriccion = this.pelicula()?.restriccion_edad;
     const edad = this.auth.edad();
     return !!restriccion && edad !== null && edad < restriccion;
+  });
+
+  // Preventa y apertura de la venta (misma regla que en la base de datos).
+  readonly ventaAbierta = computed(() => {
+    const p = this.pelicula();
+    return !!p && ventaAbierta(p);
+  });
+  readonly apertura = computed(() => {
+    const p = this.pelicula();
+    return p ? aperturaVenta(p) : null;
+  });
+  readonly preventaAbierta = computed(() => {
+    const p = this.pelicula();
+    return !!p && enPreventa(p);
+  });
+  readonly proximamente = computed(() => {
+    const p = this.pelicula();
+    return !!p && fechaEstreno(p) > new Date();
   });
 
   readonly generos = computed(() => this.pelicula()?.generos.map((g) => g.nombre).join(' · ') ?? '');
