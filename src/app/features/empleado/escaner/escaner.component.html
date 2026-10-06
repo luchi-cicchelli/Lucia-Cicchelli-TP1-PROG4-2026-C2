@@ -1,8 +1,21 @@
 <section class="escaner">
   <header class="escaner__encabezado">
-    <h1 class="titulo">Validar entradas</h1>
-    <p>Escaneá el QR o ingresá el código de 8 caracteres. Cada entrada se puede usar una sola vez.</p>
+    <h1 class="titulo">{{ modo() === 'candy' ? 'Entregar candy' : 'Validar entradas' }}</h1>
+    <p>
+      @if (modo() === 'candy') {
+        Escaneá el QR de cualquier entrada de la compra. El candy se entrega una sola vez.
+      } @else {
+        Escaneá el QR o ingresá el código de 8 caracteres. Cada entrada se puede usar una sola vez.
+      }
+    </p>
   </header>
+
+  <div class="escaner__modos" role="tablist" aria-label="Qué validar">
+    <button type="button" role="tab" class="chip" [class.chip--activo]="modo() === 'entrada'"
+            [attr.aria-selected]="modo() === 'entrada'" (click)="cambiarModo('entrada')">🎟️ Entrada a sala</button>
+    <button type="button" role="tab" class="chip" [class.chip--activo]="modo() === 'candy'"
+            [attr.aria-selected]="modo() === 'candy'" (click)="cambiarModo('candy')">🍿 Candy bar</button>
+  </div>
 
   <div class="escaner__cuerpo">
     <div class="escaner__lector">
@@ -50,7 +63,20 @@
         </div>
       } @else if (r) {
         <div class="tarjeta escaner__resultado" [class.escaner__resultado--ok]="r.ok" [class.escaner__resultado--error]="!r.ok" role="status">
-          @if (r.ok) {
+          @if (r.ok && r.modo === 'candy') {
+            <p class="escaner__estado"><span aria-hidden="true">✓</span> Entregar candy</p>
+            <ul class="escaner__candy">
+              @for (item of r.candy.items; track $index) {
+                <li>
+                  <strong>{{ item.cantidad }} ×</strong> {{ item.nombre }}
+                  @if (item.detalle) {
+                    <small>{{ item.detalle }}</small>
+                  }
+                </li>
+              }
+            </ul>
+            <p class="escaner__detalle">{{ r.candy.pelicula }} · {{ r.candy.sala }} · {{ r.candy.inicio | date: 'HH:mm' }} hs</p>
+          } @else if (r.ok && r.modo === 'entrada') {
             <p class="escaner__estado"><span aria-hidden="true">✓</span> Entrada válida</p>
             <p class="titulo escaner__pelicula">{{ r.entrada.pelicula }}</p>
             <p class="escaner__butaca">
@@ -78,7 +104,7 @@
         </div>
       } @else {
         <div class="tarjeta escaner__resultado">
-          <p class="escaner__esperando">Esperando una entrada…</p>
+          <p class="escaner__esperando">{{ modo() === 'candy' ? 'Esperando un QR para entregar candy…' : 'Esperando una entrada…' }}</p>
         </div>
       }
 
@@ -91,7 +117,9 @@
                 <span class="escaner__h-hora">{{ h.momento | date: 'HH:mm:ss' }}</span>
                 <span class="escaner__h-icono" aria-hidden="true">{{ h.ok ? '✓' : '✕' }}</span>
                 <span class="escaner__h-texto">
-                  @if (h.ok) {
+                  @if (h.ok && h.modo === 'candy') {
+                    Candy: {{ resumenCandy(h) }}
+                  } @else if (h.ok && h.modo === 'entrada') {
                     {{ h.entrada.pelicula }} · {{ butaca(h) }}
                   } @else {
                     {{ h.mensaje }}

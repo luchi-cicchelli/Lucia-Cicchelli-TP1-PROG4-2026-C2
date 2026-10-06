@@ -222,3 +222,35 @@ button {
   color: var(--texto-secundario);
   text-align: center;
 }
+
+/* ---------- Selector de cantidad (+ / −) ---------- */
+.stepper {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio-chip);
+  background: var(--superficie);
+  color: var(--texto);
+}
+
+.stepper button {
+  width: 30px;
+  height: 30px;
+  border: none;
+  background: none;
+  font-size: 1rem;
+  cursor: pointer;
+  color: var(--rosa-acento);
+}
+
+.stepper button:disabled {
+  color: var(--texto-muted);
+  cursor: default;
+}
+
+.stepper span {
+  min-width: 22px;
+  text-align: center;
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+}

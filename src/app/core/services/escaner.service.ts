@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { SupabaseService } from './supabase.service';
-import { EntradaValidada } from '../models/escaner.model';
+import { CandyEntregado, EntradaValidada } from '../models/escaner.model';
 
 @Injectable({ providedIn: 'root' })
 export class EscanerService {
@@ -12,5 +12,12 @@ export class EscanerService {
     const { data, error } = await this.supabase.client.rpc('validar_entrada', { p_codigo: codigo });
     if (error) throw new Error(error.message);
     return data as EntradaValidada;
+  }
+
+  // Entrega el candy de la compra a la que pertenece la entrada (una sola vez).
+  async entregarCandy(codigo: string): Promise<CandyEntregado> {
+    const { data, error } = await this.supabase.client.rpc('validar_candy', { p_codigo: codigo });
+    if (error) throw new Error(error.message);
+    return data as CandyEntregado;
   }
 }

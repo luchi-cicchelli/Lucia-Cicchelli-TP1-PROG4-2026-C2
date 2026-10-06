@@ -238,3 +238,104 @@
     padding: 1.25rem 1rem;
   }
 }
+
+/* ---------- Candy ---------- */
+.checkout__izquierda {
+  display: grid;
+  gap: 1.25rem;
+  min-width: 0;
+}
+
+.checkout__candy {
+  padding: 1.5rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.checkout__candy h2 {
+  font-size: 1.15rem;
+  margin-bottom: 4px;
+}
+
+.checkout__nota--destacada {
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: var(--superficie-alt);
+}
+
+.checkout__combos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.checkout__combo {
+  position: relative;
+  display: grid;
+  gap: 6px;
+  padding: 1rem;
+  border-radius: var(--radio);
+  border: 1.5px solid var(--rosa-suave);
+  background: var(--rosa-fondo);
+  color: var(--rosa-texto);
+}
+
+.checkout__combo--elegido {
+  border-color: var(--rosa-acento);
+  box-shadow: 0 0 0 2px var(--rosa-suave);
+}
+
+.checkout__combo-tag {
+  justify-self: start;
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 2px 8px;
+  border-radius: var(--radio-chip);
+  background: var(--rosa-acento);
+  color: #fff;
+}
+
+.checkout__combo-nombre {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.checkout__combo-detalle {
+  margin: 0;
+  font-size: 0.8rem;
+  opacity: 0.85;
+}
+
+.checkout__combo-pie {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.checkout__categoria h3 {
+  font-family: var(--fuente-texto);
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--texto-muted);
+  margin: 0 0 6px;
+}
+
+.checkout__producto {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--borde);
+  font-size: 0.9rem;
+}
+
+.checkout__producto-precio {
+  color: var(--texto-secundario);
+  font-size: 0.85rem;
+}

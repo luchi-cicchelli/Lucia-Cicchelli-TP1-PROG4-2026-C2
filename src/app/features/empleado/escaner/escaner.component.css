@@ -23,6 +23,33 @@
   font-size: 0.9rem;
 }
 
+.escaner__modos {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.escaner__modos .chip {
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 8px 16px;
+}
+
+.escaner__candy {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+  font-size: 1.05rem;
+}
+
+.escaner__candy small {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--texto-secundario);
+}
+
 .escaner__cuerpo {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);

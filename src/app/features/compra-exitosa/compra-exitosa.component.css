@@ -192,3 +192,39 @@
     font-size: 1.4rem;
   }
 }
+
+.exito__candy {
+  padding: 1.5rem;
+}
+
+.exito__candy h2 {
+  font-size: 1.1rem;
+  margin-bottom: 10px;
+}
+
+.exito__candy ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.exito__candy li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 0.9rem;
+}
+
+.exito__candy small {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--texto-secundario);
+}
+
+.exito__candy-nota {
+  margin: 12px 0 0;
+  font-size: 0.8rem;
+  color: var(--texto-secundario);
+}

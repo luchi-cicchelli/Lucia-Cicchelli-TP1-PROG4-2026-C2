@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { RealtimeChannel } from '@supabase/supabase-js';
 import { SupabaseService } from './supabase.service';
 import { CompraDetalle, EstadoButaca, FuncionCheckout, MetodoPago } from '../models/compra.model';
+import { ItemCarrito } from '../models/candy.model';
 
 const CLAVE_SESION = 'bijou-sesion-compra';
 
@@ -72,11 +73,12 @@ export class ComprasService {
     return Number(data ?? 0);
   }
 
-  async confirmar(funcionId: string, metodoPago: MetodoPago): Promise<string> {
+  async confirmar(funcionId: string, metodoPago: MetodoPago, items: ItemCarrito[] = []): Promise<string> {
     const { data, error } = await this.supabase.client.rpc('confirmar_compra', {
       p_funcion_id: funcionId,
       p_sesion: this.sesion,
-      p_metodo_pago: metodoPago
+      p_metodo_pago: metodoPago,
+      p_items: items
     });
     if (error) throw new Error(error.message);
     return data as string;

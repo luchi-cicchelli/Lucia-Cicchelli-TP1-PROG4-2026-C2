@@ -66,6 +66,32 @@
       }
     </div>
 
+    @if (c.candy?.length) {
+      <section class="tarjeta exito__candy">
+        <h2 class="titulo">Candy bar</h2>
+        <ul>
+          @for (item of c.candy; track $index) {
+            <li>
+              <span>
+                <strong>{{ item.cantidad }} ×</strong> {{ item.nombre }}
+                @if (item.detalle) {
+                  <small>{{ item.detalle }}</small>
+                }
+              </span>
+              <span>{{ item.precio_unitario * item.cantidad | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }}</span>
+            </li>
+          }
+        </ul>
+        <p class="exito__candy-nota">
+          @if (c.candy_retirado) {
+            Ya retiraste el candy de esta compra.
+          } @else {
+            Retiralo en el candy bar mostrando el QR (o el código) de cualquiera de tus entradas. Se entrega una sola vez.
+          }
+        </p>
+      </section>
+    }
+
     <section class="tarjeta exito__resumen">
       <h2 class="titulo">Resumen del pago</h2>
       <dl>

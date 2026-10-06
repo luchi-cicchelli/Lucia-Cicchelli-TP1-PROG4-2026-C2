@@ -5,6 +5,8 @@ import { RealtimeChannel } from '@supabase/supabase-js';
 import { AuthService } from '../../core/services/auth.service';
 import { ComprasService } from '../../core/services/compras.service';
 import { SalasService } from '../../core/services/salas.service';
+import { CandyService } from '../../core/services/candy.service';
+import { Combo, ItemCarrito, ProductoCandy, describirCombo } from '../../core/models/candy.model';
 import { EstadoButaca, FuncionCheckout, METODOS_PAGO, MetodoPago } from '../../core/models/compra.model';
 import { Butaca } from '../../core/models/sala.model';
 import { MapaButacasComponent } from '../../shared/components/mapa-butacas/mapa-butacas.component';
@@ -19,12 +21,14 @@ import { MapaButacasComponent } from '../../shared/components/mapa-butacas/mapa-
 export class CheckoutComponent implements OnInit, OnDestroy {
   private readonly compras = inject(ComprasService);
   private readonly salas = inject(SalasService);
+  private readonly candy = inject(CandyService);
   private readonly router = inject(Router);
   readonly auth = inject(AuthService);
 
   readonly funcionId = input.required<string>();
 
   readonly metodosPago = METODOS_PAGO;
+  readonly describirCombo = describirCombo;
 
   readonly funcion = signal<FuncionCheckout | null>(null);
   readonly butacas = signal<Butaca[]>([]);
@@ -33,6 +37,9 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   readonly ahora = signal(Date.now());
   readonly porcentajeBienvenida = signal(0);
   readonly metodoPago = signal<MetodoPago>('tarjeta_credito');
+  readonly productos = signal<ProductoCandy[]>([]);
+  readonly combos = signal<Combo[]>([]);
+  readonly cantidades = signal<Map<string, number>>(new Map());
 
   readonly cargando = signal(true);
   readonly procesando = signal<string | null>(null);
@@ -63,7 +70,54 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   );
 
   readonly hayVip = computed(() => this.misButacas().some((m) => m.butaca.tipo === 'vip'));
-  readonly subtotal = computed(() => this.misButacas().reduce((suma, m) => suma + m.precio, 0));
+  readonly subtotalEntradas = computed(() => this.misButacas().reduce((suma, m) => suma + m.precio, 0));
+
+  // Precio de una entrada general (lo que cubre cada combo).
+  readonly precioGeneral = computed(() => {
+    const f = this.funcion();
+    if (!f) return 0;
+    return this.enPreventa() ? Number(f.precio_preventa) : Number(f.precio_base);
+  });
+
+  readonly productosPorCategoria = computed(() => {
+    const grupos = new Map<string, ProductoCandy[]>();
+    for (const p of this.productos()) {
+      if (!grupos.has(p.categoria)) grupos.set(p.categoria, []);
+      grupos.get(p.categoria)!.push(p);
+    }
+    return [...grupos.entries()].map(([categoria, productos]) => ({ categoria, productos }));
+  });
+
+  readonly carrito = computed(() => {
+    const lista: { item: ItemCarrito; nombre: string; precioUnitario: number }[] = [];
+    for (const [clave, cantidad] of this.cantidades()) {
+      if (cantidad <= 0) continue;
+      const [tipo, id] = clave.split(':') as ['producto' | 'combo', string];
+      if (tipo === 'combo') {
+        const c = this.combos().find((x) => x.id === id);
+        if (c) lista.push({ item: { tipo, id, cantidad }, nombre: c.nombre, precioUnitario: c.precio_fijo });
+      } else {
+        const p = this.productos().find((x) => x.id === id);
+        if (p) lista.push({ item: { tipo, id, cantidad }, nombre: p.nombre, precioUnitario: p.precio });
+      }
+    }
+    return lista.sort((a, b) => (a.item.tipo === b.item.tipo ? 0 : a.item.tipo === 'combo' ? -1 : 1));
+  });
+
+  readonly totalCombos = computed(() =>
+    this.carrito().filter((c) => c.item.tipo === 'combo').reduce((suma, c) => suma + c.item.cantidad, 0)
+  );
+
+  // Cada combo incluye una entrada general: se descuenta del precio de las entradas.
+  readonly entradasEnCombos = computed(() => this.totalCombos() * this.precioGeneral());
+
+  readonly subtotalCandy = computed(() =>
+    this.carrito().reduce((suma, c) => suma + c.precioUnitario * c.item.cantidad, 0)
+  );
+
+  readonly subtotal = computed(
+    () => this.subtotalEntradas() + this.subtotalCandy() - this.entradasEnCombos()
+  );
 
   readonly aplicaBienvenida = computed(() => {
     const perfil = this.auth.perfil();
@@ -112,13 +166,17 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       }
       this.funcion.set(funcion);
 
-      const [butacas, porcentaje] = await Promise.all([
+      const [butacas, porcentaje, productos, combos] = await Promise.all([
         this.salas.butacas(funcion.sala_id),
         this.compras.porcentajeBienvenida(),
+        this.candy.listarProductos(true).catch(() => []),
+        this.candy.listarCombos(true).catch(() => []),
         this.refrescar()
       ]);
       this.butacas.set(butacas);
       this.porcentajeBienvenida.set(porcentaje);
+      this.productos.set(productos);
+      this.combos.set(combos);
 
       this.canal = this.compras.escucharCambios(funcion.id, () => this.refrescar());
       this.intervalos.push(setInterval(() => this.refrescar(), 15000));
@@ -165,6 +223,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
         this.cambiarEstado(b.id, null);
         await this.compras.liberar(id, b.id);
         if (this.seleccionadas().size === 0) this.expira.set(null);
+        this.ajustarCombos();
       } else {
         this.cambiarEstado(b.id, 'mia');
         this.expira.set(await this.compras.reservar(id, b.id));
@@ -183,7 +242,8 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     this.pagando.set(true);
     this.error.set('');
     try {
-      const compraId = await this.compras.confirmar(this.funcionId(), this.metodoPago());
+      const items = this.carrito().map((c) => c.item);
+      const compraId = await this.compras.confirmar(this.funcionId(), this.metodoPago(), items);
       this.compraConfirmada = true;
       await this.auth.recargarPerfil();
       if (this.canal) this.compras.avisarCambio(this.canal);
@@ -196,11 +256,49 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     }
   }
 
+  cantidad(tipo: 'producto' | 'combo', id: string): number {
+    return this.cantidades().get(`${tipo}:${id}`) ?? 0;
+  }
+
+  cambiarCantidad(tipo: 'producto' | 'combo', id: string, delta: number) {
+    const actual = this.cantidad(tipo, id);
+    const nueva = Math.max(0, Math.min(20, actual + delta));
+    if (tipo === 'combo' && delta > 0 && this.totalCombos() >= this.misButacas().length) {
+      this.aviso.set('Cada combo incluye una entrada: elegí otra butaca para sumar otro combo.');
+      return;
+    }
+    this.aviso.set('');
+    this.cantidades.update((mapa) => {
+      const nuevo = new Map(mapa);
+      if (nueva === 0) nuevo.delete(`${tipo}:${id}`);
+      else nuevo.set(`${tipo}:${id}`, nueva);
+      return nuevo;
+    });
+  }
+
+  // Si se liberan butacas, no puede haber más combos que entradas.
+  private ajustarCombos() {
+    let sobrantes = this.totalCombos() - this.misButacas().length;
+    if (sobrantes <= 0) return;
+    this.cantidades.update((mapa) => {
+      const nuevo = new Map(mapa);
+      for (const [clave, cant] of [...nuevo.entries()].reverse()) {
+        if (!clave.startsWith('combo:') || sobrantes <= 0) continue;
+        const quitar = Math.min(cant, sobrantes);
+        sobrantes -= quitar;
+        if (cant - quitar === 0) nuevo.delete(clave);
+        else nuevo.set(clave, cant - quitar);
+      }
+      return nuevo;
+    });
+  }
+
   private async refrescar() {
     try {
       const { estados, expira } = await this.compras.estadoButacas(this.funcionId());
       this.estados.set(estados);
       this.expira.set(expira);
+      this.ajustarCombos();
     } catch (e: any) {
       this.error.set('No se pudo actualizar el mapa: ' + e.message);
     }

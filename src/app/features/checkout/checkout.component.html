@@ -20,6 +20,7 @@
     </header>
 
     <div class="checkout__cuerpo">
+      <div class="checkout__izquierda">
       <section class="tarjeta checkout__mapa">
         <h2 class="titulo">Elegí tus butacas</h2>
         @if (bloqueadaPorEdad()) {
@@ -36,6 +37,60 @@
         />
         <p class="checkout__nota">El mapa se actualiza solo: si alguien elige una butaca, la vas a ver ocupada al instante.</p>
       </section>
+
+      @if (combos().length || productos().length) {
+        <section class="tarjeta checkout__candy">
+          <div>
+            <h2 class="titulo">Sumá combos y candy</h2>
+            <p class="checkout__nota">Lo retirás en el candy bar con el mismo QR de tu entrada.</p>
+          </div>
+
+          @if (misButacas().length === 0) {
+            <p class="checkout__nota checkout__nota--destacada">Elegí al menos una butaca para sumar candy.</p>
+          }
+
+          @if (combos().length) {
+            <div class="checkout__combos">
+              @for (c of combos(); track c.id) {
+                <div class="checkout__combo" [class.checkout__combo--elegido]="cantidad('combo', c.id) > 0">
+                  <span class="checkout__combo-tag">Combo</span>
+                  <p class="titulo checkout__combo-nombre">{{ c.nombre }}</p>
+                  <p class="checkout__combo-detalle">{{ describirCombo(c) }}</p>
+                  <div class="checkout__combo-pie">
+                    <strong>{{ c.precio_fijo | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }}</strong>
+                    <div class="stepper">
+                      <button type="button" (click)="cambiarCantidad('combo', c.id, -1)" [disabled]="cantidad('combo', c.id) === 0" [attr.aria-label]="'Quitar ' + c.nombre">−</button>
+                      <span>{{ cantidad('combo', c.id) }}</span>
+                      <button type="button" (click)="cambiarCantidad('combo', c.id, 1)" [disabled]="misButacas().length === 0 || totalCombos() >= misButacas().length" [attr.aria-label]="'Agregar ' + c.nombre">+</button>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+            <p class="checkout__nota">
+              Cada combo incluye una entrada general y reemplaza el precio de una de tus butacas (las VIP pagan la diferencia).
+            </p>
+          }
+
+          @for (g of productosPorCategoria(); track g.categoria) {
+            <div class="checkout__categoria">
+              <h3>{{ g.categoria }}</h3>
+              @for (p of g.productos; track p.id) {
+                <div class="checkout__producto">
+                  <span>{{ p.nombre }}</span>
+                  <span class="checkout__producto-precio">{{ p.precio | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }}</span>
+                  <div class="stepper">
+                    <button type="button" (click)="cambiarCantidad('producto', p.id, -1)" [disabled]="cantidad('producto', p.id) === 0" [attr.aria-label]="'Quitar ' + p.nombre">−</button>
+                    <span>{{ cantidad('producto', p.id) }}</span>
+                    <button type="button" (click)="cambiarCantidad('producto', p.id, 1)" [disabled]="misButacas().length === 0" [attr.aria-label]="'Agregar ' + p.nombre">+</button>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </section>
+      }
+      </div>
 
       <aside class="tarjeta checkout__resumen">
         <h2 class="titulo">Tu compra</h2>
@@ -78,6 +133,25 @@
               </li>
             }
           </ul>
+
+          @if (carrito().length) {
+            <ul class="checkout__lista">
+              @for (c of carrito(); track c.item.tipo + c.item.id) {
+                <li>
+                  <span>{{ c.item.cantidad }} × {{ c.nombre }}</span>
+                  <span class="checkout__precio">{{ c.precioUnitario * c.item.cantidad | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }}</span>
+                  <button type="button" class="checkout__quitar" (click)="cambiarCantidad(c.item.tipo, c.item.id, -c.item.cantidad)" [attr.aria-label]="'Quitar ' + c.nombre">×</button>
+                </li>
+              }
+              @if (totalCombos() > 0) {
+                <li class="checkout__descuento">
+                  <span>Entradas incluidas en combos ({{ totalCombos() }})</span>
+                  <span class="checkout__precio">−{{ entradasEnCombos() | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }}</span>
+                  <span></span>
+                </li>
+              }
+            </ul>
+          }
 
           @if (hayVip()) {
             <p class="banner-destacado checkout__aviso-vip">

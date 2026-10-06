@@ -84,6 +84,13 @@ export const routes: Routes = [
           )
       },
       {
+        path: 'candy',
+        loadComponent: () =>
+          import('./features/admin/candy-admin/candy-admin.component').then(
+            (m) => m.CandyAdminComponent
+          )
+      },
+      {
         path: 'usuarios',
         loadComponent: () =>
           import('./features/admin/usuarios-admin/usuarios-admin.component').then(

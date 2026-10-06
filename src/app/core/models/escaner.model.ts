@@ -1,5 +1,6 @@
 import { Formato, Idioma } from './funcion.model';
 import { TipoButaca } from './sala.model';
+import { ItemCandyCompra } from './candy.model';
 
 export interface EntradaValidada {
   entrada_id: string;
@@ -15,6 +16,17 @@ export interface EntradaValidada {
   tipo: TipoButaca;
 }
 
+export interface CandyEntregado {
+  compra_id: string;
+  pelicula: string;
+  sala: string;
+  inicio: string;
+  items: ItemCandyCompra[];
+}
+
+export type ModoEscaner = 'entrada' | 'candy';
+
 export type ResultadoEscaneo =
-  | { ok: true; entrada: EntradaValidada; momento: Date }
-  | { ok: false; mensaje: string; momento: Date };
+  | { ok: true; modo: 'entrada'; entrada: EntradaValidada; momento: Date }
+  | { ok: true; modo: 'candy'; candy: CandyEntregado; momento: Date }
+  | { ok: false; modo: ModoEscaner; mensaje: string; momento: Date };

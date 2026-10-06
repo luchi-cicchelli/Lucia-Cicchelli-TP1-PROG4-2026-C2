@@ -2,7 +2,7 @@ import { Component, ElementRef, OnDestroy, inject, signal, viewChild } from '@an
 import { DatePipe } from '@angular/common';
 import jsQR from 'jsqr';
 import { EscanerService } from '../../../core/services/escaner.service';
-import { ResultadoEscaneo } from '../../../core/models/escaner.model';
+import { ModoEscaner, ResultadoEscaneo } from '../../../core/models/escaner.model';
 
 const PAUSA_MISMO_CODIGO_MS = 4000;
 const INTERVALO_LECTURA_MS = 200;
@@ -20,6 +20,7 @@ export class EscanerComponent implements OnDestroy {
   private readonly video = viewChild<ElementRef<HTMLVideoElement>>('video');
   private readonly canvas = document.createElement('canvas');
 
+  readonly modo = signal<ModoEscaner>('entrada');
   readonly camaraActiva = signal(false);
   readonly errorCamara = signal('');
   readonly procesando = signal(false);
@@ -32,6 +33,13 @@ export class EscanerComponent implements OnDestroy {
   private ultimaLectura = 0;
   private ultimoCodigo = '';
   private ultimoCodigoEn = 0;
+
+  cambiarModo(modo: ModoEscaner) {
+    this.modo.set(modo);
+    this.resultado.set(null);
+    // Permite leer enseguida el mismo QR en el otro modo (entrada y después candy).
+    this.ultimoCodigo = '';
+  }
 
   async activarCamara() {
     this.errorCamara.set('');
@@ -121,13 +129,19 @@ export class EscanerComponent implements OnDestroy {
 
   private async validar(codigo: string) {
     this.procesando.set(true);
+    const modo = this.modo();
     let resultado: ResultadoEscaneo;
     try {
-      const entrada = await this.escaner.validar(codigo);
-      resultado = { ok: true, entrada, momento: new Date() };
+      if (modo === 'candy') {
+        const candy = await this.escaner.entregarCandy(codigo);
+        resultado = { ok: true, modo, candy, momento: new Date() };
+      } else {
+        const entrada = await this.escaner.validar(codigo);
+        resultado = { ok: true, modo, entrada, momento: new Date() };
+      }
       navigator.vibrate?.(120);
     } catch (e: any) {
-      resultado = { ok: false, mensaje: e.message, momento: new Date() };
+      resultado = { ok: false, modo, mensaje: e.message, momento: new Date() };
       navigator.vibrate?.([80, 60, 80]);
     }
     this.resultado.set(resultado);
@@ -135,8 +149,13 @@ export class EscanerComponent implements OnDestroy {
     this.procesando.set(false);
   }
 
+  resumenCandy(r: ResultadoEscaneo): string {
+    if (!r.ok || r.modo !== 'candy') return '';
+    return r.candy.items.map((i) => `${i.cantidad} × ${i.nombre}`).join(', ');
+  }
+
   butaca(r: ResultadoEscaneo): string {
-    if (!r.ok) return '';
+    if (!r.ok || r.modo !== 'entrada') return '';
     const e = r.entrada;
     return e.fila === 'ACC' ? `Fila accesible · Butaca ${e.numero}` : `Fila ${e.fila} · Butaca ${e.numero}`;
   }

@@ -1,5 +1,6 @@
 import { Formato, Funcion, Idioma } from './funcion.model';
 import { TipoButaca } from './sala.model';
+import { ItemCandyCompra } from './candy.model';
 
 export type EstadoButaca = 'vendida' | 'reservada' | 'mia';
 
@@ -33,6 +34,8 @@ export interface CompraDetalle {
   pelicula: { nombre: string; restriccion_edad: number | null; imagen_url: string | null };
   funcion: { inicio: string; fin: string; formato: Formato; idioma: Idioma; sala: string };
   entradas: EntradaDetalle[];
+  candy?: ItemCandyCompra[];
+  candy_retirado?: boolean;
 }
 
 export interface FuncionCheckout extends Funcion {

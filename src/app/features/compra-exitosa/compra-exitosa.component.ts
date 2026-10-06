@@ -112,7 +112,8 @@ export class CompraExitosaComponent implements OnInit {
           y += 7;
         }
 
-        const lado = 62;
+        const candy = compra.candy ?? [];
+        const lado = candy.length ? 48 : 62;
         pdf.addImage(this.qrs()[e.id], 'PNG', (ancho - lado) / 2, y + 2, lado, lado);
         y += lado + 9;
 
@@ -126,6 +127,19 @@ export class CompraExitosaComponent implements OnInit {
         y += 16;
 
         pdf.setFont('helvetica', 'normal');
+        if (candy.length) {
+          const texto =
+            'Incluye candy: ' +
+            candy.map((c) => `${c.cantidad} x ${c.nombre}`).join(', ') +
+            '. Se retira una sola vez, con el QR de cualquiera de tus entradas.';
+          pdf.setFillColor(247, 241, 238);
+          pdf.roundedRect(12, y, ancho - 24, 14, 2, 2, 'F');
+          pdf.setFontSize(8.5);
+          pdf.setTextColor(46, 42, 44);
+          pdf.text(texto, ancho / 2, y + 5.5, { align: 'center', maxWidth: ancho - 30 });
+          y += 18;
+        }
+
         if (compra.pelicula.restriccion_edad) {
           pdf.setFillColor(251, 234, 240);
           pdf.roundedRect(12, y, ancho - 24, 12, 2, 2, 'F');
@@ -140,8 +154,8 @@ export class CompraExitosaComponent implements OnInit {
 
         pdf.setFontSize(8);
         pdf.setTextColor(167, 159, 161);
-        pdf.text('Válida para un solo ingreso. Presentá el QR o el código en la entrada de la sala.', ancho / 2, 200, { align: 'center' });
-        pdf.text(`Compra ${compra.id.slice(0, 8).toUpperCase()}`, ancho / 2, 205, { align: 'center' });
+        pdf.text('Válida para un solo ingreso. Presentá el QR o el código en la entrada de la sala.', ancho / 2, 202, { align: 'center' });
+        pdf.text(`Compra ${compra.id.slice(0, 8).toUpperCase()}`, ancho / 2, 206, { align: 'center' });
       });
 
       pdf.save(`entradas-${compra.pelicula.nombre.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}.pdf`);
