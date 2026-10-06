@@ -5,6 +5,7 @@ import { AuthService } from '../../core/services/auth.service';
 import { COLORES_OJOS, ROLES, TIPOS_SANGRE } from '../../core/models/perfil.model';
 import { fechaNacimientoValida } from '../../core/validators/fecha.validators';
 import { soloLetras } from '../../core/validators/nombre.validators';
+import { SelectorFechaComponent } from '../../shared/components/selector-fecha/selector-fecha.component';
 import { MisComprasComponent } from './mis-compras/mis-compras.component';
 import { MisPeliculasComponent } from './mis-peliculas/mis-peliculas.component';
 import { MisPuntosComponent } from './mis-puntos/mis-puntos.component';
@@ -14,7 +15,7 @@ type Pestania = 'datos' | 'entradas' | 'peliculas' | 'puntos';
 @Component({
   selector: 'app-perfil',
   standalone: true,
-  imports: [ReactiveFormsModule, DatePipe, CurrencyPipe, MisComprasComponent, MisPeliculasComponent, MisPuntosComponent],
+  imports: [ReactiveFormsModule, DatePipe, CurrencyPipe, MisComprasComponent, MisPeliculasComponent, MisPuntosComponent, SelectorFechaComponent],
   templateUrl: './perfil.component.html',
   styleUrl: './perfil.component.css'
 })
@@ -23,7 +24,7 @@ export class PerfilComponent {
 
   readonly tiposSangre = TIPOS_SANGRE;
   readonly coloresOjos = COLORES_OJOS;
-  readonly hoy = new Date().toISOString().slice(0, 10);
+  readonly anioActual = new Date().getFullYear();
 
   readonly pestanias: { valor: Pestania; etiqueta: string }[] = [
     { valor: 'datos', etiqueta: 'Mis datos' },

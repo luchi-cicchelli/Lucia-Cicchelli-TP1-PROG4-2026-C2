@@ -2,22 +2,25 @@ import { Formato, Idioma } from './funcion.model';
 import { TipoButaca } from './sala.model';
 import { ItemCandyCompra } from './candy.model';
 
+// Resultado de escanear el QR de una compra en la entrada a la sala:
+// se validan juntas todas sus entradas.
 export interface EntradaValidada {
-  entrada_id: string;
+  compra_id: string;
   codigo_manual: string;
+  nombre: string | null;
   pelicula: string;
   restriccion_edad: number | null;
   inicio: string;
   formato: Formato;
   idioma: Idioma;
   sala: string;
-  fila: string;
-  numero: number;
-  tipo: TipoButaca;
+  butacas: { fila: string; numero: number; tipo: TipoButaca }[];
+  tiene_candy: boolean;
 }
 
 export interface CandyEntregado {
   compra_id: string;
+  nombre: string | null;
   pelicula: string;
   sala: string;
   inicio: string;

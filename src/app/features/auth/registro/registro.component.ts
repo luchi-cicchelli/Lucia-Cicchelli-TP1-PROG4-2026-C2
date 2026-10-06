@@ -12,6 +12,7 @@ import { AuthService } from '../../../core/services/auth.service';
 import { COLORES_OJOS, TIPOS_SANGRE } from '../../../core/models/perfil.model';
 import { fechaNacimientoValida } from '../../../core/validators/fecha.validators';
 import { soloLetras } from '../../../core/validators/nombre.validators';
+import { SelectorFechaComponent } from '../../../shared/components/selector-fecha/selector-fecha.component';
 
 const passwordsIguales: ValidatorFn = (grupo: AbstractControl): ValidationErrors | null => {
   const password = grupo.get('password')?.value;
@@ -22,7 +23,7 @@ const passwordsIguales: ValidatorFn = (grupo: AbstractControl): ValidationErrors
 @Component({
   selector: 'app-registro',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, SelectorFechaComponent],
   templateUrl: './registro.component.html',
   styleUrl: '../auth.css'
 })
@@ -32,7 +33,7 @@ export class RegistroComponent {
 
   readonly tiposSangre = TIPOS_SANGRE;
   readonly coloresOjos = COLORES_OJOS;
-  readonly hoy = new Date().toISOString().slice(0, 10);
+  readonly anioActual = new Date().getFullYear();
 
   readonly form = inject(FormBuilder).nonNullable.group(
     {

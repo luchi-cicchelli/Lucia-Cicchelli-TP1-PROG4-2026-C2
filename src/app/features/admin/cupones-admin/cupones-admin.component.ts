@@ -4,6 +4,7 @@ import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Va
 import { RouterLink } from '@angular/router';
 import { CuponesService } from '../../../core/services/cupones.service';
 import { Cupon, TipoCupon } from '../../../core/models/beneficios.model';
+import { SelectorFechaComponent } from '../../../shared/components/selector-fecha/selector-fecha.component';
 
 function aFechaInput(iso: string | null): string {
   if (!iso) return '';
@@ -26,11 +27,12 @@ const vigenciaValida: ValidatorFn = (grupo: AbstractControl): ValidationErrors |
 @Component({
   selector: 'app-cupones-admin',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, DatePipe],
+  imports: [ReactiveFormsModule, RouterLink, DatePipe, SelectorFechaComponent],
   templateUrl: './cupones-admin.component.html',
   styleUrl: './cupones-admin.component.css'
 })
 export class CuponesAdminComponent implements OnInit {
+  readonly anioActual = new Date().getFullYear();
   private readonly cuponesService = inject(CuponesService);
   private readonly fb = inject(FormBuilder);
 

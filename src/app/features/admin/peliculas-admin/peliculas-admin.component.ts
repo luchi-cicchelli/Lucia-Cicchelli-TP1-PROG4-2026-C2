@@ -5,6 +5,7 @@ import { RouterLink } from '@angular/router';
 import { PeliculasService } from '../../../core/services/peliculas.service';
 import { AlertasService } from '../../../core/services/alertas.service';
 import { Genero, PeliculaConGeneros } from '../../../core/models/pelicula.model';
+import { SelectorFechaComponent } from '../../../shared/components/selector-fecha/selector-fecha.component';
 import { SubirImagenComponent } from '../../../shared/components/subir-imagen/subir-imagen.component';
 import { ImagenRespaldoDirective, POSTER_RESPALDO } from '../../../shared/directives/imagen-respaldo.directive';
 import { DuracionPipe } from '../../../shared/pipes/duracion.pipe';
@@ -31,6 +32,7 @@ function fechaLocal(iso: string): Date {
     RouterLink,
     DatePipe,
     SubirImagenComponent,
+    SelectorFechaComponent,
     ImagenRespaldoDirective,
     DuracionPipe,
     TextoCortoPipe
@@ -43,6 +45,7 @@ export class PeliculasAdminComponent implements OnInit {
   private readonly alertas = inject(AlertasService);
 
   readonly posterRespaldo = POSTER_RESPALDO;
+  readonly anioActual = new Date().getFullYear();
 
   readonly peliculas = signal<PeliculaConGeneros[]>([]);
   readonly generos = signal<Genero[]>([]);

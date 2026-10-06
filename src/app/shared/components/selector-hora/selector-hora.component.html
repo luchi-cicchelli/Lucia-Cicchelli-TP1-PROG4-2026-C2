@@ -1,0 +1,13 @@
+<div class="hora" role="group" aria-label="Horario">
+  <select class="input" aria-label="Hora" (change)="elegirHora($event)">
+    @for (h of horas; track h) {
+      <option [value]="h" [selected]="h === hora()">{{ h }}</option>
+    }
+  </select>
+  <span>:</span>
+  <select class="input" aria-label="Minutos" (change)="elegirMinuto($event)">
+    @for (m of minutos; track m) {
+      <option [value]="m" [selected]="m === minuto()">{{ m }}</option>
+    }
+  </select>
+</div>

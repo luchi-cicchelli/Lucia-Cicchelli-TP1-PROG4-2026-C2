@@ -59,14 +59,14 @@
         }
       </div>
       <div class="cupones__fila">
-        <label class="campo">
+        <div class="campo">
           Válido desde
-          <input class="input" type="date" formControlName="desde" />
-        </label>
-        <label class="campo">
+          <app-selector-fecha [valor]="form.controls.desde.value" [anioDesde]="anioActual - 1" [anioHasta]="anioActual + 2" etiqueta="Válido desde" (cambio)="form.controls.desde.setValue($event); form.controls.desde.markAsTouched()" />
+        </div>
+        <div class="campo">
           Válido hasta (opcional)
-          <input class="input" type="date" formControlName="hasta" [min]="form.controls.desde.value" />
-        </label>
+          <app-selector-fecha [valor]="form.controls.hasta.value" [anioDesde]="anioActual" [anioHasta]="anioActual + 3" etiqueta="Válido hasta" (cambio)="form.controls.hasta.setValue($event); form.controls.hasta.markAsTouched()" />
+        </div>
       </div>
       @if (form.hasError('vigenciaInvertida')) {
         <p class="error-texto">La fecha "hasta" tiene que ser posterior a "desde".</p>

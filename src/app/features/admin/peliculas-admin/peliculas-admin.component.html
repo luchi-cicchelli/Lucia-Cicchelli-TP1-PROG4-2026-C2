@@ -51,10 +51,10 @@
             <span class="error-texto">Entre 1 y 600 minutos.</span>
           }
         </label>
-        <label class="campo">
+        <div class="campo">
           Fecha de estreno
-          <input class="input" type="date" formControlName="fecha_estreno" />
-        </label>
+          <app-selector-fecha [valor]="form.controls.fecha_estreno.value" [anioDesde]="anioActual + 2" [anioHasta]="1950" etiqueta="Fecha de estreno" (cambio)="form.controls.fecha_estreno.setValue($event); form.controls.fecha_estreno.markAsTouched()" />
+        </div>
         <label class="campo">
           Restricción de edad
           <select class="input" formControlName="restriccion_edad">

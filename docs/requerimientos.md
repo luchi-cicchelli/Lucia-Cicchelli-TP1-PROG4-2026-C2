@@ -8,11 +8,12 @@ Estado: ✅ hecho · ⏸️ pendiente por decisión del cliente.
 | # | Requerimiento | Estado | Cómo se resolvió |
 |---|---|---|---|
 | U1 | Registro con mail, nombre, apellido, fecha de nacimiento, tipo de sangre, color de ojos y días de vacaciones por año | ✅ | Formulario reactivo con validaciones (nombre solo letras, fecha no futura, días entre 0 y 365) |
-| U2 | Se puede comprar sin registrarse | ✅ | Compra anónima; el link de la compra es privado (UUID) |
+| U2 | Se puede comprar sin registrarse | ✅ | Compra como invitado: se pide al menos el nombre (mail opcional) |
 | U3 | Rol admin: controla salas, funciones, butacas, productos, etc. | ✅ | Panel `/admin` protegido por guard y por RLS |
 | U4 | Rol empleado: escanea QR de entradas y del candy | ✅ | `/empleado/escaner` |
 | U5 | Interfaces fáciles de usar para clientes y empleados | ✅ | Diseño propio, responsive, modo oscuro |
-| U6 | Fechas y horas fáciles de cargar, sin tanto scroll | ✅ | Funciones por días de la semana + horarios + rango; atajos de fechas en reportes |
+| U6 | Fechas y horas fáciles de cargar, sin tanto scroll | ✅ | Sin input date: desplegables de día/mes/año y hora/minutos; funciones por días de la semana; atajos en reportes |
+| U7 | Ingreso rápido para probar cada rol | ✅ | Accesos rápidos en el login: Admin, Empleado, Cliente e Invitado |
 
 ## 2. Películas y cartelera
 
@@ -34,7 +35,7 @@ Estado: ✅ hecho · ⏸️ pendiente por decisión del cliente.
 | # | Requerimiento | Estado | Cómo se resolvió |
 |---|---|---|---|
 | S1 | Varias salas, todas con la misma forma: 20 filas (A–T) y bloques de 4, 20 y 4 butacas | ✅ | Las butacas se generan solas al crear la sala |
-| S2 | Filas J y K reemplazadas por una fila accesible (2, 10 y 2 butacas), resaltada distinto | ✅ | |
+| S2 | Filas J y K reemplazadas por una fila accesible (2, 10 y 2 butacas), resaltada distinto | ✅ | Butacas accesibles más grandes (el lugar de dos) y con ícono |
 | S3 | Butacas VIP en las filas R, S y T: más caras, marcadas distinto y avisadas antes de pagar | ✅ | |
 | S4 | Formato 2D/3D/4D/5D e idioma castellano o subtitulada | ✅ | |
 | S5 | Asignación de sala automática (ej.: lunes, martes y viernes a las 18) | ✅ | `crear_funciones` busca una sala libre para cada horario |
@@ -45,12 +46,12 @@ Estado: ✅ hecho · ⏸️ pendiente por decisión del cliente.
 
 | # | Requerimiento | Estado | Cómo se resolvió |
 |---|---|---|---|
-| C1 | PDF con los datos de la entrada y el QR | ✅ | `jspdf` + `qrcode`, con código manual |
+| C1 | PDF con los datos de la entrada y el QR | ✅ | Un solo QR por compra (y código manual) en el PDF |
 | C2 | Candy bar: productos en categorías, comprables junto con la entrada | ✅ | |
-| C3 | Retirar el candy con el mismo QR | ✅ | Escáner en modo candy |
+| C3 | Retirar el candy con el mismo QR | ✅ | El mismo QR de la compra, en modo candy del escáner |
 | C4 | Combos (entrada + pochoclo + bebida) a precio fijo configurable, destacados | ✅ | |
-| C5 | Validar QR o código manual; una vez usado, deja de funcionar | ✅ | `validar_entrada` y `validar_candy` |
-| C6 | Cancelar hasta 2 horas antes, sin devolver dinero: queda crédito en la cuenta | ✅ | `cancelar_compra`; el crédito se ve en el perfil |
+| C5 | Validar QR o código manual; una vez usado, deja de funcionar | ✅ | `validar_entrada` hace pasar todas las butacas de la compra; `validar_candy` entrega el candy |
+| C6 | Cancelar hasta 2 horas antes, sin devolver dinero: queda crédito en la cuenta | ✅ | `cancelar_compra`; el crédito se ve en el perfil. Las compras de invitados no se cancelan (no hay cuenta donde dejar el crédito) |
 | C7 | Usar el crédito junto con otros medios de pago | ✅ | Opción "Usar mi crédito" en el checkout |
 
 ## 5. Beneficios

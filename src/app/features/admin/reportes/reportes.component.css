@@ -37,7 +37,8 @@
 }
 
 .rep__rango .campo {
-  width: 160px;
+  width: 270px;
+  max-width: 100%;
 }
 
 .rep__resumen {

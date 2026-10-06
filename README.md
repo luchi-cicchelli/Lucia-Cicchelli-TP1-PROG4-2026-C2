@@ -18,20 +18,21 @@ ng serve
 
 1. Completar `src/environments/` con la URL y la *publishable key* de Supabase.
 2. En el SQL Editor de Supabase, correr en este orden los scripts de `supabase/`:
-   `schema.sql`, `seed_generos.sql`, `auth.sql`, `salas_funciones.sql`, `cartelera.sql`, `compra.sql`, `escaner.sql`, `candy.sql`, `beneficios.sql`, `storage.sql`, `proximamente.sql`, `reportes.sql`.
+   `schema.sql`, `seed_generos.sql`, `auth.sql`, `salas_funciones.sql`, `cartelera.sql`, `compra.sql`, `escaner.sql`, `candy.sql`, `beneficios.sql`, `storage.sql`, `proximamente.sql`, `reportes.sql`, `qr_unico.sql`.
    Datos de prueba (una sola vez): `peliculas_prueba.sql` y `candy_prueba.sql`.
-3. Registrarse desde la app y hacerse admin:
+3. Cuentas de prueba (accesos rápidos del login): registrar desde la app `admin@bijou.com`, `empleado@bijou.com` y `cliente@bijou.com` con la contraseña `Bijou2026`, y darles el rol:
    ```sql
-   update public.perfiles set rol = 'admin' where email = 'tu@mail.com';
+   update public.perfiles set rol = 'admin' where email = 'admin@bijou.com';
+   update public.perfiles set rol = 'empleado' where email = 'empleado@bijou.com';
    ```
 4. Notificaciones push: crear la Edge Function `avisar-estrenos` con el código de `supabase/functions/avisar-estrenos/index.ts` y cargar los secretos `VAPID_PUBLIC`, `VAPID_PRIVATE` y `VAPID_MAIL`. La clave pública también va en `environment.vapidPublicKey`.
 
 ## Funcionalidades
 
-- **Clientes:** registro con los datos pedidos (o compra anónima), cartelera con las 3 más vendidas, buscador y filtro por género, reseñas con promedio, Próximamente con alerta de estreno.
-- **Compra:** butacas en tiempo real (accesibles y VIP resaltadas), candy y combos, cupones (bienvenida y mayores de 50), canje de puntos, crédito a favor, restricción de edad y PDF con QR.
+- **Clientes:** login con accesos rápidos, registro con los datos pedidos o compra como invitado (con nombre), cartelera con las 3 más vendidas, buscador y filtro por género, reseñas con promedio, Próximamente con alerta de estreno.
+- **Compra:** butacas en tiempo real (accesibles más grandes y VIP resaltadas), candy y combos, cupones (bienvenida y mayores de 50), canje de puntos, crédito a favor, restricción de edad y PDF con **un solo QR** para toda la compra.
 - **Perfil:** datos, mis entradas (cancelación hasta 2 h antes → crédito), mis películas con mi calificación, puntos e historial de canjes.
-- **Empleados:** escáner con cámara o código manual, para entradas y para el candy. Un QR usado deja de funcionar.
+- **Empleados:** escáner con cámara o código manual. El mismo QR hace entrar a todas las butacas de la compra y retira el candy; cada cosa una sola vez.
 - **Admin:** películas con póster (Storage) y preventa, salas, funciones con sala automática y cambio de precio, candy, cupones, recompensas, roles, reportes exportables a PDF y Excel con gráficos, y log de actividad.
 
 ## Arquitectura
@@ -51,7 +52,7 @@ Los componentes no hablan con Supabase: lo hacen los servicios. El estado se man
 | Tema | Dónde |
 |---|---|
 | Ruteo, lazy loading, parámetros como `input` | `app.routes.ts`, `pelicula-detalle` (`withComponentInputBinding`) |
-| Componentes, `input`/`output` | `tarjeta-pelicula`, `estrellas`, `mapa-butacas`, `subir-imagen` (emite la URL subida) |
+| Componentes, `input`/`output` | `tarjeta-pelicula`, `estrellas`, `mapa-butacas`, `subir-imagen` (emite la URL subida), `selector-fecha` y `selector-hora` (reemplazan los input date/time) |
 | Servicios e `inject` | `core/services/*` |
 | Formularios reactivos y validadores propios | registro (`soloLetras`, `fechaNacimientoValida`, contraseñas iguales), funciones (`FormArray` de horarios, rango de fechas), cupones, preventa |
 | Auth, guards y roles | `auth.service.ts`, `auth.guards.ts`, `auth.sql` |
@@ -74,7 +75,9 @@ Los componentes no hablan con Supabase: lo hacen los servicios. El estado se man
 - **Cancelación con crédito:** devuelve el total como crédito, descuenta los puntos ganados y devuelve los canjeados.
 - **Log de actividad:** las RPC y algunos triggers registran quién hizo qué (funciones, precios, validaciones, cancelaciones, roles).
 - **Reportes:** se calculan en SQL; los gráficos son barras con CSS (sin librerías) y la exportación carga `jspdf`/`exceljs` solo al usarla.
-- **Compras anónimas:** el id de la compra es un UUID que funciona como link privado a las entradas.
+- **Un solo QR por compra:** el QR y el código manual son de la compra (los genera un trigger). En la sala valida todas las entradas juntas y en el candy bar entrega todo; cada uno una sola vez.
+- **Compras de invitados:** sin cuenta se pide al menos el nombre (el mail es opcional). No se pueden cancelar, porque el crédito necesita una cuenta donde quedar; el link de la compra (UUID) funciona como acceso privado a las entradas.
+- **Fechas sin input date:** se eligen con desplegables de día, mes y año (y hora y minutos), como pidió el cliente para evitar el calendario del navegador.
 
 ## Fuera de alcance
 

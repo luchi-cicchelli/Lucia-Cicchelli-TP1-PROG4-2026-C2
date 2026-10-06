@@ -80,7 +80,9 @@ export class ComprasService {
       p_items: opciones.items,
       p_cupon: opciones.cupon,
       p_usar_credito: opciones.usarCredito,
-      p_canjes: opciones.canjes
+      p_canjes: opciones.canjes,
+      p_nombre: opciones.nombre,
+      p_email: opciones.email
     });
     if (error) throw new Error(error.message);
     return data as string;

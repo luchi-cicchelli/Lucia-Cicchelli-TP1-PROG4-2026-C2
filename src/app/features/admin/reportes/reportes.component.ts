@@ -5,6 +5,7 @@ import { RouterLink } from '@angular/router';
 import { ReportesService } from '../../../core/services/reportes.service';
 import { Ranking, VentaDiaria } from '../../../core/models/reporte.model';
 import { exportarExcel, exportarPdf } from './exportar';
+import { SelectorFechaComponent } from '../../../shared/components/selector-fecha/selector-fecha.component';
 
 const MAX_DIAS = 92;
 
@@ -31,7 +32,7 @@ type Periodo = 'semana' | 'mes';
 @Component({
   selector: 'app-reportes',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, CurrencyPipe, DatePipe, DecimalPipe],
+  imports: [ReactiveFormsModule, RouterLink, CurrencyPipe, DatePipe, DecimalPipe, SelectorFechaComponent],
   templateUrl: './reportes.component.html',
   styleUrl: './reportes.component.css'
 })
@@ -39,6 +40,7 @@ export class ReportesComponent implements OnInit {
   private readonly reportes = inject(ReportesService);
 
   readonly hoy = aIso(new Date());
+  readonly anioActual = new Date().getFullYear();
 
   // ---------- Facturación por día ----------
   readonly form = inject(FormBuilder).nonNullable.group(

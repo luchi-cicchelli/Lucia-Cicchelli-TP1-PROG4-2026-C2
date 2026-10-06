@@ -34,9 +34,10 @@
       </button>
     </div>
 
-    @if (!auth.estaLogueado()) {
+    @if (c.invitado) {
       <p class="banner-destacado exito__aviso">
-        Compraste sin cuenta: guardá el PDF o este link, es la forma de recuperar tus entradas.
+        Compraste como invitado a nombre de <strong>{{ c.nombre_comprador }}</strong>: guardá el PDF o este link para
+        recuperar tus entradas. Las compras sin cuenta no se pueden cancelar.
       </p>
     }
 
@@ -46,29 +47,50 @@
       </p>
     }
 
-    <div class="exito__entradas">
-      @for (e of c.entradas; track e.id) {
-        <article class="tarjeta exito__entrada">
-          <div class="exito__entrada-info">
-            <p class="exito__butaca">{{ etiquetaButaca(e) }}</p>
-            @if (e.tipo === 'vip') {
-              <span class="exito__tag exito__tag--vip">VIP</span>
-            }
-            @if (e.tipo === 'accesible') {
-              <span class="exito__tag exito__tag--acc">Accesible</span>
-            }
-            <p class="exito__precio">{{ e.precio_pagado | currency: 'ARS' : 'symbol-narrow' : '1.0-2' }}</p>
-          </div>
-          @if (qrs()[e.id]) {
-            <img class="exito__qr" [src]="qrs()[e.id]" [alt]="'Código QR de ' + etiquetaButaca(e)" />
+    <!-- Un solo QR para toda la compra: entradas y candy -->
+    <section class="tarjeta exito__pase">
+      <div class="exito__pase-qr">
+        @if (qr()) {
+          <img class="exito__qr" [src]="qr()" alt="Código QR de la compra" />
+        }
+        <p class="exito__codigo">
+          <span>Código manual</span>
+          <strong>{{ c.codigo_manual }}</strong>
+        </p>
+      </div>
+
+      <div class="exito__pase-info">
+        <p class="exito__pase-titulo">
+          {{ c.entradas.length }} {{ c.entradas.length === 1 ? 'entrada' : 'entradas' }}
+          @if (c.nombre_comprador) {
+            · a nombre de {{ c.nombre_comprador }}
           }
-          <p class="exito__codigo">
-            <span>Código manual</span>
-            <strong>{{ e.codigo_manual }}</strong>
-          </p>
-        </article>
-      }
-    </div>
+        </p>
+        <ul class="exito__butacas">
+          @for (e of c.entradas; track e.id) {
+            <li>
+              <span>
+                {{ etiquetaButaca(e) }}
+                @if (e.tipo === 'vip') {
+                  <span class="exito__tag exito__tag--vip">VIP</span>
+                }
+                @if (e.tipo === 'accesible') {
+                  <span class="exito__tag exito__tag--acc">Accesible</span>
+                }
+              </span>
+              <span class="exito__precio">{{ e.precio_pagado | currency: 'ARS' : 'symbol-narrow' : '1.0-2' }}</span>
+            </li>
+          }
+        </ul>
+        <p class="exito__pase-nota">
+          Mostrá este QR (o el código) en la entrada de la sala: valida todas tus entradas juntas.
+          @if (c.candy?.length) {
+            Con el mismo QR retirás el candy.
+          }
+          Se usa una sola vez.
+        </p>
+      </div>
+    </section>
 
     @if (c.candy?.length) {
       <section class="tarjeta exito__candy">
@@ -90,7 +112,7 @@
           @if (c.candy_retirado) {
             Ya retiraste el candy de esta compra.
           } @else {
-            Retiralo en el candy bar mostrando el QR (o el código) de cualquiera de tus entradas. Se entrega una sola vez.
+            Retiralo en el candy bar mostrando el mismo QR (o el código) de la compra. Se entrega una sola vez.
           }
         </p>
       </section>

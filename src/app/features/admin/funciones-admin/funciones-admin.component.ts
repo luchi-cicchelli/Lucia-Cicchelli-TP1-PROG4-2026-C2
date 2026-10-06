@@ -15,6 +15,8 @@ import { FuncionesService } from '../../../core/services/funciones.service';
 import { PeliculasService } from '../../../core/services/peliculas.service';
 import { PeliculaConGeneros } from '../../../core/models/pelicula.model';
 import { DuracionPipe } from '../../../shared/pipes/duracion.pipe';
+import { SelectorFechaComponent } from '../../../shared/components/selector-fecha/selector-fecha.component';
+import { SelectorHoraComponent } from '../../../shared/components/selector-hora/selector-hora.component';
 import {
   FORMATOS,
   Formato,
@@ -66,7 +68,7 @@ const rangoValido: ValidatorFn = (grupo: AbstractControl): ValidationErrors | nu
 @Component({
   selector: 'app-funciones-admin',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, DatePipe, CurrencyPipe, UpperCasePipe, DuracionPipe],
+  imports: [ReactiveFormsModule, RouterLink, DatePipe, CurrencyPipe, UpperCasePipe, DuracionPipe, SelectorFechaComponent, SelectorHoraComponent],
   templateUrl: './funciones-admin.component.html',
   styleUrl: './funciones-admin.component.css'
 })
@@ -79,6 +81,7 @@ export class FuncionesAdminComponent implements OnInit {
   readonly idiomas = IDIOMAS;
   readonly diasSemana = DIAS_SEMANA;
   readonly hoy = aIso(new Date());
+  readonly anioActual = new Date().getFullYear();
 
   readonly peliculas = signal<PeliculaConGeneros[]>([]);
   readonly funciones = signal<FuncionConDetalle[]>([]);

@@ -1,6 +1,8 @@
 import { Component, OnDestroy, OnInit, computed, inject, input, signal } from '@angular/core';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { soloLetras } from '../../core/validators/nombre.validators';
 import { RealtimeChannel } from '@supabase/supabase-js';
 import { AuthService } from '../../core/services/auth.service';
 import { ComprasService } from '../../core/services/compras.service';
@@ -17,7 +19,7 @@ import { MapaButacasComponent } from '../../shared/components/mapa-butacas/mapa-
 @Component({
   selector: 'app-checkout',
   standalone: true,
-  imports: [RouterLink, DatePipe, CurrencyPipe, MapaButacasComponent],
+  imports: [RouterLink, ReactiveFormsModule, DatePipe, CurrencyPipe, MapaButacasComponent],
   templateUrl: './checkout.component.html',
   styleUrl: './checkout.component.css'
 })
@@ -54,6 +56,12 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   readonly recompensas = signal<Recompensa[]>([]);
   readonly canjes = signal<Map<string, number>>(new Map());
   readonly usarCredito = signal(false);
+
+  // Compra sin cuenta: se pide al menos el nombre (el mail es opcional).
+  readonly formInvitado = inject(FormBuilder).nonNullable.group({
+    nombre: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(60), soloLetras]],
+    email: ['', [Validators.email, Validators.maxLength(120)]]
+  });
 
   readonly cargando = signal(true);
   readonly procesando = signal<string | null>(null);
@@ -300,6 +308,13 @@ export class CheckoutComponent implements OnInit, OnDestroy {
 
   async pagar() {
     if (!this.misButacas().length || this.pagando()) return;
+    const invitado = !this.auth.estaLogueado();
+    if (invitado && this.formInvitado.invalid) {
+      this.formInvitado.markAllAsTouched();
+      this.error.set('Para comprar sin cuenta completá tu nombre.');
+      return;
+    }
+    const { nombre, email } = this.formInvitado.getRawValue();
     this.pagando.set(true);
     this.error.set('');
     try {
@@ -307,7 +322,9 @@ export class CheckoutComponent implements OnInit, OnDestroy {
         items: this.carrito().map((c) => c.item),
         cupon: this.cuponAplicado()?.codigo ?? null,
         usarCredito: this.usarCredito(),
-        canjes: this.listaCanjes().map((c) => ({ recompensa_id: c.recompensa.id, cantidad: c.cantidad }))
+        canjes: this.listaCanjes().map((c) => ({ recompensa_id: c.recompensa.id, cantidad: c.cantidad })),
+        nombre: invitado ? nombre.trim() : null,
+        email: invitado && email.trim() ? email.trim() : null
       });
       this.compraConfirmada = true;
       await this.auth.recargarPerfil();

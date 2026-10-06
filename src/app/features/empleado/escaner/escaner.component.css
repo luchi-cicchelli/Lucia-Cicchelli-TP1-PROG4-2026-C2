@@ -274,3 +274,11 @@
     aspect-ratio: 4 / 3;
   }
 }
+
+.escaner__butacas {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+}

@@ -3,9 +3,9 @@
     <h1 class="titulo">{{ modo() === 'candy' ? 'Entregar candy' : 'Validar entradas' }}</h1>
     <p>
       @if (modo() === 'candy') {
-        Escaneá el QR de cualquier entrada de la compra. El candy se entrega una sola vez.
+        Escaneá el QR de la compra o ingresá su código. El candy se entrega una sola vez.
       } @else {
-        Escaneá el QR o ingresá el código de 8 caracteres. Cada entrada se puede usar una sola vez.
+        Escaneá el QR de la compra o ingresá el código de 8 caracteres: entran todas sus butacas juntas, una sola vez.
       }
     </p>
   </header>
@@ -75,23 +75,41 @@
                 </li>
               }
             </ul>
-            <p class="escaner__detalle">{{ r.candy.pelicula }} · {{ r.candy.sala }} · {{ r.candy.inicio | date: 'HH:mm' }} hs</p>
-          } @else if (r.ok && r.modo === 'entrada') {
-            <p class="escaner__estado"><span aria-hidden="true">✓</span> Entrada válida</p>
-            <p class="titulo escaner__pelicula">{{ r.entrada.pelicula }}</p>
-            <p class="escaner__butaca">
-              {{ butaca(r) }}
-              @if (r.entrada.tipo === 'vip') {
-                <span class="escaner__tag escaner__tag--vip">VIP</span>
-              }
-              @if (r.entrada.tipo === 'accesible') {
-                <span class="escaner__tag escaner__tag--acc">Accesible</span>
+            <p class="escaner__detalle">
+              {{ r.candy.pelicula }} · {{ r.candy.sala }} · {{ r.candy.inicio | date: 'HH:mm' }} hs
+              @if (r.candy.nombre) {
+                · {{ r.candy.nombre }}
               }
             </p>
+          } @else if (r.ok && r.modo === 'entrada') {
+            <p class="escaner__estado">
+              <span aria-hidden="true">✓</span>
+              Pasan {{ r.entrada.butacas.length }} {{ r.entrada.butacas.length === 1 ? 'persona' : 'personas' }}
+            </p>
+            <p class="titulo escaner__pelicula">{{ r.entrada.pelicula }}</p>
+            @if (r.entrada.nombre) {
+              <p class="escaner__detalle">A nombre de {{ r.entrada.nombre }}</p>
+            }
+            <ul class="escaner__butacas">
+              @for (b of r.entrada.butacas; track $index) {
+                <li class="escaner__butaca">
+                  {{ etiquetaButaca(b.fila, b.numero) }}
+                  @if (b.tipo === 'vip') {
+                    <span class="escaner__tag escaner__tag--vip">VIP</span>
+                  }
+                  @if (b.tipo === 'accesible') {
+                    <span class="escaner__tag escaner__tag--acc">Accesible</span>
+                  }
+                </li>
+              }
+            </ul>
             <p class="escaner__detalle">
               {{ r.entrada.sala }} · {{ r.entrada.inicio | date: 'HH:mm' }} hs ·
               {{ r.entrada.formato.toUpperCase() }} · {{ r.entrada.idioma === 'castellano' ? 'Castellano' : 'Subtitulada' }}
             </p>
+            @if (r.entrada.tiene_candy) {
+              <p class="escaner__detalle">Esta compra tiene candy para retirar con el mismo QR.</p>
+            }
             @if (r.entrada.restriccion_edad) {
               <p class="escaner__aviso">
                 Película +{{ r.entrada.restriccion_edad }}: si es menor, tiene que ingresar con un adulto.

@@ -154,9 +154,12 @@ export class EscanerComponent implements OnDestroy {
     return r.candy.items.map((i) => `${i.cantidad} × ${i.nombre}`).join(', ');
   }
 
+  etiquetaButaca(fila: string, numero: number): string {
+    return fila === 'ACC' ? `Fila accesible · Butaca ${numero}` : `Fila ${fila} · Butaca ${numero}`;
+  }
+
   butaca(r: ResultadoEscaneo): string {
     if (!r.ok || r.modo !== 'entrada') return '';
-    const e = r.entrada;
-    return e.fila === 'ACC' ? `Fila accesible · Butaca ${e.numero}` : `Fila ${e.fila} · Butaca ${e.numero}`;
+    return r.entrada.butacas.map((b) => (b.fila === 'ACC' ? `Acc ${b.numero}` : `${b.fila}${b.numero}`)).join(', ');
   }
 }

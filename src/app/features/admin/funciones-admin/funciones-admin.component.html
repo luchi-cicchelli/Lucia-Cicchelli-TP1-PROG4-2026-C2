@@ -108,7 +108,7 @@
         <div class="funciones__horarios" formArrayName="horarios">
           @for (h of horarios.controls; track $index) {
             <div class="funciones__horario">
-              <input class="input" type="time" [formControlName]="$index" step="300" />
+              <app-selector-hora [valor]="h.value" (cambio)="h.setValue($event)" />
               @if (horarios.length > 1) {
                 <button type="button" class="funciones__quitar" (click)="quitarHorario($index)" aria-label="Quitar horario">×</button>
               }
@@ -119,14 +119,14 @@
       </div>
 
       <div class="funciones__fila">
-        <label class="campo">
+        <div class="campo">
           Desde
-          <input class="input" type="date" formControlName="desde" [min]="hoy" />
-        </label>
-        <label class="campo">
+          <app-selector-fecha [valor]="form.controls.desde.value" [anioDesde]="anioActual" [anioHasta]="anioActual + 1" etiqueta="Desde" (cambio)="form.controls.desde.setValue($event); form.controls.desde.markAsTouched()" />
+        </div>
+        <div class="campo">
           Hasta
-          <input class="input" type="date" formControlName="hasta" [min]="form.controls.desde.value" />
-        </label>
+          <app-selector-fecha [valor]="form.controls.hasta.value" [anioDesde]="anioActual" [anioHasta]="anioActual + 1" etiqueta="Hasta" (cambio)="form.controls.hasta.setValue($event); form.controls.hasta.markAsTouched()" />
+        </div>
       </div>
       @if (form.hasError('rangoInvertido')) {
         <span class="error-texto">La fecha "hasta" tiene que ser posterior a "desde".</span>

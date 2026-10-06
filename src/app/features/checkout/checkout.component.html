@@ -42,7 +42,7 @@
         <section class="tarjeta checkout__candy">
           <div>
             <h2 class="titulo">Sumá combos y candy</h2>
-            <p class="checkout__nota">Lo retirás en el candy bar con el mismo QR de tu entrada.</p>
+            <p class="checkout__nota">Lo retirás en el candy bar con el mismo QR de tu compra.</p>
           </div>
 
           @if (misButacas().length === 0) {
@@ -240,10 +240,28 @@
           @if (auth.estaLogueado()) {
             <p class="checkout__nota">Con esta compra sumás <strong>{{ puntos() }} puntos</strong>.</p>
           } @else {
-            <p class="checkout__nota">
-              Estás comprando sin cuenta. <a routerLink="/registro">Registrate</a> para sumar puntos
-              y tener {{ porcentajeBienvenida() || 20 }}% off en tu primera compra.
-            </p>
+            <form class="checkout__invitado" [formGroup]="formInvitado" novalidate>
+              <p class="checkout__subtitulo">Comprás como invitado</p>
+              <label class="campo">
+                Nombre y apellido
+                <input class="input" formControlName="nombre" autocomplete="name" />
+                @if (formInvitado.controls.nombre.touched && formInvitado.controls.nombre.invalid) {
+                  <span class="error-texto">Ingresá tu nombre (solo letras).</span>
+                }
+              </label>
+              <label class="campo">
+                Mail (opcional)
+                <input class="input" type="email" formControlName="email" autocomplete="email" />
+                @if (formInvitado.controls.email.touched && formInvitado.controls.email.invalid) {
+                  <span class="error-texto">El mail no es válido.</span>
+                }
+              </label>
+              <p class="checkout__nota">
+                Las compras sin cuenta <strong>no se pueden cancelar</strong>.
+                <a routerLink="/login">Ingresá</a> o <a routerLink="/registro">registrate</a> para poder cancelar,
+                sumar puntos y tener {{ porcentajeBienvenida() || 20 }}% off en tu primera compra.
+              </p>
+            </form>
           }
 
           @if (f.pelicula?.restriccion_edad && !bloqueadaPorEdad()) {

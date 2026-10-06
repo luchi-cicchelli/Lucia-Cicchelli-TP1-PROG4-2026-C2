@@ -396,3 +396,11 @@
   align-items: center;
   font-size: 0.85rem;
 }
+
+.checkout__invitado {
+  display: grid;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--superficie-alt);
+}

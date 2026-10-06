@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-login',
@@ -23,6 +24,14 @@ export class LoginComponent {
   readonly cargando = signal(false);
   readonly error = signal('');
   readonly verPassword = signal(false);
+
+  // Botones para entrar con las cuentas de prueba sin tipear.
+  readonly accesos = environment.accesosRapidos;
+
+  async accesoRapido(acceso: { email: string; password: string }) {
+    this.form.setValue({ email: acceso.email, password: acceso.password });
+    await this.ingresar();
+  }
 
   async ingresar() {
     if (this.form.invalid) {

@@ -84,10 +84,13 @@
               </div>
 
               <div class="perfil__fila">
-                <label class="campo">
+                <div class="campo">
                   Fecha de nacimiento
-                  <input class="input" type="date" formControlName="fecha_nacimiento" min="1900-01-01" [max]="hoy" />
-                </label>
+                  <app-selector-fecha [valor]="form.controls.fecha_nacimiento.value" [anioDesde]="anioActual" [anioHasta]="1900" etiqueta="Fecha de nacimiento" (cambio)="form.controls.fecha_nacimiento.setValue($event); form.controls.fecha_nacimiento.markAsTouched()" />
+                  @if (form.controls.fecha_nacimiento.touched && form.controls.fecha_nacimiento.invalid) {
+                    <span class="error-texto">Elegí una fecha válida (no puede ser futura).</span>
+                  }
+                </div>
                 <label class="campo">
                   Días de vacaciones por año
                   <input class="input" type="number" min="0" max="365" formControlName="dias_vacaciones_anuales" />

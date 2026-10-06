@@ -95,3 +95,36 @@
     grid-template-columns: 1fr;
   }
 }
+
+.auth__rapidos {
+  display: grid;
+  gap: 8px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--superficie-alt);
+}
+
+.auth__rapidos p {
+  margin: 0;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--texto-muted);
+}
+
+.auth__rapidos-botones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.auth__rapidos-botones .chip {
+  cursor: pointer;
+  text-decoration: none;
+  font-size: 0.8rem;
+}
+
+.auth__rapidos-botones .chip:hover {
+  border-color: var(--rosa-acento);
+  color: var(--rosa-acento);
+}

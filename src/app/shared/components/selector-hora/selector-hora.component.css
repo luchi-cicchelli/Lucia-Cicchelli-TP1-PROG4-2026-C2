@@ -1,0 +1,10 @@
+.hora {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.hora .input {
+  width: auto;
+  padding: 8px 6px;
+}

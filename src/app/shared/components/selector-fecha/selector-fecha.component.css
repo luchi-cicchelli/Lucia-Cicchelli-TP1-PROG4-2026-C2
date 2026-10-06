@@ -1,0 +1,10 @@
+.fecha {
+  display: grid;
+  grid-template-columns: 0.8fr 1.4fr 1fr;
+  gap: 6px;
+}
+
+.fecha .input {
+  padding-left: 8px;
+  padding-right: 4px;
+}

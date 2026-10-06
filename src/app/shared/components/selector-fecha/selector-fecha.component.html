@@ -1,0 +1,20 @@
+<div class="fecha" role="group" [attr.aria-label]="etiqueta()">
+  <select class="input" [attr.aria-label]="etiqueta() + ': día'" (change)="elegir('dia', $event)">
+    <option value="" [selected]="!partes().dia">Día</option>
+    @for (d of dias(); track d) {
+      <option [value]="d" [selected]="partes().dia === d">{{ d }}</option>
+    }
+  </select>
+  <select class="input" [attr.aria-label]="etiqueta() + ': mes'" (change)="elegir('mes', $event)">
+    <option value="" [selected]="!partes().mes">Mes</option>
+    @for (m of meses; track m; let i = $index) {
+      <option [value]="i + 1" [selected]="partes().mes === i + 1">{{ m }}</option>
+    }
+  </select>
+  <select class="input" [attr.aria-label]="etiqueta() + ': año'" (change)="elegir('anio', $event)">
+    <option value="" [selected]="!partes().anio">Año</option>
+    @for (a of anios(); track a) {
+      <option [value]="a" [selected]="partes().anio === a">{{ a }}</option>
+    }
+  </select>
+</div>

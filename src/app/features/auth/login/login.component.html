@@ -5,6 +5,16 @@
       <p>Ingresá para ver tus entradas, puntos y más.</p>
     </header>
 
+    <div class="auth__rapidos">
+      <p>Acceso rápido</p>
+      <div class="auth__rapidos-botones">
+        @for (a of accesos; track a.email) {
+          <button type="button" class="chip" [disabled]="cargando()" (click)="accesoRapido(a)">{{ a.etiqueta }}</button>
+        }
+        <a class="chip" routerLink="/">Invitado (sin cuenta)</a>
+      </div>
+    </div>
+
     @if (error()) {
       <p class="alerta alerta--error" role="alert">{{ error() }}</p>
     }
