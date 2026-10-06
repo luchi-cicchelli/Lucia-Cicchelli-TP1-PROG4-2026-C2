@@ -1,9 +1,11 @@
 // Edge Function "avisar-estrenos"
-// Manda una notificación push a quienes activaron la alerta de una película
-// cuando ya se pueden comprar entradas (preventa o estreno). La llama el admin desde el panel.
+// Cuando ya se pueden comprar entradas de una película (preventa o estreno), avisa a quienes
+// activaron la alerta: les manda un mail a la dirección de su cuenta y, si activaron las
+// notificaciones en algún dispositivo, también una notificación push. La llama el admin desde el panel.
 //
 // Secretos que hay que cargar en Supabase (Edge Functions → Secrets):
-//   VAPID_PUBLIC, VAPID_PRIVATE, VAPID_MAIL
+//   BREVO_API_KEY y MAIL_REMITENTE (el mail verificado en Brevo desde el que salen los avisos)
+//   VAPID_PUBLIC, VAPID_PRIVATE y VAPID_MAIL (para las notificaciones push)
 // SUPABASE_URL y SUPABASE_SERVICE_ROLE_KEY ya vienen cargados por Supabase.
 
 import { createClient } from 'npm:@supabase/supabase-js@2';
@@ -14,6 +16,8 @@ const cors = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type'
 };
 
+const URL_APP = 'https://lucia-cicchelli-tp-1-prog-4-2026-c2.vercel.app';
+
 function responder(cuerpo: unknown, status = 200) {
   return new Response(JSON.stringify(cuerpo), {
     status,
@@ -21,18 +25,42 @@ function responder(cuerpo: unknown, status = 200) {
   });
 }
 
+// Manda el mail con la API de Brevo. Devuelve true si Brevo lo aceptó.
+async function enviarMail(para: string, nombre: string, asunto: string, html: string): Promise<boolean> {
+  const respuesta = await fetch('https://api.brevo.com/v3/smtp/email', {
+    method: 'POST',
+    headers: {
+      'api-key': Deno.env.get('BREVO_API_KEY')!,
+      'Content-Type': 'application/json',
+      Accept: 'application/json'
+    },
+    body: JSON.stringify({
+      sender: { name: 'Bijou Cine', email: Deno.env.get('MAIL_REMITENTE') },
+      to: [{ email: para, name: nombre }],
+      subject: asunto,
+      htmlContent: html
+    })
+  });
+  if (!respuesta.ok) console.error('Brevo rechazó el mail', respuesta.status, await respuesta.text());
+  return respuesta.ok;
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors });
 
-  // Las claves VAPID se leen acá (y no al cargar el archivo) para poder avisar si faltan.
+  if (!Deno.env.get('BREVO_API_KEY') || !Deno.env.get('MAIL_REMITENTE')) {
+    return responder({ error: 'Faltan los secretos BREVO_API_KEY y MAIL_REMITENTE en Supabase' }, 500);
+  }
+
+  // El push es opcional: solo se usa si están cargadas las claves VAPID.
   const vapidPublica = Deno.env.get('VAPID_PUBLIC');
   const vapidPrivada = Deno.env.get('VAPID_PRIVATE');
-  if (!vapidPublica || !vapidPrivada) {
-    return responder({ error: 'Faltan los secretos VAPID_PUBLIC y VAPID_PRIVATE en Supabase' }, 500);
+  const conPush = !!(vapidPublica && vapidPrivada);
+  if (conPush) {
+    webpush.setVapidDetails('mailto:' + (Deno.env.get('VAPID_MAIL') ?? 'bijou@example.com'), vapidPublica!, vapidPrivada!);
   }
-  webpush.setVapidDetails('mailto:' + (Deno.env.get('VAPID_MAIL') ?? 'bijou@example.com'), vapidPublica, vapidPrivada);
 
-  // Cliente con service role: puede leer las suscripciones de todos.
+  // Cliente con service role: puede leer los mails y las suscripciones de todos.
   const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
 
   // Solo un admin puede disparar el envío.
@@ -46,45 +74,84 @@ Deno.serve(async (req) => {
   const { data: pendientes, error } = await supabase.rpc('alertas_pendientes');
   if (error) return responder({ error: error.message }, 500);
 
-  let enviadas = 0;
+  let mails = 0;
+  let notificaciones = 0;
+  let sinEnviar = 0;
 
   for (const alerta of pendientes ?? []) {
-    const { data: suscripciones } = await supabase
-      .from('suscripciones_push')
-      .select('*')
-      .eq('usuario_id', alerta.usuario_id);
+    const titulo = alerta.preventa ? '¡Abrió la preventa!' : '¡Ya están las entradas!';
+    const texto = `Ya podés comprar tus entradas para ${alerta.pelicula}.`;
+    const enlace = `${URL_APP}/pelicula/${alerta.pelicula_id}`;
+    let avisado = false;
 
-    const mensaje = JSON.stringify({
-      notification: {
-        title: alerta.preventa ? '¡Abrió la preventa!' : '¡Ya están las entradas!',
-        body: `Ya podés comprar tus entradas para ${alerta.pelicula}.`,
-        icon: '/icons/icon-192x192.png',
-        vibrate: [100, 50, 100],
-        data: {
-          onActionClick: {
-            default: { operation: 'navigateLastFocusedOrOpen', url: `/pelicula/${alerta.pelicula_id}` }
+    // 1. Mail a la dirección de la cuenta.
+    const { data: cliente } = await supabase
+      .from('perfiles')
+      .select('nombre, email')
+      .eq('id', alerta.usuario_id)
+      .single();
+
+    if (cliente?.email) {
+      const html = `
+        <div style="font-family: Arial, sans-serif; max-width: 480px; margin: auto; color: #222">
+          <h2 style="color: #d6336c">${titulo}</h2>
+          <p>Hola ${cliente.nombre}:</p>
+          <p>${texto}</p>
+          <p><a href="${enlace}" style="display: inline-block; background: #d6336c; color: #fff;
+             padding: 10px 18px; border-radius: 6px; text-decoration: none">Comprar entradas</a></p>
+          <p style="color: #888; font-size: 12px">Recibiste este mail porque activaste la alerta de estreno en Bijou Cine.</p>
+        </div>`;
+      if (await enviarMail(cliente.email, cliente.nombre, `${titulo} ${alerta.pelicula} en Bijou`, html)) {
+        mails++;
+        avisado = true;
+      }
+    }
+
+    // 2. Notificación push a cada dispositivo donde la activó (si hay).
+    if (conPush) {
+      const { data: suscripciones } = await supabase
+        .from('suscripciones_push')
+        .select('*')
+        .eq('usuario_id', alerta.usuario_id);
+
+      const mensaje = JSON.stringify({
+        notification: {
+          title: titulo,
+          body: texto,
+          icon: '/icons/icon-192x192.png',
+          vibrate: [100, 50, 100],
+          data: {
+            onActionClick: {
+              default: { operation: 'navigateLastFocusedOrOpen', url: `/pelicula/${alerta.pelicula_id}` }
+            }
           }
         }
-      }
-    });
+      });
 
-    for (const s of suscripciones ?? []) {
-      try {
-        await webpush.sendNotification(
-          { endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } },
-          mensaje
-        );
-        enviadas++;
-      } catch (e: any) {
-        // 404/410: el navegador dio de baja la suscripción, la borramos.
-        if (e.statusCode === 404 || e.statusCode === 410) {
-          await supabase.from('suscripciones_push').delete().eq('id', s.id);
+      for (const s of suscripciones ?? []) {
+        try {
+          await webpush.sendNotification(
+            { endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } },
+            mensaje
+          );
+          notificaciones++;
+          avisado = true;
+        } catch (e: any) {
+          // 404/410: el navegador dio de baja la suscripción, la borramos.
+          if (e.statusCode === 404 || e.statusCode === 410) {
+            await supabase.from('suscripciones_push').delete().eq('id', s.id);
+          }
         }
       }
     }
 
-    await supabase.from('alertas_estreno').update({ notificado: true }).eq('id', alerta.alerta_id);
+    // Solo se marca como avisada si le llegó algo; si no, queda pendiente para el próximo envío.
+    if (avisado) {
+      await supabase.from('alertas_estreno').update({ notificado: true }).eq('id', alerta.alerta_id);
+    } else {
+      sinEnviar++;
+    }
   }
 
-  return responder({ alertas: pendientes?.length ?? 0, notificaciones: enviadas });
+  return responder({ alertas: pendientes?.length ?? 0, mails, notificaciones, sinEnviar });
 });

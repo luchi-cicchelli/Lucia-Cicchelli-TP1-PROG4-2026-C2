@@ -83,7 +83,8 @@ export class AuthService {
   }
 
   async cerrarSesion(): Promise<void> {
-    await this.supabase.client.auth.signOut();
+    // 'local': cierra la sesión solo en este navegador (si no, Supabase la cierra en todos los dispositivos).
+    await this.supabase.client.auth.signOut({ scope: 'local' });
     this._perfil.set(null);
     await this.router.navigate(['/login']);
   }

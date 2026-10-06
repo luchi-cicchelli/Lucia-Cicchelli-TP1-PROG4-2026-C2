@@ -38,10 +38,8 @@ export class BotonAlertaComponent {
       if (this.activa()) {
         await this.alertas.desactivar(usuarioId, this.peliculaId());
       } else {
-        const conPush = await this.alertas.activar(usuarioId, this.peliculaId());
-        if (!conPush) {
-          this.aviso.set('Alerta guardada. Para recibir la notificación, permití las notificaciones o instalá la app.');
-        }
+        await this.alertas.activar(usuarioId, this.peliculaId());
+        this.aviso.set(`Te vamos a mandar un mail a ${this.auth.perfil()?.email} cuando salgan las entradas.`);
       }
     } catch (e: any) {
       this.aviso.set('No se pudo guardar la alerta: ' + e.message);

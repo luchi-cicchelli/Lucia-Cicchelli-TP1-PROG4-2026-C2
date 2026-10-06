@@ -266,3 +266,27 @@ $$;
 
 revoke execute on function public.alertas_pendientes() from anon, authenticated, public;
 grant execute on function public.alertas_pendientes() to service_role;
+
+
+-- ---------- 5. Guardar la suscripción push del navegador ----------
+-- Un navegador tiene un solo endpoint: si antes se usó con otra cuenta, la suscripción pasa a la cuenta actual.
+create or replace function public.guardar_suscripcion(p_endpoint text, p_p256dh text, p_auth text)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if auth.uid() is null or not exists (select 1 from perfiles where id = auth.uid()) then
+    raise exception 'Tenés que tener una cuenta para recibir avisos';
+  end if;
+
+  insert into suscripciones_push (usuario_id, endpoint, p256dh, auth)
+  values (auth.uid(), p_endpoint, p_p256dh, p_auth)
+  on conflict (endpoint) do update
+    set usuario_id = excluded.usuario_id, p256dh = excluded.p256dh, auth = excluded.auth;
+end;
+$$;
+
+revoke execute on function public.guardar_suscripcion(text, text, text) from anon, public;
+grant execute on function public.guardar_suscripcion(text, text, text) to authenticated;

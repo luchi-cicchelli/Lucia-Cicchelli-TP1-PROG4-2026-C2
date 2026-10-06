@@ -188,10 +188,11 @@ export class PeliculasAdminComponent implements OnInit {
     this.mensaje.set('');
     try {
       const r = await this.alertas.enviarPendientes();
+      const sinEnviar = r.sinEnviar ? ` ${r.sinEnviar} no se pudieron enviar: quedan pendientes.` : '';
       this.mensaje.set(
         r.alertas === 0
           ? 'No hay alertas pendientes: ninguna película con alertas abrió su venta todavía.'
-          : `Se avisó a ${r.alertas} ${r.alertas === 1 ? 'persona' : 'personas'} (${r.notificaciones} notificaciones enviadas).`
+          : `Alertas: ${r.alertas}. Mails enviados: ${r.mails}. Notificaciones push: ${r.notificaciones}.${sinEnviar}`
       );
     } catch (e: any) {
       this.error.set('No se pudieron enviar las alertas: ' + (e.error?.error ?? e.message));

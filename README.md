@@ -26,12 +26,14 @@ ng serve
    update public.perfiles set rol = 'admin' where email = 'admin@bijou.com';
    update public.perfiles set rol = 'empleado' where email = 'empleado@bijou.com';
    ```
-4. Notificaciones push: crear la Edge Function `avisar-estrenos` con el código de `supabase/functions/avisar-estrenos/index.ts` y cargar los secretos `VAPID_PUBLIC`, `VAPID_PRIVATE` y `VAPID_MAIL`. La clave pública también va en `environment.vapidPublicKey`.
+4. Alertas de estreno: crear la Edge Function `avisar-estrenos` con el código de `supabase/functions/avisar-estrenos/index.ts` y cargar los secretos:
+   - Mail (aviso principal): crear una cuenta gratis en [Brevo](https://www.brevo.com), verificar el mail remitente (Senders) y crear una API key (SMTP & API). Secretos `BREVO_API_KEY` y `MAIL_REMITENTE`.
+   - Push (extra): `VAPID_PUBLIC`, `VAPID_PRIVATE` y `VAPID_MAIL`. La clave pública también va en `environment.vapidPublicKey`.
 
 ## Funcionalidades
 
 - **Ingreso:** para usar la app hay que entrar con cuenta (con accesos rápidos de prueba) o como invitado poniendo el nombre.
-- **Clientes:** registro con los datos pedidos, cartelera con las 3 más vendidas, buscador y filtro por género, reseñas con promedio, Próximamente con alerta de estreno.
+- **Clientes:** registro con los datos pedidos, cartelera con las 3 más vendidas, buscador y filtro por género, reseñas con promedio, Próximamente con alerta de estreno (llega un mail a la dirección de la cuenta).
 - **Compra:** butacas en tiempo real (accesibles más grandes y VIP resaltadas), candy y combos, cupones (bienvenida y mayores de 50), canje de puntos, crédito a favor, restricción de edad y PDF con **un solo QR** para toda la compra.
 - **Perfil:** datos, mis entradas (cancelación hasta 2 h antes → crédito), mis películas con mi calificación, puntos e historial de canjes.
 - **Empleados:** escáner con cámara o código manual. El mismo QR hace entrar a todas las butacas de la compra y retira el candy; cada cosa una sola vez.
@@ -65,7 +67,7 @@ Los componentes no hablan con Supabase: lo hacen los servicios. El estado se man
 | Directiva propia | `appImagenRespaldo`: si un póster no carga, pone uno por defecto (usa `host`) |
 | Interceptor | `supabase.interceptor.ts`: agrega apikey y token a las llamadas a la Edge Function y maneja la barra de carga |
 | PWA | `ngsw-config.json`, `manifest.webmanifest`, íconos |
-| Notificaciones push | `alertas.service.ts` (`SwPush`) + Edge Function `avisar-estrenos` (`web-push`) |
+| Alertas por mail y push | Edge Function `avisar-estrenos`: mail con la API de Brevo (`fetch`) y push con `web-push`; `alertas.service.ts` (`SwPush`) |
 
 ## Decisiones técnicas
 
@@ -79,6 +81,7 @@ Los componentes no hablan con Supabase: lo hacen los servicios. El estado se man
 - **Reportes:** se calculan en SQL; los gráficos son barras con CSS (sin librerías) y la exportación carga `jspdf`/`exceljs` solo al usarla.
 - **Un solo QR por compra:** el QR y el código manual son de la compra (los genera un trigger). En la sala valida todas las entradas juntas y en el candy bar entrega todo; cada uno una sola vez.
 - **Invitados:** se entra con un usuario anónimo de Supabase Auth (`signInAnonymously`) que guarda el nombre. Tiene sesión (el guard `ingresoGuard` lo deja pasar) pero no perfil: no suma puntos, no usa cupones de edad y no puede cancelar, porque el crédito necesita una cuenta donde quedar. En la base, `es_invitado()` lee el token y `confirmar_compra` lo trata como compra sin cuenta.
+- **Alerta de estreno por mail:** la Edge Function busca las alertas cuyas películas ya abrieron la venta y le manda un mail a la dirección de cada cuenta (Brevo). Si además activó las notificaciones, le llega un push. La alerta solo se marca como avisada si algo llegó; si no, queda para el próximo envío.
 - **Fechas sin input date:** se eligen con desplegables de día, mes y año (y hora y minutos), como pidió el cliente para evitar el calendario del navegador.
 
 ## Fuera de alcance
