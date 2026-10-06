@@ -354,3 +354,23 @@ end;
 $$;
 
 grant execute on function public.confirmar_compra(uuid, text, text, jsonb, text, boolean, jsonb, text, text) to anon, authenticated;
+
+
+-- ---------- 5. Limpieza: invitados creados antes de correr este script ----------
+-- Con el trigger viejo los invitados recibían un perfil y compraban como clientes
+-- (cupón de bienvenida y puntos). Sus compras pasan a ser de invitado y se borra ese perfil.
+update public.compras c
+set usuario_id = null,
+    puntos_ganados = 0,
+    nombre_comprador = coalesce(nullif(trim(c.nombre_comprador), ''), u.raw_user_meta_data->>'nombre')
+from auth.users u
+where u.id = c.usuario_id and coalesce(u.is_anonymous, false);
+
+update public.logs_actividad l
+set usuario_id = null
+from auth.users u
+where u.id = l.usuario_id and coalesce(u.is_anonymous, false);
+
+delete from public.perfiles p
+using auth.users u
+where u.id = p.id and coalesce(u.is_anonymous, false);
