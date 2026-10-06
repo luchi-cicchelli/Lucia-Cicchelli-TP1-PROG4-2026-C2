@@ -83,7 +83,3 @@ Los componentes no hablan con Supabase: lo hacen los servicios. El estado se man
 - **Invitados:** se entra con un usuario anónimo de Supabase Auth (`signInAnonymously`) que guarda el nombre. Tiene sesión (el guard `ingresoGuard` lo deja pasar) pero no perfil: no suma puntos, no usa cupones de edad y no puede cancelar, porque el crédito necesita una cuenta donde quedar. En la base, `es_invitado()` lee el token y `confirmar_compra` lo trata como compra sin cuenta.
 - **Alerta de estreno por mail:** la Edge Function busca las alertas cuyas películas ya abrieron la venta y le manda un mail a la dirección de cada cuenta (Brevo). Si además activó las notificaciones, le llega un push. La alerta solo se marca como avisada si algo llegó; si no, queda para el próximo envío.
 - **Fechas sin input date:** se eligen con desplegables de día, mes y año (y hora y minutos), como pidió el cliente para evitar el calendario del navegador.
-
-## Fuera de alcance
-
-El mapa del cine con la ubicación de la sala quedó pendiente porque el cliente todavía no le dio luz verde. Los pagos son simulados.
