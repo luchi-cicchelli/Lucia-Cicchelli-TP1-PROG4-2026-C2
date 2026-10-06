@@ -289,7 +289,7 @@ begin
 
   insert into logs_actividad (usuario_id, accion, entidad, entidad_id, detalle)
   values (auth.uid(), 'cancelo_compra', 'compra', p_compra_id::text,
-          v_pelicula || ' · crédito $' || v_credito);
+          v_pelicula || ' · crédito $' || trim_scale(v_credito));
 
   return v_credito;
 end;

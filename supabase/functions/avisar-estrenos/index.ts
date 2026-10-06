@@ -21,14 +21,16 @@ function responder(cuerpo: unknown, status = 200) {
   });
 }
 
-webpush.setVapidDetails(
-  'mailto:' + Deno.env.get('VAPID_MAIL'),
-  Deno.env.get('VAPID_PUBLIC')!,
-  Deno.env.get('VAPID_PRIVATE')!
-);
-
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors });
+
+  // Las claves VAPID se leen acá (y no al cargar el archivo) para poder avisar si faltan.
+  const vapidPublica = Deno.env.get('VAPID_PUBLIC');
+  const vapidPrivada = Deno.env.get('VAPID_PRIVATE');
+  if (!vapidPublica || !vapidPrivada) {
+    return responder({ error: 'Faltan los secretos VAPID_PUBLIC y VAPID_PRIVATE en Supabase' }, 500);
+  }
+  webpush.setVapidDetails('mailto:' + (Deno.env.get('VAPID_MAIL') ?? 'bijou@example.com'), vapidPublica, vapidPrivada);
 
   // Cliente con service role: puede leer las suscripciones de todos.
   const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);

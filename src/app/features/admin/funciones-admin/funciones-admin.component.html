@@ -17,7 +17,7 @@
 
   @if (creadas().length) {
     <div class="alerta alerta--ok">
-      <strong>Se crearon {{ creadas().length }} funciones.</strong>
+      <strong>{{ creadas().length === 1 ? 'Se creó 1 función.' : 'Se crearon ' + creadas().length + ' funciones.' }}</strong>
       <ul class="funciones__creadas">
         @for (c of creadas().slice(0, 6); track c.funcion_id) {
           <li>{{ c.inicio | date: 'EEE d/MM HH:mm' }} → {{ c.sala_nombre }}</li>
@@ -150,7 +150,7 @@
       <div class="funciones__resumen">
         @if (inicios().length) {
           <p>
-            Se van a crear <strong>{{ inicios().length }} funciones</strong>
+            {{ inicios().length === 1 ? 'Se va a crear' : 'Se van a crear' }} <strong>{{ inicios().length }} {{ inicios().length === 1 ? 'función' : 'funciones' }}</strong>
             @if (peliculaElegida(); as p) {
               de <strong>{{ p.nombre }}</strong>
             }
