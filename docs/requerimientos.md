@@ -8,12 +8,12 @@ Estado: ✅ hecho · ⏸️ pendiente por decisión del cliente.
 | # | Requerimiento | Estado | Cómo se resolvió |
 |---|---|---|---|
 | U1 | Registro con mail, nombre, apellido, fecha de nacimiento, tipo de sangre, color de ojos y días de vacaciones por año | ✅ | Formulario reactivo con validaciones (nombre solo letras, fecha no futura, días entre 0 y 365) |
-| U2 | Se puede comprar sin registrarse | ✅ | Compra como invitado: se pide al menos el nombre (mail opcional) |
+| U2 | Se puede comprar sin registrarse | ✅ | Para entrar hay que tener cuenta o ingresar como invitado con el nombre (usuario anónimo de Supabase). El invitado compra, pero no suma puntos ni cancela |
 | U3 | Rol admin: controla salas, funciones, butacas, productos, etc. | ✅ | Panel `/admin` protegido por guard y por RLS |
 | U4 | Rol empleado: escanea QR de entradas y del candy | ✅ | `/empleado/escaner` |
 | U5 | Interfaces fáciles de usar para clientes y empleados | ✅ | Diseño propio, responsive, modo oscuro |
 | U6 | Fechas y horas fáciles de cargar, sin tanto scroll | ✅ | Sin input date: desplegables de día/mes/año y hora/minutos; funciones por días de la semana; atajos en reportes |
-| U7 | Ingreso rápido para probar cada rol | ✅ | Accesos rápidos en el login: Admin, Empleado, Cliente e Invitado |
+| U7 | Ingreso rápido para probar cada rol | ✅ | Accesos rápidos en el login: Admin, Empleado y Cliente, más el ingreso como invitado |
 
 ## 2. Películas y cartelera
 

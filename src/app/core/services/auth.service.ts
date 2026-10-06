@@ -12,7 +12,14 @@ export class AuthService {
   readonly session = this._session.asReadonly();
   readonly perfil = this._perfil.asReadonly();
 
-  readonly estaLogueado = computed(() => this._session() !== null);
+  // Hay dos formas de entrar: con cuenta o como invitado (usuario anónimo de Supabase con su nombre).
+  readonly tieneSesion = computed(() => this._session() !== null);
+  readonly esInvitado = computed(() => !!this._session()?.user.is_anonymous);
+  readonly nombreInvitado = computed(() =>
+    this.esInvitado() ? (this._session()?.user.user_metadata['nombre'] as string) ?? '' : ''
+  );
+  // Con cuenta registrada (los invitados no tienen perfil, puntos ni cancelaciones).
+  readonly estaLogueado = computed(() => this.tieneSesion() && !this.esInvitado());
   readonly rol = computed<Rol | null>(() => this._perfil()?.rol ?? null);
   readonly esAdmin = computed(() => this.rol() === 'admin');
   readonly esEmpleado = computed(() => this.rol() === 'empleado' || this.rol() === 'admin');
@@ -32,7 +39,7 @@ export class AuthService {
         this._session.set(session);
 
         setTimeout(async () => {
-          if (!session) {
+          if (!session || session.user.is_anonymous) {
             this._perfil.set(null);
           } else if (this._perfil()?.id !== session.user.id || evento === 'USER_UPDATED') {
             await this.cargarPerfil(session.user.id);
@@ -47,6 +54,12 @@ export class AuthService {
     const { data, error } = await this.supabase.client.auth.signInWithPassword({ email, password });
     if (error) throw new Error(this.traducirError(error));
     await this.cargarPerfil(data.user.id);
+  }
+
+  // Entrar sin cuenta: Supabase crea un usuario anónimo y guardamos el nombre en sus datos.
+  async entrarComoInvitado(nombre: string): Promise<void> {
+    const { error } = await this.supabase.client.auth.signInAnonymously({ options: { data: { nombre } } });
+    if (error) throw new Error(this.traducirError(error));
   }
 
   async registrar(datos: RegistroDatos): Promise<{ requiereConfirmacion: boolean }> {
@@ -72,7 +85,7 @@ export class AuthService {
   async cerrarSesion(): Promise<void> {
     await this.supabase.client.auth.signOut();
     this._perfil.set(null);
-    await this.router.navigate(['/']);
+    await this.router.navigate(['/login']);
   }
 
   async actualizarDatos(cambios: DatosPersonales): Promise<void> {
@@ -126,6 +139,7 @@ export class AuthService {
     if (mensaje.includes('email not confirmed')) return 'Tenés que confirmar tu mail antes de ingresar.';
     if (mensaje.includes('already registered')) return 'Ya existe una cuenta con ese mail.';
     if (mensaje.includes('password should be at least')) return 'La contraseña debe tener al menos 6 caracteres.';
+    if (mensaje.includes('anonymous sign-ins are disabled')) return 'El ingreso como invitado no está habilitado.';
     if (mensaje.includes('rate limit')) return 'Demasiados intentos. Esperá unos minutos y probá de nuevo.';
     if (mensaje.includes('invalid') && mensaje.includes('email')) return 'El mail no es válido.';
     return error.message;

@@ -1,43 +1,47 @@
 import { Routes } from '@angular/router';
-import { authGuard, invitadoGuard, rolGuard } from './core/guards/auth.guards';
+import { authGuard, ingresoGuard, sinCuentaGuard, rolGuard } from './core/guards/auth.guards';
 
 export const routes: Routes = [
-  // --- Público ---
+  // --- Hay que entrar (con cuenta o como invitado) ---
   {
     path: '',
+    canActivate: [ingresoGuard],
     loadComponent: () =>
       import('./features/home/home.component').then((m) => m.HomeComponent)
   },
   {
     path: 'pelicula/:id',
+    canActivate: [ingresoGuard],
     loadComponent: () =>
       import('./features/pelicula-detalle/pelicula-detalle.component').then(
         (m) => m.PeliculaDetalleComponent
       )
   },
   {
-    // Se puede comprar sin estar registrado, por eso no lleva guard.
+    // Los invitados también pueden comprar.
     path: 'checkout/:funcionId',
+    canActivate: [ingresoGuard],
     loadComponent: () =>
       import('./features/checkout/checkout.component').then((m) => m.CheckoutComponent)
   },
 
   {
     path: 'compra/:id',
+    canActivate: [ingresoGuard],
     loadComponent: () =>
       import('./features/compra-exitosa/compra-exitosa.component').then((m) => m.CompraExitosaComponent)
   },
 
-  // --- Auth (solo si NO está logueado) ---
+  // --- Login y registro (sin cuenta; un invitado puede entrar para crearse una) ---
   {
     path: 'login',
-    canActivate: [invitadoGuard],
+    canActivate: [sinCuentaGuard],
     loadComponent: () =>
       import('./features/auth/login/login.component').then((m) => m.LoginComponent)
   },
   {
     path: 'registro',
-    canActivate: [invitadoGuard],
+    canActivate: [sinCuentaGuard],
     loadComponent: () =>
       import('./features/auth/registro/registro.component').then((m) => m.RegistroComponent)
   },

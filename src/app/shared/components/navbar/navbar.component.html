@@ -1,6 +1,6 @@
 <header class="navbar">
   <div class="navbar__contenido">
-    <a routerLink="/" class="navbar__marca">Bijou</a>
+    <a [routerLink]="auth.tieneSesion() ? '/' : '/login'" class="navbar__marca">Bijou</a>
 
     <button
       type="button"
@@ -13,7 +13,9 @@
     </button>
 
     <nav class="navbar__links" [class.navbar__links--abierto]="menuAbierto()">
-      <a routerLink="/" routerLinkActive="activo" [routerLinkActiveOptions]="{ exact: true }">Cartelera</a>
+      @if (auth.tieneSesion()) {
+        <a routerLink="/" routerLinkActive="activo" [routerLinkActiveOptions]="{ exact: true }">Cartelera</a>
+      }
 
       @if (auth.esEmpleado()) {
         <a routerLink="/empleado/escaner" routerLinkActive="activo">Escáner</a>
@@ -26,6 +28,10 @@
         <a routerLink="/perfil" routerLinkActive="activo" class="navbar__usuario">
           {{ auth.perfil()?.nombre || 'Mi perfil' }}
         </a>
+        <button type="button" class="navbar__salir" (click)="salir()">Salir</button>
+      } @else if (auth.esInvitado()) {
+        <span class="navbar__usuario">Invitado: {{ auth.nombreInvitado() }}</span>
+        <a routerLink="/registro" class="boton navbar__cta">Crear cuenta</a>
         <button type="button" class="navbar__salir" (click)="salir()">Salir</button>
       } @else {
         <a routerLink="/login" routerLinkActive="activo">Ingresar</a>

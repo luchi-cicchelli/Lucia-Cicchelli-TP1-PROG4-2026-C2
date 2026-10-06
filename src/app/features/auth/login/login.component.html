@@ -1,8 +1,8 @@
-<section class="auth">
+<section class="auth auth--columna">
   <form class="tarjeta auth__tarjeta" [formGroup]="form" (ngSubmit)="ingresar()" novalidate>
     <header class="auth__encabezado">
-      <h1 class="titulo">Hola de nuevo</h1>
-      <p>Ingresá para ver tus entradas, puntos y más.</p>
+      <h1 class="titulo">Te damos la bienvenida a Bijou</h1>
+      <p>Para entrar, ingresá con tu cuenta o como invitado con tu nombre.</p>
     </header>
 
     <div class="auth__rapidos">
@@ -11,7 +11,6 @@
         @for (a of accesos; track a.email) {
           <button type="button" class="chip" [disabled]="cargando()" (click)="accesoRapido(a)">{{ a.etiqueta }}</button>
         }
-        <a class="chip" routerLink="/">Invitado (sin cuenta)</a>
       </div>
     </div>
 
@@ -52,5 +51,20 @@
     <p class="auth__pie">
       ¿No tenés cuenta? <a routerLink="/registro">Registrate</a> y obtené 20% off en tu primera compra.
     </p>
+  </form>
+
+  <form class="tarjeta auth__tarjeta auth__invitado" [formGroup]="formInvitado" (ngSubmit)="entrarComoInvitado()" novalidate>
+    <header class="auth__encabezado">
+      <h2 class="titulo">Entrar como invitado</h2>
+      <p>Sin cuenta podés ver la cartelera y comprar, pero no sumás puntos ni podés cancelar.</p>
+    </header>
+    <label class="campo">
+      Tu nombre
+      <input class="input" formControlName="nombre" autocomplete="name" />
+      @if (formInvitado.controls.nombre.touched && formInvitado.controls.nombre.invalid) {
+        <span class="error-texto">Ingresá tu nombre (solo letras).</span>
+      }
+    </label>
+    <button type="submit" class="boton boton--secundario auth__enviar" [disabled]="cargando()">Entrar como invitado</button>
   </form>
 </section>

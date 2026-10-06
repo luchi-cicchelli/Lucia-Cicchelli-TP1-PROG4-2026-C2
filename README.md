@@ -18,7 +18,8 @@ ng serve
 
 1. Completar `src/environments/` con la URL y la *publishable key* de Supabase.
 2. En el SQL Editor de Supabase, correr en este orden los scripts de `supabase/`:
-   `schema.sql`, `seed_generos.sql`, `auth.sql`, `salas_funciones.sql`, `cartelera.sql`, `compra.sql`, `escaner.sql`, `candy.sql`, `beneficios.sql`, `storage.sql`, `proximamente.sql`, `reportes.sql`, `qr_unico.sql`.
+   `schema.sql`, `seed_generos.sql`, `auth.sql`, `salas_funciones.sql`, `cartelera.sql`, `compra.sql`, `escaner.sql`, `candy.sql`, `beneficios.sql`, `storage.sql`, `proximamente.sql`, `reportes.sql`, `qr_unico.sql`, `invitados.sql`.
+   En Authentication → Sign In / Providers, activar **Allow anonymous sign-ins** (lo usa el ingreso como invitado).
    Datos de prueba (una sola vez): `peliculas_prueba.sql` y `candy_prueba.sql`.
 3. Cuentas de prueba (accesos rápidos del login): registrar desde la app `admin@bijou.com`, `empleado@bijou.com` y `cliente@bijou.com` con la contraseña `Bijou2026`, y darles el rol:
    ```sql
@@ -29,7 +30,8 @@ ng serve
 
 ## Funcionalidades
 
-- **Clientes:** login con accesos rápidos, registro con los datos pedidos o compra como invitado (con nombre), cartelera con las 3 más vendidas, buscador y filtro por género, reseñas con promedio, Próximamente con alerta de estreno.
+- **Ingreso:** para usar la app hay que entrar con cuenta (con accesos rápidos de prueba) o como invitado poniendo el nombre.
+- **Clientes:** registro con los datos pedidos, cartelera con las 3 más vendidas, buscador y filtro por género, reseñas con promedio, Próximamente con alerta de estreno.
 - **Compra:** butacas en tiempo real (accesibles más grandes y VIP resaltadas), candy y combos, cupones (bienvenida y mayores de 50), canje de puntos, crédito a favor, restricción de edad y PDF con **un solo QR** para toda la compra.
 - **Perfil:** datos, mis entradas (cancelación hasta 2 h antes → crédito), mis películas con mi calificación, puntos e historial de canjes.
 - **Empleados:** escáner con cámara o código manual. El mismo QR hace entrar a todas las butacas de la compra y retira el candy; cada cosa una sola vez.
@@ -76,7 +78,7 @@ Los componentes no hablan con Supabase: lo hacen los servicios. El estado se man
 - **Log de actividad:** las RPC y algunos triggers registran quién hizo qué (funciones, precios, validaciones, cancelaciones, roles).
 - **Reportes:** se calculan en SQL; los gráficos son barras con CSS (sin librerías) y la exportación carga `jspdf`/`exceljs` solo al usarla.
 - **Un solo QR por compra:** el QR y el código manual son de la compra (los genera un trigger). En la sala valida todas las entradas juntas y en el candy bar entrega todo; cada uno una sola vez.
-- **Compras de invitados:** sin cuenta se pide al menos el nombre (el mail es opcional). No se pueden cancelar, porque el crédito necesita una cuenta donde quedar; el link de la compra (UUID) funciona como acceso privado a las entradas.
+- **Invitados:** se entra con un usuario anónimo de Supabase Auth (`signInAnonymously`) que guarda el nombre. Tiene sesión (el guard `ingresoGuard` lo deja pasar) pero no perfil: no suma puntos, no usa cupones de edad y no puede cancelar, porque el crédito necesita una cuenta donde quedar. En la base, `es_invitado()` lee el token y `confirmar_compra` lo trata como compra sin cuenta.
 - **Fechas sin input date:** se eligen con desplegables de día, mes y año (y hora y minutos), como pidió el cliente para evitar el calendario del navegador.
 
 ## Fuera de alcance

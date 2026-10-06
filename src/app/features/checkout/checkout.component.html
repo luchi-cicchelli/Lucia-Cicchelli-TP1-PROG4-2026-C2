@@ -241,14 +241,7 @@
             <p class="checkout__nota">Con esta compra sumás <strong>{{ puntos() }} puntos</strong>.</p>
           } @else {
             <form class="checkout__invitado" [formGroup]="formInvitado" novalidate>
-              <p class="checkout__subtitulo">Comprás como invitado</p>
-              <label class="campo">
-                Nombre y apellido
-                <input class="input" formControlName="nombre" autocomplete="name" />
-                @if (formInvitado.controls.nombre.touched && formInvitado.controls.nombre.invalid) {
-                  <span class="error-texto">Ingresá tu nombre (solo letras).</span>
-                }
-              </label>
+              <p class="checkout__subtitulo">Comprás como invitado: {{ auth.nombreInvitado() }}</p>
               <label class="campo">
                 Mail (opcional)
                 <input class="input" type="email" formControlName="email" autocomplete="email" />
@@ -258,7 +251,7 @@
               </label>
               <p class="checkout__nota">
                 Las compras sin cuenta <strong>no se pueden cancelar</strong>.
-                <a routerLink="/login">Ingresá</a> o <a routerLink="/registro">registrate</a> para poder cancelar,
+                <a routerLink="/registro">Creá una cuenta</a> para poder cancelar,
                 sumar puntos y tener {{ porcentajeBienvenida() || 20 }}% off en tu primera compra.
               </p>
             </form>
