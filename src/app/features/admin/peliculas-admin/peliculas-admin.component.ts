@@ -181,7 +181,7 @@ export class PeliculasAdminComponent implements OnInit {
     }
   }
 
-  // Llama a la Edge Function que manda las notificaciones de "ya salieron las entradas".
+  // Llama a la Edge Function que manda los mails de "ya salieron las entradas".
   async enviarAlertas() {
     this.enviandoAlertas.set(true);
     this.error.set('');
@@ -192,7 +192,7 @@ export class PeliculasAdminComponent implements OnInit {
       this.mensaje.set(
         r.alertas === 0
           ? 'No hay alertas pendientes: ninguna película con alertas abrió su venta todavía.'
-          : `Alertas: ${r.alertas}. Mails enviados: ${r.mails}. Notificaciones push: ${r.notificaciones}.${sinEnviar}`
+          : `Alertas: ${r.alertas}. Mails enviados: ${r.mails}.${sinEnviar}`
       );
     } catch (e: any) {
       this.error.set('No se pudieron enviar las alertas: ' + (e.error?.error ?? e.message));

@@ -27,7 +27,7 @@ Estado: ✅ hecho · ⏸️ pendiente por decisión del cliente.
 | P6 | Restricción de edad (+13 / +18): no se vende a menores y la entrada aclara que debe ir un adulto | ✅ | Validado en el front y en `confirmar_compra`; aviso en el detalle y en el PDF |
 | P7 | Reseñas con estrellas y comentario corto, visibles antes de comprar, con promedio | ✅ | Solo reseña quien vio la película; comentario de hasta 280 caracteres |
 | P8 | Sección Próximamente con estrenos de las próximas semanas | ✅ | En la home |
-| P9 | Alerta para avisar cuando salen las entradas | ✅ | Mail a la dirección de la cuenta (Edge Function + Brevo), y notificación push si se activó |
+| P9 | Alerta para avisar cuando salen las entradas | ✅ | Mail a la dirección de la cuenta (Edge Function + Brevo) y aviso en la app la próxima vez que entra |
 | P10 | Preventa: abrir la venta 7 días antes del estreno con precio especial, configurable por película | ✅ | Se configura en la película; después del estreno vuelve al precio normal |
 
 ## 3. Salas y funciones
@@ -83,6 +83,6 @@ Estado: ✅ hecho · ⏸️ pendiente por decisión del cliente.
 |---|---|
 | Usar los temas vistos en clase | ✅ (ver tabla en el README) |
 | Integración con Supabase | ✅ Auth, Postgres + RLS, Realtime, Storage, Edge Functions |
-| PWA | ✅ Instalable, con Service Worker y notificaciones push |
+| PWA | ✅ Instalable, con Service Worker |
 | Estilo visual propio | ✅ Minimalista, rosa, Playfair Display + Inter, modo oscuro |
 | App desplegada, código en GitHub, README con arquitectura y decisiones | ✅ |

@@ -1,6 +1,5 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { SwPush } from '@angular/service-worker';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { SupabaseService } from './supabase.service';
@@ -8,19 +7,29 @@ import { SupabaseService } from './supabase.service';
 export interface ResultadoEnvio {
   alertas: number;
   mails: number;
-  notificaciones: number;
   sinEnviar: number;
+}
+
+// Aviso que se muestra dentro de la app cuando abre la venta de una película con alerta.
+export interface AvisoEstreno {
+  alerta_id: string;
+  pelicula_id: string;
+  pelicula: string;
+  preventa: boolean;
 }
 
 @Injectable({ providedIn: 'root' })
 export class AlertasService {
   private readonly supabase = inject(SupabaseService);
-  private readonly swPush = inject(SwPush);
   private readonly http = inject(HttpClient);
 
   // Ids de las películas con alerta activa del usuario logueado.
   readonly mias = signal<ReadonlySet<string>>(new Set());
   private cargadasDe: string | null = null;
+
+  // Avisos "abrió la venta" que todavía no se mostraron en la app.
+  readonly avisos = signal<AvisoEstreno[]>([]);
+  private avisosDe: string | null = null;
 
   async cargar(usuarioId: string) {
     if (this.cargadasDe === usuarioId) return;
@@ -37,11 +46,12 @@ export class AlertasService {
   async activar(usuarioId: string, peliculaId: string) {
     const { error } = await this.supabase.client
       .from('alertas_estreno')
-      .upsert({ usuario_id: usuarioId, pelicula_id: peliculaId, notificado: false }, { onConflict: 'usuario_id,pelicula_id' });
+      .upsert(
+        { usuario_id: usuarioId, pelicula_id: peliculaId, notificado: false, vista_en_app: false },
+        { onConflict: 'usuario_id,pelicula_id' }
+      );
     if (error) throw error;
     this.mias.update((s) => new Set(s).add(peliculaId));
-    // El aviso principal es por mail; la notificación push es un extra si el navegador la permite.
-    await this.suscribirAPush();
   }
 
   async desactivar(usuarioId: string, peliculaId: string) {
@@ -58,28 +68,32 @@ export class AlertasService {
     });
   }
 
-  // Pide permiso de notificaciones y guarda la suscripción del navegador.
-  // Devuelve false si el navegador no lo permite (o en modo desarrollo, sin service worker).
-  private async suscribirAPush(): Promise<boolean> {
-    if (!this.swPush.isEnabled) return false;
-    try {
-      const sub = await this.swPush.requestSubscription({ serverPublicKey: environment.vapidPublicKey });
-      const json = sub.toJSON();
-      // Por RPC: si este navegador ya estaba suscripto con otra cuenta, la suscripción pasa a la cuenta actual.
-      const { error } = await this.supabase.client.rpc('guardar_suscripcion', {
-        p_endpoint: json.endpoint,
-        p_p256dh: json.keys?.['p256dh'],
-        p_auth: json.keys?.['auth']
-      });
-      if (error) throw error;
-      return true;
-    } catch (e) {
-      console.error('No se pudo activar la notificación push', e);
-      return false;
-    }
+  // Al entrar a la app: trae las alertas cuyas películas ya abrieron la venta (preventa o estreno)
+  // y que todavía no se avisaron en la app. Una vez por usuario por cada vez que se abre la app.
+  async buscarAvisos(usuarioId: string) {
+    if (this.avisosDe === usuarioId) return;
+    this.avisosDe = usuarioId;
+    const { data, error } = await this.supabase.client.rpc('mis_avisos_estreno');
+    if (error) throw error;
+    this.avisos.set(data ?? []);
   }
 
-  // Admin: llama a la Edge Function que manda los mails (y notificaciones) pendientes.
+  // Cuando el usuario cierra el aviso (o va a la película), se marca como visto para no volver a mostrarlo.
+  async marcarVisto(aviso: AvisoEstreno) {
+    this.avisos.update((lista) => lista.filter((a) => a.alerta_id !== aviso.alerta_id));
+    const { error } = await this.supabase.client
+      .from('alertas_estreno')
+      .update({ vista_en_app: true })
+      .eq('id', aviso.alerta_id);
+    if (error) console.error('No se pudo marcar el aviso como visto', error);
+  }
+
+  limpiarAvisos() {
+    this.avisos.set([]);
+    this.avisosDe = null;
+  }
+
+  // Admin: llama a la Edge Function que manda los mails pendientes.
   // Los headers (apikey y token) los agrega el interceptor.
   enviarPendientes(): Promise<ResultadoEnvio> {
     return firstValueFrom(

@@ -1,4 +1,4 @@
--- Próximamente, preventa por película y alertas de estreno (notificaciones push).
+-- Próximamente, preventa por película y alertas de estreno.
 -- Correr después de beneficios.sql.
 
 -- ---------- 1. Preventa configurable película por película ----------
@@ -225,25 +225,11 @@ end;
 $$;
 
 
--- ---------- 4. Alertas de estreno y suscripciones push ----------
-create table if not exists public.suscripciones_push (
-  id uuid primary key default gen_random_uuid(),
-  usuario_id uuid not null references public.perfiles(id) on delete cascade,
-  endpoint text not null unique,
-  p256dh text not null,
-  auth text not null,
-  created_at timestamptz not null default now()
-);
-
+-- ---------- 4. Alertas de estreno ----------
 alter table public.alertas_estreno enable row level security;
-alter table public.suscripciones_push enable row level security;
 
 drop policy if exists "alertas: las propias" on public.alertas_estreno;
 create policy "alertas: las propias" on public.alertas_estreno for all to authenticated
-  using (usuario_id = auth.uid()) with check (usuario_id = auth.uid());
-
-drop policy if exists "suscripciones: las propias" on public.suscripciones_push;
-create policy "suscripciones: las propias" on public.suscripciones_push for all to authenticated
   using (usuario_id = auth.uid()) with check (usuario_id = auth.uid());
 
 -- Alertas que ya hay que mandar: la venta abrió y hay funciones a la venta.
@@ -266,27 +252,3 @@ $$;
 
 revoke execute on function public.alertas_pendientes() from anon, authenticated, public;
 grant execute on function public.alertas_pendientes() to service_role;
-
-
--- ---------- 5. Guardar la suscripción push del navegador ----------
--- Un navegador tiene un solo endpoint: si antes se usó con otra cuenta, la suscripción pasa a la cuenta actual.
-create or replace function public.guardar_suscripcion(p_endpoint text, p_p256dh text, p_auth text)
-returns void
-language plpgsql
-security definer
-set search_path = public
-as $$
-begin
-  if auth.uid() is null or not exists (select 1 from perfiles where id = auth.uid()) then
-    raise exception 'Tenés que tener una cuenta para recibir avisos';
-  end if;
-
-  insert into suscripciones_push (usuario_id, endpoint, p256dh, auth)
-  values (auth.uid(), p_endpoint, p_p256dh, p_auth)
-  on conflict (endpoint) do update
-    set usuario_id = excluded.usuario_id, p256dh = excluded.p256dh, auth = excluded.auth;
-end;
-$$;
-
-revoke execute on function public.guardar_suscripcion(text, text, text) from anon, public;
-grant execute on function public.guardar_suscripcion(text, text, text) to authenticated;

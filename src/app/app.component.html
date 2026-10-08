@@ -2,6 +2,21 @@
   <div class="barra-carga" role="progressbar" aria-label="Cargando"></div>
 }
 <app-navbar />
+@if (alertas.avisos().length) {
+  <section class="avisos" aria-live="polite">
+    @for (aviso of alertas.avisos(); track aviso.alerta_id) {
+      <div class="aviso" role="status">
+        <svg class="aviso__icono" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 22a2.5 2.5 0 0 0 2.45-2h-4.9A2.5 2.5 0 0 0 12 22Zm7-6V11a7 7 0 0 0-5.5-6.84V3.5a1.5 1.5 0 0 0-3 0v.66A7 7 0 0 0 5 11v5l-2 2v1h18v-1Z"/></svg>
+        <p class="aviso__texto">
+          <strong>{{ aviso.preventa ? '¡Abrió la preventa!' : '¡Ya están las entradas!' }}</strong>
+          Ya podés comprar tus entradas para {{ aviso.pelicula }}.
+        </p>
+        <a class="aviso__link" [routerLink]="['/pelicula', aviso.pelicula_id]" (click)="cerrar(aviso)">Comprar</a>
+        <button type="button" class="aviso__cerrar" aria-label="Cerrar aviso" (click)="cerrar(aviso)">×</button>
+      </div>
+    }
+  </section>
+}
 <main>
   <router-outlet />
 </main>

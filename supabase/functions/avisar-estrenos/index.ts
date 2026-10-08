@@ -1,15 +1,13 @@
 // Edge Function "avisar-estrenos"
 // Cuando ya se pueden comprar entradas de una película (preventa o estreno), avisa a quienes
-// activaron la alerta: les manda un mail a la dirección de su cuenta y, si activaron las
-// notificaciones en algún dispositivo, también una notificación push. La llama el admin desde el panel.
+// activaron la alerta: les manda un mail a la dirección de su cuenta. La llama el admin desde el panel.
+// (Además, la app les muestra un aviso la próxima vez que entran: ver supabase/avisos_app.sql.)
 //
 // Secretos que hay que cargar en Supabase (Edge Functions → Secrets):
 //   BREVO_API_KEY y MAIL_REMITENTE (el mail verificado en Brevo desde el que salen los avisos)
-//   VAPID_PUBLIC, VAPID_PRIVATE y VAPID_MAIL (para las notificaciones push)
 // SUPABASE_URL y SUPABASE_SERVICE_ROLE_KEY ya vienen cargados por Supabase.
 
 import { createClient } from 'npm:@supabase/supabase-js@2';
-import webpush from 'npm:web-push@3.6.7';
 
 const cors = {
   'Access-Control-Allow-Origin': '*',
@@ -52,15 +50,7 @@ Deno.serve(async (req) => {
     return responder({ error: 'Faltan los secretos BREVO_API_KEY y MAIL_REMITENTE en Supabase' }, 500);
   }
 
-  // El push es opcional: solo se usa si están cargadas las claves VAPID.
-  const vapidPublica = Deno.env.get('VAPID_PUBLIC');
-  const vapidPrivada = Deno.env.get('VAPID_PRIVATE');
-  const conPush = !!(vapidPublica && vapidPrivada);
-  if (conPush) {
-    webpush.setVapidDetails('mailto:' + (Deno.env.get('VAPID_MAIL') ?? 'bijou@example.com'), vapidPublica!, vapidPrivada!);
-  }
-
-  // Cliente con service role: puede leer los mails y las suscripciones de todos.
+  // Cliente con service role: puede leer los mails de todos.
   const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
 
   // Solo un admin puede disparar el envío.
@@ -75,7 +65,6 @@ Deno.serve(async (req) => {
   if (error) return responder({ error: error.message }, 500);
 
   let mails = 0;
-  let notificaciones = 0;
   let sinEnviar = 0;
 
   for (const alerta of pendientes ?? []) {
@@ -84,7 +73,7 @@ Deno.serve(async (req) => {
     const enlace = `${URL_APP}/pelicula/${alerta.pelicula_id}`;
     let avisado = false;
 
-    // 1. Mail a la dirección de la cuenta.
+    // Mail a la dirección de la cuenta.
     const { data: cliente } = await supabase
       .from('perfiles')
       .select('nombre, email')
@@ -107,45 +96,7 @@ Deno.serve(async (req) => {
       }
     }
 
-    // 2. Notificación push a cada dispositivo donde la activó (si hay).
-    if (conPush) {
-      const { data: suscripciones } = await supabase
-        .from('suscripciones_push')
-        .select('*')
-        .eq('usuario_id', alerta.usuario_id);
-
-      const mensaje = JSON.stringify({
-        notification: {
-          title: titulo,
-          body: texto,
-          icon: '/icons/icon-192x192.png',
-          vibrate: [100, 50, 100],
-          data: {
-            onActionClick: {
-              default: { operation: 'navigateLastFocusedOrOpen', url: `/pelicula/${alerta.pelicula_id}` }
-            }
-          }
-        }
-      });
-
-      for (const s of suscripciones ?? []) {
-        try {
-          await webpush.sendNotification(
-            { endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } },
-            mensaje
-          );
-          notificaciones++;
-          avisado = true;
-        } catch (e: any) {
-          // 404/410: el navegador dio de baja la suscripción, la borramos.
-          if (e.statusCode === 404 || e.statusCode === 410) {
-            await supabase.from('suscripciones_push').delete().eq('id', s.id);
-          }
-        }
-      }
-    }
-
-    // Solo se marca como avisada si le llegó algo; si no, queda pendiente para el próximo envío.
+    // Solo se marca como avisada si le llegó el mail; si no, queda pendiente para el próximo envío.
     if (avisado) {
       await supabase.from('alertas_estreno').update({ notificado: true }).eq('id', alerta.alerta_id);
     } else {
@@ -153,5 +104,5 @@ Deno.serve(async (req) => {
     }
   }
 
-  return responder({ alertas: pendientes?.length ?? 0, mails, notificaciones, sinEnviar });
+  return responder({ alertas: pendientes?.length ?? 0, mails, sinEnviar });
 });
