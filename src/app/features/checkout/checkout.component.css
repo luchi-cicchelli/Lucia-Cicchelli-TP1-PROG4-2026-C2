@@ -61,6 +61,8 @@
 .checkout__resumen {
   padding: 1.1rem 1.25rem;
   display: grid;
+  /* el contenido nunca ensancha la tarjeta: si el mapa no entra, scrollea él de costado */
+  grid-template-columns: minmax(0, 1fr);
   gap: 0.75rem;
 }
 
@@ -256,7 +258,7 @@
 
   .checkout__mapa,
   .checkout__resumen {
-    padding: 0.9rem 0.85rem;
+    padding: 0.75rem 0.6rem;
   }
 }
 
@@ -264,6 +266,7 @@
 .checkout__izquierda {
   display: grid;
   align-content: start;
+  grid-auto-rows: max-content;
   gap: 1rem;
   min-width: 0;
   min-height: 0;

@@ -84,6 +84,8 @@ app-root {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   align-content: start;
+  /* cada fila mide lo que su contenido: las tarjetas no se achican ni se recortan */
+  grid-auto-rows: max-content;
   gap: 0.75rem;
   /* un poquito de aire para que no se recorten bordes ni el foco */
   padding: 2px 4px 12px 2px;

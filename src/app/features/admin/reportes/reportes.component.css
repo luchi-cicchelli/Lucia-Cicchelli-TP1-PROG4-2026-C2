@@ -201,9 +201,7 @@
 }
 
 .rep__nombre {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 }
 
 .rep__pista {

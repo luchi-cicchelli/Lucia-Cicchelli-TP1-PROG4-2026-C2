@@ -154,8 +154,8 @@
 @media (max-width: 600px) {
   :host {
     --butaca: 9px;
-    --separacion: 2px;
-    --pasillo: 6px;
+    --separacion: 1.5px;
+    --pasillo: 4px;
   }
 
   .butaca {
@@ -164,7 +164,7 @@
   }
 
   .mapa__letra {
-    width: 10px;
+    width: 8px;
     font-size: 0.55rem;
   }
 

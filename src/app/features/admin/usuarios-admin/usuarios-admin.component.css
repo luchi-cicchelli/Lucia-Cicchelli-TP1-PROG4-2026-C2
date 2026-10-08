@@ -68,9 +68,7 @@
   margin: 0;
   font-size: 0.8rem;
   color: var(--texto-secundario);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 }
 
 .usuarios__rol {

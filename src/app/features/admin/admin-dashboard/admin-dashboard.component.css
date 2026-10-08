@@ -42,3 +42,28 @@
   font-size: 0.8rem;
   color: var(--texto-secundario);
 }
+
+/* En celu: dos accesos por fila y más bajitos, así entra todo el panel sin scrollear */
+@media (max-width: 600px) {
+  .panel__grilla {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .panel__grupo {
+    gap: 6px;
+  }
+
+  .panel__acceso {
+    padding: 0.6rem 0.75rem;
+    gap: 2px;
+  }
+
+  .panel__acceso strong {
+    font-size: 0.95rem;
+  }
+
+  .panel__acceso span {
+    font-size: 0.72rem;
+  }
+}

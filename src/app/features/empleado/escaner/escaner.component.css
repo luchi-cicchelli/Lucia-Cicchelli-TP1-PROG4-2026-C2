@@ -7,9 +7,9 @@
 .escaner {
   max-width: 1000px;
   margin: 0 auto;
-  padding: 2rem 1rem 3rem;
+  padding: 1rem 1rem 1rem;
   display: grid;
-  gap: 1.25rem;
+  gap: 0.85rem;
 }
 
 .escaner__encabezado h1 {
@@ -263,7 +263,7 @@
 
 @media (max-width: 760px) {
   .escaner {
-    padding: 1.25rem 1rem 2.5rem;
+    padding: 0.75rem 0.75rem 0.75rem;
   }
 
   .escaner__cuerpo {
