@@ -4,7 +4,7 @@
 
 .tarjeta-peli {
   display: grid;
-  gap: 10px;
+  gap: 6px;
   color: inherit;
   text-decoration: none;
 }
@@ -67,11 +67,11 @@
 
 .tarjeta-peli__info {
   display: grid;
-  gap: 4px;
+  gap: 2px;
 }
 
 .tarjeta-peli__nombre {
-  font-size: 1.05rem;
+  font-size: 0.95rem;
   line-height: 1.25;
 }
 

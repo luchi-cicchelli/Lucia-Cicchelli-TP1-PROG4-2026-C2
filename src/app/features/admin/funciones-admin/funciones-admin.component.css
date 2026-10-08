@@ -12,9 +12,9 @@
 }
 
 .funciones__form {
-  padding: 1.5rem;
+  padding: 1.1rem 1.25rem;
   display: grid;
-  gap: 16px;
+  gap: 12px;
 }
 
 .funciones__form h2 {
@@ -112,7 +112,7 @@
   justify-content: space-between;
   align-items: center;
   gap: 12px;
-  margin-top: 1rem;
+  margin-top: 0.25rem;
   flex-wrap: wrap;
 }
 
@@ -131,11 +131,11 @@
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--texto-muted);
-  margin: 0.5rem 0 8px;
+  margin: 0;
 }
 
 .funciones__item {
-  padding: 0.85rem 1.25rem;
+  padding: 0.6rem 0.9rem;
   display: flex;
   align-items: center;
   gap: 16px;
@@ -220,4 +220,58 @@
   width: 90px;
   padding: 6px 8px;
   font-size: 0.85rem;
+}
+
+/* Pestañas de días: se ve un día a la vez */
+.funciones__dias {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.funciones__dia-tab {
+  flex-shrink: 0;
+  display: grid;
+  justify-items: center;
+  min-width: 54px;
+  padding: 6px 8px;
+  border-radius: var(--radio);
+  border: 1px solid var(--borde);
+  background: var(--superficie);
+  cursor: pointer;
+  text-transform: capitalize;
+}
+
+.funciones__dia-tab span {
+  font-size: 0.65rem;
+  color: var(--texto-secundario);
+}
+
+.funciones__dia-tab strong {
+  font-family: var(--fuente-titulo);
+  font-size: 1.15rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.funciones__dia-tab--activo {
+  border-color: var(--rosa-acento);
+  background: var(--rosa-fondo);
+}
+
+.funciones__dia-tab--activo span,
+.funciones__dia-tab--activo strong {
+  color: var(--rosa-texto);
+}
+
+.funciones__lista {
+  display: grid;
+  gap: 8px;
+}
+
+@media (min-width: 900px) {
+  .funciones__lista {
+    grid-template-columns: 1fr 1fr;
+  }
 }

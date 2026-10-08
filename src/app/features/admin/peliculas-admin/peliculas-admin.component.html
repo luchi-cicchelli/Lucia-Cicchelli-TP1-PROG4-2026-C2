@@ -129,7 +129,7 @@
     <p class="admin__vacio">Cargando…</p>
   }
 
-  <div class="admin__lista">
+  <div class="admin__lista admin__lista--doble">
     @for (p of peliculas(); track p.id) {
       <div class="tarjeta pelis__item" [class.pelis__item--oculta]="!p.activa">
         <img class="pelis__poster" [src]="p.imagen_url || posterRespaldo" [alt]="'Póster de ' + p.nombre" loading="lazy" appImagenRespaldo />

@@ -13,14 +13,20 @@
   margin: 0;
   padding: 0;
   display: grid;
-  gap: 8px;
+  gap: 6px;
+}
+
+@media (min-width: 900px) {
+  .act__lista {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 .act__item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 0.75rem 1rem;
+  gap: 10px;
+  padding: 0.5rem 0.85rem;
 }
 
 .act__punto {

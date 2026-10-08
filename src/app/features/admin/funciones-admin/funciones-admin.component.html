@@ -187,59 +187,74 @@
     </select>
   </div>
 
-  @for (grupo of funcionesPorDia(); track grupo.dia) {
-    <div class="funciones__dia">
-      <h3 class="funciones__dia-titulo">{{ fechaDesdeIso(grupo.dia) | date: 'EEEE d \'de\' MMMM' }}</h3>
-      <div class="admin__lista">
-        @for (f of grupo.funciones; track f.id) {
-          <div class="tarjeta funciones__item">
-            <div class="funciones__hora">
-              <strong>{{ f.fecha_hora_inicio | date: 'HH:mm' }}</strong>
-              <span>a {{ f.fecha_hora_fin | date: 'HH:mm' }}</span>
-            </div>
-            <div class="funciones__info">
-              <p class="funciones__pelicula">{{ f.pelicula?.nombre }}</p>
-              <p class="funciones__detalle">
-                {{ f.sala?.nombre }} · {{ f.formato | uppercase }} · {{ f.idioma === 'castellano' ? 'Castellano' : 'Subtitulada' }}
-                · {{ f.precio_base | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }}
-                (VIP {{ f.precio_vip | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }})
-                @if (f.es_preventa) {
-                  <span class="chip chip--activo funciones__preventa">
-                    Preventa {{ f.precio_preventa | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }}
-                  </span>
-                }
-              </p>
-            </div>
-            @if (editandoPrecioId() === f.id) {
-              <form class="funciones__precio" [formGroup]="formPrecio" (ngSubmit)="guardarPrecio(f)">
-                <label>
-                  General
-                  <input class="input" type="number" min="1" formControlName="base" />
-                </label>
-                <label>
-                  VIP
-                  <input class="input" type="number" min="1" formControlName="vip" />
-                </label>
-                <button type="submit" class="boton boton--chico" [disabled]="formPrecio.invalid">Guardar</button>
-                <button type="button" class="boton boton--secundario boton--chico" (click)="editandoPrecioId.set(null)">×</button>
-              </form>
-            } @else {
-              <button type="button" class="boton boton--secundario boton--chico" (click)="editarPrecio(f)">Precio</button>
-            }
-            <button
-              type="button"
-              class="boton boton--secundario boton--chico"
-              [class.boton--peligro]="confirmarBorrarId() === f.id"
-              (click)="eliminar(f)"
-              (blur)="confirmarBorrarId.set(null)"
-            >
-              {{ confirmarBorrarId() === f.id ? '¿Seguro?' : 'Borrar' }}
-            </button>
-          </div>
-        }
-      </div>
+  @if (grupoVisible(); as grupo) {
+    <div class="funciones__dias" role="tablist" aria-label="Días con funciones">
+      @for (g of funcionesPorDia(); track g.dia) {
+        <button
+          type="button"
+          role="tab"
+          class="funciones__dia-tab"
+          [class.funciones__dia-tab--activo]="g.dia === grupo.dia"
+          [attr.aria-selected]="g.dia === grupo.dia"
+          (click)="diaListado.set(g.dia)"
+        >
+          <span>{{ fechaDesdeIso(g.dia) | date: 'EEE' }}</span>
+          <strong>{{ fechaDesdeIso(g.dia) | date: 'd' }}</strong>
+          <span>{{ g.funciones.length }} func.</span>
+        </button>
+      }
     </div>
-  } @empty {
+
+    <h3 class="funciones__dia-titulo">{{ fechaDesdeIso(grupo.dia) | date: "EEEE d 'de' MMMM" }}</h3>
+    <div class="funciones__lista">
+      @for (f of grupo.funciones; track f.id) {
+        <div class="tarjeta funciones__item">
+          <div class="funciones__hora">
+            <strong>{{ f.fecha_hora_inicio | date: 'HH:mm' }}</strong>
+            <span>a {{ f.fecha_hora_fin | date: 'HH:mm' }}</span>
+          </div>
+          <div class="funciones__info">
+            <p class="funciones__pelicula">{{ f.pelicula?.nombre }}</p>
+            <p class="funciones__detalle">
+              {{ f.sala?.nombre }} · {{ f.formato | uppercase }} · {{ f.idioma === 'castellano' ? 'Castellano' : 'Subtitulada' }}
+              · {{ f.precio_base | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }}
+              (VIP {{ f.precio_vip | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }})
+              @if (f.es_preventa) {
+                <span class="chip chip--activo funciones__preventa">
+                  Preventa {{ f.precio_preventa | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }}
+                </span>
+              }
+            </p>
+          </div>
+          @if (editandoPrecioId() === f.id) {
+            <form class="funciones__precio" [formGroup]="formPrecio" (ngSubmit)="guardarPrecio(f)">
+              <label>
+                General
+                <input class="input" type="number" min="1" formControlName="base" />
+              </label>
+              <label>
+                VIP
+                <input class="input" type="number" min="1" formControlName="vip" />
+              </label>
+              <button type="submit" class="boton boton--chico" [disabled]="formPrecio.invalid">Guardar</button>
+              <button type="button" class="boton boton--secundario boton--chico" (click)="editandoPrecioId.set(null)">×</button>
+            </form>
+          } @else {
+            <button type="button" class="boton boton--secundario boton--chico" (click)="editarPrecio(f)">Precio</button>
+          }
+          <button
+            type="button"
+            class="boton boton--secundario boton--chico"
+            [class.boton--peligro]="confirmarBorrarId() === f.id"
+            (click)="eliminar(f)"
+            (blur)="confirmarBorrarId.set(null)"
+          >
+            {{ confirmarBorrarId() === f.id ? '¿Seguro?' : 'Borrar' }}
+          </button>
+        </div>
+      }
+    </div>
+  } @else {
     @if (!cargando()) {
       <p class="admin__vacio">No hay funciones programadas.</p>
     }

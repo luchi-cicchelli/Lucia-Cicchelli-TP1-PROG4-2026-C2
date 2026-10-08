@@ -5,7 +5,7 @@ import { ReportesService } from '../../../core/services/reportes.service';
 import { ACCIONES, LogActividad } from '../../../core/models/reporte.model';
 import { HacePipe } from '../../../shared/pipes/hace.pipe';
 
-const POR_PAGINA = 50;
+const POR_PAGINA = 20;
 
 // Filtros que agrupan varias acciones del log.
 const FILTROS = [

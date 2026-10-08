@@ -53,7 +53,7 @@
     <button type="button" class="boton cupones__nuevo" (click)="nueva()">+ Nueva recompensa</button>
   }
 
-  <div class="admin__lista">
+  <div class="admin__lista admin__lista--doble">
     @for (r of recompensas(); track r.id) {
       <div class="tarjeta cupones__item" [class.cupones__item--inactivo]="!r.activo">
         <div>

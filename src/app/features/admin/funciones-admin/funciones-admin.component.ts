@@ -159,6 +159,13 @@ export class FuncionesAdminComponent implements OnInit {
     return grupos;
   });
 
+  // El listado muestra un día a la vez (con pestañas de días) para no hacer una lista enorme.
+  readonly diaListado = signal<string | null>(null);
+  readonly grupoVisible = computed(() => {
+    const grupos = this.funcionesPorDia();
+    return grupos.find((g) => g.dia === this.diaListado()) ?? grupos[0] ?? null;
+  });
+
   get horarios() {
     return this.form.controls.horarios;
   }

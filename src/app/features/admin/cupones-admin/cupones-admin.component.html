@@ -81,7 +81,7 @@
     <button type="button" class="boton cupones__nuevo" (click)="nuevo()">+ Nuevo cupón</button>
   }
 
-  <div class="admin__lista">
+  <div class="admin__lista admin__lista--doble">
     @for (c of otros(); track c.id) {
       <div class="tarjeta cupones__item" [class.cupones__item--inactivo]="!vigente(c)">
         <div>

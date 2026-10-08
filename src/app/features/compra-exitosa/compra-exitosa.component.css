@@ -1,9 +1,9 @@
 .exito {
   max-width: 900px;
   margin: 0 auto;
-  padding: 2rem 1.5rem 4rem;
+  padding: 1.25rem 1.5rem 2.5rem;
   display: grid;
-  gap: 1.5rem;
+  gap: 1rem;
 }
 
 .exito__vacio {
@@ -213,7 +213,7 @@
 
 @media (max-width: 600px) {
   .exito {
-    padding: 1.25rem 1rem 3rem;
+    padding: 0.85rem 0.75rem 2rem;
   }
 
   .exito__encabezado h1 {
