@@ -5,7 +5,6 @@ TP1 · Programación IV · 2026 C2 · Lucía Cicchelli
 App web para un cine con varias salas: los clientes compran entradas y candy eligiendo butacas en tiempo real; los empleados validan los QR, y el admin gestiona la cartelera, los beneficios y los reportes.
 
 **Deploy:** https://lucia-cicchelli-tp-1-prog-4-2026-c2.vercel.app/
-**Requerimientos:** [docs/requerimientos.md](docs/requerimientos.md)
 
 **Stack:** Angular 19 (standalone, signals) · Supabase (Postgres, Auth, Realtime, Storage, Edge Functions) · PWA · `qrcode`, `jsqr`, `jspdf`, `exceljs` · Vercel
 
