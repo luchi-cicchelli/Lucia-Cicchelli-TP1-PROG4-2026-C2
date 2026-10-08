@@ -1,4 +1,3 @@
--- ---------- 1. Ajustes de tablas ----------
 alter table public.compras add column if not exists subtotal numeric(10,2);
 alter table public.compras add column if not exists descuento numeric(10,2) not null default 0;
 
@@ -10,7 +9,6 @@ insert into public.cupones (codigo, tipo, porcentaje_descuento)
 values ('BIENVENIDA', 'general', 20)
 on conflict (codigo) do nothing;
 
--- ---------- 2. Estado de las butacas de una función ----------
 drop function if exists public.estado_butacas(uuid, text);
 create or replace function public.estado_butacas(p_funcion_id uuid, p_sesion text)
 returns table (butaca_id uuid, estado text, expira_en timestamptz)
@@ -34,8 +32,6 @@ begin
 end;
 $$;
 
-
--- ---------- 3. Reservar y liberar butacas (10 minutos) ----------
 create or replace function public.reservar_butaca(p_funcion_id uuid, p_butaca_id uuid, p_sesion text)
 returns timestamptz
 language plpgsql
@@ -98,8 +94,6 @@ as $$
     and (p_butaca_id is null or butaca_id = p_butaca_id);
 $$;
 
-
--- ---------- 4. Porcentaje del cupón de bienvenida (para mostrarlo antes de pagar) ----------
 create or replace function public.porcentaje_bienvenida()
 returns numeric
 language sql
@@ -112,8 +106,6 @@ as $$
     and fecha_inicio <= now() and (fecha_fin is null or fecha_fin > now());
 $$;
 
-
--- ---------- 5. Confirmar la compra (todo o nada) ----------
 create or replace function public.confirmar_compra(p_funcion_id uuid, p_sesion text, p_metodo_pago text)
 returns uuid
 language plpgsql
@@ -229,8 +221,6 @@ begin
 end;
 $$;
 
-
--- ---------- 6. Detalle de una compra (para la pantalla final y el PDF) ----------
 create or replace function public.detalle_compra(p_compra_id uuid)
 returns json
 language sql
@@ -268,8 +258,6 @@ as $$
   limit 1;
 $$;
 
-
--- ---------- 7. Permisos ----------
 grant execute on function public.estado_butacas(uuid, text) to anon, authenticated;
 grant execute on function public.reservar_butaca(uuid, uuid, text) to anon, authenticated;
 grant execute on function public.liberar_butaca(uuid, uuid, text) to anon, authenticated;
@@ -277,8 +265,6 @@ grant execute on function public.porcentaje_bienvenida() to anon, authenticated;
 grant execute on function public.confirmar_compra(uuid, text, text) to anon, authenticated;
 grant execute on function public.detalle_compra(uuid) to anon, authenticated;
 
-
--- ---------- 8. RLS: nadie toca estas tablas directo, todo pasa por las funciones ----------
 alter table public.reservas_temporales enable row level security;
 alter table public.compras enable row level security;
 alter table public.compra_items enable row level security;

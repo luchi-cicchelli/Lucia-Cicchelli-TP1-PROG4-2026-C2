@@ -31,7 +31,6 @@ export class CuponesService {
     if (error) throw error;
   }
 
-  // Lo usa el checkout: la base valida vigencia y edad (validar_cupon en beneficios.sql).
   async validar(codigo: string): Promise<CuponValido> {
     const { data, error } = await this.supabase.client.rpc('validar_cupon', { p_codigo: codigo });
     if (error) throw new Error(error.message);

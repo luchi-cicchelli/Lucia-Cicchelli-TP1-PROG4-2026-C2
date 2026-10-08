@@ -30,7 +30,6 @@ export class RecompensasService {
     if (error) throw error;
   }
 
-  /** Historial de puntos del usuario logueado (RLS solo devuelve los propios). */
   async historial(usuarioId: string): Promise<MovimientoPuntos[]> {
     const { data, error } = await this.supabase.client
       .from('puntos_historial')

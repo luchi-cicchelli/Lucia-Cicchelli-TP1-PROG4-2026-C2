@@ -1,6 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
-// 148 -> "2 h 28 min"
 @Pipe({ name: 'duracion', standalone: true })
 export class DuracionPipe implements PipeTransform {
   transform(minutos: number | null | undefined): string {

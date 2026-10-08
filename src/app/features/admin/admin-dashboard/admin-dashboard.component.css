@@ -43,7 +43,6 @@
   color: var(--texto-secundario);
 }
 
-/* En celu: dos accesos por fila y más bajitos, así entra todo el panel sin scrollear */
 @media (max-width: 600px) {
   .panel__grilla {
     grid-template-columns: repeat(2, minmax(0, 1fr));

@@ -1,10 +1,3 @@
--- ============================================================
--- BIJOU CINEMA — Cupones, canje de puntos, crédito, cancelación y reseñas
--- Correr DESPUÉS de candy.sql. Se puede volver a correr.
--- Reemplaza confirmar_compra (es la versión final).
--- ============================================================
-
--- ---------- 1. Ajustes de tablas ----------
 alter table public.compras add column if not exists descuento_canjes numeric(10,2) not null default 0;
 alter table public.compras add column if not exists cancelada_en timestamptz;
 
@@ -27,8 +20,6 @@ alter table public.resenas drop constraint if exists resenas_comentario_corto;
 alter table public.resenas add constraint resenas_comentario_corto
   check (comentario is null or char_length(comentario) <= 280);
 
-
--- ---------- 2. RLS ----------
 alter table public.recompensas enable row level security;
 alter table public.resenas enable row level security;
 
@@ -40,7 +31,6 @@ drop policy if exists "recompensas: admin escribe" on public.recompensas;
 create policy "recompensas: admin escribe" on public.recompensas for all to authenticated
   using (public.rol_actual() = 'admin') with check (public.rol_actual() = 'admin');
 
--- Reseñas: cualquiera las lee; solo reseña quien vio la película (compró y la función ya empezó).
 create or replace function public.vio_pelicula(p_pelicula_id uuid)
 returns boolean
 language sql
@@ -76,9 +66,6 @@ drop policy if exists "resenas: borrar la propia" on public.resenas;
 create policy "resenas: borrar la propia" on public.resenas for delete to authenticated
   using (usuario_id = auth.uid());
 
-
--- ---------- 3. Validar un cupón antes de pagar ----------
--- Devuelve el porcentaje si el cupón existe, está vigente y la persona puede usarlo.
 create or replace function public.validar_cupon(p_codigo text)
 returns json
 language plpgsql
@@ -121,16 +108,6 @@ $$;
 
 grant execute on function public.validar_cupon(text) to anon, authenticated;
 
-
--- ---------- 4. Confirmar la compra (versión final, todo o nada) ----------
--- p_items:  [{"tipo":"producto"|"combo","id":"<uuid>","cantidad":n}]
--- p_canjes: [{"recompensa_id":"<uuid>","cantidad":n}]  (solo usuarios registrados)
--- Orden del cálculo:
---   entradas + candy (los combos incluyen una entrada general)
---   - canjes de puntos (entrada gratis o producto gratis)
---   - un solo cupón: el de mayor porcentaje entre el ingresado y el de bienvenida
---   - crédito a favor (si la persona elige usarlo)
---   = total pagado → 1 punto por cada peso
 drop function if exists public.confirmar_compra(uuid, text, text);
 drop function if exists public.confirmar_compra(uuid, text, text, jsonb);
 drop function if exists public.confirmar_compra(uuid, text, text, jsonb, text, boolean, jsonb);
@@ -212,13 +189,11 @@ begin
     else v_funcion.precio_base
   end;
 
-  -- Entradas
   select coalesce(sum(case when b.tipo = 'vip' then v_funcion.precio_vip else v_precio_general end), 0)
   into v_subtotal
   from reservas_temporales r join butacas b on b.id = r.butaca_id
   where r.funcion_id = p_funcion_id and r.session_id = p_sesion;
 
-  -- Candy y combos (precios de la base)
   for v_item in
     select x.tipo, x.id, x.cantidad
     from jsonb_to_recordset(coalesce(p_items, '[]'::jsonb)) as x(tipo text, id uuid, cantidad int)
@@ -244,7 +219,6 @@ begin
     raise exception 'Cada combo incluye una entrada: elegiste % combos y % butacas', v_cant_combos, v_cant_butacas;
   end if;
 
-  -- Canjes de puntos
   if jsonb_array_length(coalesce(p_canjes, '[]'::jsonb)) > 0 then
     if v_usuario is null then
       raise exception 'Para canjear puntos tenés que ingresar con tu cuenta';
@@ -276,7 +250,6 @@ begin
 
   v_subtotal := v_subtotal - v_descuento_canjes;
 
-  -- Un solo cupón: el de mayor porcentaje entre el ingresado y el de bienvenida.
   if v_usuario is not null and not v_perfil.cupon_bienvenida_usado then
     select * into v_cupon from cupones
     where codigo = 'BIENVENIDA' and activo
@@ -299,7 +272,6 @@ begin
   v_descuento := round(v_subtotal * v_porcentaje / 100, 2);
   v_total := v_subtotal - v_descuento;
 
-  -- Crédito a favor (por compras canceladas)
   if p_usar_credito and v_usuario is not null and v_perfil.credito_disponible > 0 then
     v_credito := least(v_perfil.credito_disponible, v_total);
     v_total := v_total - v_credito;
@@ -319,7 +291,6 @@ begin
                        join recompensas r on r.id = x.recompensa_id where r.tipo = 'producto_candy'))
   returning id into v_compra_id;
 
-  -- Entradas: primero las incluidas en combos, después las gratis por puntos (las no VIP primero).
   for v_reserva in
     select r.butaca_id, b.tipo
     from reservas_temporales r join butacas b on b.id = r.butaca_id
@@ -341,7 +312,6 @@ begin
     values (v_compra_id, p_funcion_id, v_reserva.butaca_id, v_precio, gen_random_uuid()::text, v_codigo);
   end loop;
 
-  -- Candy comprado
   insert into compra_items (compra_id, tipo, referencia_id, cantidad, precio_unitario)
   select v_compra_id, x.tipo::tipo_item_compra, x.id, x.cantidad,
          case when x.tipo = 'producto'
@@ -349,14 +319,12 @@ begin
               else (select precio_fijo from combos where id = x.id) end
   from jsonb_to_recordset(coalesce(p_items, '[]'::jsonb)) as x(tipo text, id uuid, cantidad int);
 
-  -- Productos canjeados con puntos: se suman al candy a retirar, con precio 0.
   insert into compra_items (compra_id, tipo, referencia_id, cantidad, precio_unitario)
   select v_compra_id, 'producto', r.producto_id, x.cantidad, 0
   from jsonb_to_recordset(coalesce(p_canjes, '[]'::jsonb)) as x(recompensa_id uuid, cantidad int)
   join recompensas r on r.id = x.recompensa_id
   where r.tipo = 'producto_candy' and r.producto_id is not null;
 
-  -- Historial de canjes
   insert into puntos_historial (usuario_id, tipo, cantidad, compra_id, recompensa_id)
   select v_usuario, 'canjeado', r.puntos_requeridos * x.cantidad, v_compra_id, r.id
   from jsonb_to_recordset(coalesce(p_canjes, '[]'::jsonb)) as x(recompensa_id uuid, cantidad int)
@@ -383,8 +351,6 @@ $$;
 
 grant execute on function public.confirmar_compra(uuid, text, text, jsonb, text, boolean, jsonb) to anon, authenticated;
 
-
--- ---------- 5. Cancelar una compra hasta 2 horas antes (devuelve crédito) ----------
 create or replace function public.cancelar_compra(p_compra_id uuid)
 returns numeric
 language plpgsql
@@ -417,7 +383,6 @@ begin
     raise exception 'No se puede cancelar: ya se usó una entrada o se retiró el candy';
   end if;
 
-  -- Se devuelve como crédito todo lo pagado, incluido el crédito que se había usado.
   v_credito := v_compra.total + v_compra.credito_usado;
 
   update entradas set estado = 'cancelada' where compra_id = p_compra_id;
@@ -451,8 +416,6 @@ $$;
 revoke execute on function public.cancelar_compra(uuid) from anon, public;
 grant execute on function public.cancelar_compra(uuid) to authenticated;
 
-
--- ---------- 6. Detalle de compra: suma canjes, crédito y cancelación ----------
 create or replace function public.detalle_compra(p_compra_id uuid)
 returns json
 language sql
@@ -497,8 +460,6 @@ as $$
   limit 1;
 $$;
 
-
--- ---------- 7. Datos de ejemplo: recompensas ----------
 insert into public.recompensas (nombre, puntos_requeridos, tipo)
 select 'Entrada gratis', 25000, 'entrada_gratis'
 where not exists (select 1 from public.recompensas where tipo = 'entrada_gratis');

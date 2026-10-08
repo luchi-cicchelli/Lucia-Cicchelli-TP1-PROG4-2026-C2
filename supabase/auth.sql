@@ -1,7 +1,5 @@
--- ---------- 1. Email en perfiles (para listar usuarios en el admin) ----------
 alter table public.perfiles add column if not exists email text;
 
--- ---------- 2. Crear el perfil automáticamente al registrarse ----------
 create or replace function public.crear_perfil_nuevo_usuario()
 returns trigger
 language plpgsql
@@ -32,8 +30,6 @@ create trigger al_crear_usuario
   after insert on auth.users
   for each row execute function public.crear_perfil_nuevo_usuario();
 
-
--- ---------- 3. Helper: rol del usuario logueado ----------
 create or replace function public.rol_actual()
 returns rol_usuario
 language sql
@@ -44,7 +40,6 @@ as $$
   select rol from public.perfiles where id = auth.uid();
 $$;
 
--- ---------- 4. RLS en perfiles ----------
 alter table public.perfiles enable row level security;
 
 drop policy if exists "perfiles: ver el propio o admin ve todos" on public.perfiles;
@@ -61,10 +56,9 @@ create policy "perfiles: editar el propio"
   with check (id = auth.uid());
 
 revoke update on public.perfiles from authenticated, anon;
-grant update (nombre, apellido, fecha_nacimiento, tipo_sangre, color_ojos, dias_vacaciones_anuales)
+grant update (nombre, apellido, tipo_sangre, color_ojos, dias_vacaciones_anuales)
   on public.perfiles to authenticated;
 
--- ---------- 5. Cambio de rol (solo admin) ----------
 create or replace function public.asignar_rol(p_usuario_id uuid, p_rol rol_usuario)
 returns void
 language plpgsql
@@ -90,7 +84,6 @@ $$;
 revoke execute on function public.asignar_rol(uuid, rol_usuario) from anon, public;
 grant execute on function public.asignar_rol(uuid, rol_usuario) to authenticated;
 
--- ---------- 6. RLS en películas y géneros ----------
 alter table public.peliculas enable row level security;
 alter table public.generos enable row level security;
 alter table public.pelicula_generos enable row level security;
@@ -131,7 +124,6 @@ create policy "pelicula_generos: admin escribe"
   using (public.rol_actual() = 'admin')
   with check (public.rol_actual() = 'admin');
 
--- ---------- 7. Log de actividad: solo admin lee ----------
 alter table public.logs_actividad enable row level security;
 
 drop policy if exists "logs: admin lee" on public.logs_actividad;

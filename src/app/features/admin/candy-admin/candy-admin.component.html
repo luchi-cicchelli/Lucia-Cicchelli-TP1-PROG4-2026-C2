@@ -21,7 +21,6 @@
     <p class="alerta alerta--error">{{ error() }}</p>
   }
 
-  <!-- ================= PRODUCTOS ================= -->
   <div class="pantalla__scroll">
     @if (pestania() === 'productos') {
       @if (formProductoAbierto()) {
@@ -104,7 +103,6 @@
       }
     }
 
-    <!-- ================= COMBOS ================= -->
     @if (pestania() === 'combos') {
       @if (formComboAbierto()) {
         <form class="tarjeta candy__form" [formGroup]="formCombo" (ngSubmit)="guardarCombo()" novalidate>

@@ -20,7 +20,6 @@ export class MapaButacasComponent {
 
   readonly elegir = output<Butaca>();
 
-  // Filas normales: 4 + 20 + 4. Fila accesible: 2 + 10 + 2.
   readonly filas = computed<FilaMapa[]>(() => {
     const porFila = new Map<string, Butaca[]>();
     for (const b of this.butacas()) {

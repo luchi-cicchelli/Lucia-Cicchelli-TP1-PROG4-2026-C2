@@ -11,7 +11,6 @@ with nuevas (nombre, sinopsis, duracion_minutos, fecha_estreno, restriccion_edad
   ('Parásitos', 'Una familia pobre se infiltra, de a uno, en la casa de una familia millonaria.', 132, date '2019-05-30', 13, array['Suspenso', 'Drama', 'Comedia']),
   ('Intensamente 2', 'Nuevas emociones llegan a la mente de Riley justo cuando empieza la adolescencia.', 96, date '2024-06-13', null, array['Animación', 'Comedia']),
   ('¡Huye!', 'Un joven visita a la familia de su novia y descubre que la amabilidad esconde algo siniestro.', 104, date '2017-02-24', 13, array['Terror', 'Suspenso']),
-  -- Para la sección Próximamente (fechas de prueba)
   ('Volver al futuro', 'Un adolescente viaja accidentalmente a 1955 y pone en riesgo su propia existencia.', 116, (current_date + 20), null, array['Ciencia ficción', 'Comedia']),
   ('Jurassic Park', 'Un parque con dinosaurios clonados se sale de control durante una visita de prueba.', 127, (current_date + 35), 13, array['Acción', 'Ciencia ficción', 'Suspenso'])
 ),

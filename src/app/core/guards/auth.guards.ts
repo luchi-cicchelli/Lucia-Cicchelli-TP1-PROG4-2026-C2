@@ -3,7 +3,6 @@ import { CanActivateFn, Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 import { Rol } from '../models/perfil.model';
 
-// Para usar la app hay que haber entrado: con cuenta o como invitado.
 export const ingresoGuard: CanActivateFn = async (_route, state) => {
   const auth = inject(AuthService);
   const router = inject(Router);
@@ -14,7 +13,6 @@ export const ingresoGuard: CanActivateFn = async (_route, state) => {
     : router.createUrlTree(['/login'], { queryParams: { volver: state.url } });
 };
 
-// Solo usuarios con cuenta (no invitados).
 export const authGuard: CanActivateFn = async (_route, state) => {
   const auth = inject(AuthService);
   const router = inject(Router);
@@ -39,7 +37,6 @@ export function rolGuard(roles: Rol[]): CanActivateFn {
   };
 }
 
-// Login y registro: si ya entró con cuenta lo manda a su inicio (un invitado sí puede pasar).
 export const sinCuentaGuard: CanActivateFn = async () => {
   const auth = inject(AuthService);
   const router = inject(Router);

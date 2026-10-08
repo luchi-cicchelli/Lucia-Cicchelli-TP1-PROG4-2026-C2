@@ -78,7 +78,6 @@ export class CandyAdminComponent implements OnInit {
     }
   }
 
-  // ---------- Productos ----------
   nuevoProducto() {
     this.editandoProductoId.set(null);
     this.formProducto.reset({ nombre: '', categoria: '', precio: null, imagen_url: '', activo: true });
@@ -116,7 +115,6 @@ export class CandyAdminComponent implements OnInit {
     await this.ejecutar(() => this.candy.cambiarActivoProducto(p.id, !p.activo));
   }
 
-  // ---------- Combos ----------
   nuevoItem(productoId = '', cantidad = 1) {
     return this.fb.nonNullable.group({
       producto_id: [productoId, Validators.required],
@@ -172,7 +170,6 @@ export class CandyAdminComponent implements OnInit {
     await this.ejecutar(() => this.candy.cambiarActivoCombo(c.id, !c.activo));
   }
 
-  /** Lo que costarían los productos del combo por separado (sin la entrada). */
   precioSuelto(c: Combo): number {
     return c.items.reduce((suma, i) => {
       const p = this.productos().find((x) => x.id === i.producto_id);

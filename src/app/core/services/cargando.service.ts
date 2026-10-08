@@ -1,6 +1,5 @@
 import { Injectable, computed, signal } from '@angular/core';
 
-// Cuenta las peticiones HTTP en curso para mostrar la barra de carga.
 @Injectable({ providedIn: 'root' })
 export class CargandoService {
   private readonly pendientes = signal(0);

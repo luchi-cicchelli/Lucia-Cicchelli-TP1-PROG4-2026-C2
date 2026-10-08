@@ -25,7 +25,6 @@ export interface EntradaDetalle {
 export interface CompraDetalle {
   id: string;
   fecha: string;
-  // Un solo QR por compra: sirve para todas las entradas y para el candy.
   qr_codigo: string;
   codigo_manual: string;
   nombre_comprador: string | null;
@@ -52,12 +51,10 @@ export interface OpcionesCompra {
   cupon: string | null;
   usarCredito: boolean;
   canjes: Canje[];
-  // Solo si compra sin cuenta (invitado).
   nombre: string | null;
   email: string | null;
 }
 
-/** Una compra del usuario, para "Mis entradas" y "Mis películas". */
 export interface MiCompra {
   id: string;
   fecha: string;

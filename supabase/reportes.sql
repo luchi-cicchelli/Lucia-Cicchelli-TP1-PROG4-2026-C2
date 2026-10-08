@@ -1,8 +1,3 @@
--- Reportes del admin, cambio de precios y más registros en el log de actividad.
--- Correr después de proximamente.sql.
-
--- ---------- 1. Facturación y entradas vendidas por día ----------
--- Las compras canceladas no cuentan. Incluye los días sin ventas (en cero).
 create or replace function public.reporte_ventas(p_desde date, p_hasta date)
 returns table (dia date, compras int, entradas int, facturacion numeric)
 language plpgsql
@@ -35,9 +30,6 @@ begin
 end;
 $$;
 
-
--- ---------- 2. Películas más vistas en un período ----------
--- Cuenta las entradas no canceladas de las funciones de ese período.
 create or replace function public.peliculas_mas_vistas(p_desde date, p_hasta date)
 returns table (pelicula text, entradas int)
 language plpgsql
@@ -63,9 +55,6 @@ begin
 end;
 $$;
 
-
--- ---------- 3. Productos del candy más vendidos ----------
--- Suma los productos comprados sueltos y los que vienen dentro de los combos.
 create or replace function public.candy_mas_vendido(p_desde date, p_hasta date)
 returns table (producto text, unidades int)
 language plpgsql
@@ -111,8 +100,6 @@ grant execute on function public.reporte_ventas(date, date) to authenticated;
 grant execute on function public.peliculas_mas_vistas(date, date) to authenticated;
 grant execute on function public.candy_mas_vendido(date, date) to authenticated;
 
-
--- ---------- 4. Cambiar el precio de una función (queda en el log) ----------
 create or replace function public.cambiar_precio_funcion(p_funcion_id uuid, p_precio_base numeric, p_precio_vip numeric)
 returns void
 language plpgsql
@@ -152,9 +139,6 @@ $$;
 revoke execute on function public.cambiar_precio_funcion(uuid, numeric, numeric) from anon, public;
 grant execute on function public.cambiar_precio_funcion(uuid, numeric, numeric) to authenticated;
 
-
--- ---------- 5. Más registros automáticos en el log (triggers) ----------
--- Películas creadas o editadas.
 create or replace function public.log_pelicula()
 returns trigger
 language plpgsql
@@ -177,7 +161,6 @@ create trigger log_pelicula
   after insert or update on public.peliculas
   for each row execute function public.log_pelicula();
 
--- Cambios de precio en productos y combos del candy.
 create or replace function public.log_precio_candy()
 returns trigger
 language plpgsql
@@ -218,7 +201,6 @@ create trigger log_precio_combo
   after update on public.combos
   for each row execute function public.log_precio_candy();
 
--- Cupones creados o cambiados (incluye el % del cupón de bienvenida).
 create or replace function public.log_cupon()
 returns trigger
 language plpgsql

@@ -10,7 +10,7 @@ export interface Pelicula {
   duracion_minutos: number;
   imagen_url: string | null;
   restriccion_edad: number | null;
-  fecha_estreno: string; 
+  fecha_estreno: string;
   activa: boolean;
   preventa: boolean;
   precio_preventa: number | null;
@@ -40,8 +40,6 @@ export function fechaEstreno(p: Pelicula): Date {
   return new Date(a, m - 1, d);
 }
 
-// Misma regla que apertura_venta() en la base: con preventa abre X días antes del estreno,
-// sin preventa abre el día del estreno.
 export function aperturaVenta(p: Pelicula): Date {
   const apertura = fechaEstreno(p);
   if (p.preventa) apertura.setDate(apertura.getDate() - p.dias_preventa);

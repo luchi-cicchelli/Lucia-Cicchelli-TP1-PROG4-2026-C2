@@ -17,7 +17,6 @@ export class AppComponent {
   readonly alertas = inject(AlertasService);
 
   constructor() {
-    // Cuando entra un usuario con cuenta, se fija si abrió la venta de alguna película con alerta.
     effect(() => {
       const id = this.auth.perfil()?.id;
       if (id) {

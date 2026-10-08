@@ -3,7 +3,6 @@ app-navbar,
   flex-shrink: 0;
 }
 
-/* El main ocupa el resto del alto y es lo único que scrollea (el navbar no se mueve). */
 main {
   flex: 1 1 0;
   min-height: 0;
@@ -11,7 +10,6 @@ main {
   overscroll-behavior: contain;
 }
 
-/* El componente de cada ruta ocupa todo el alto del main (lo usan las pantallas .pantalla). */
 main > :not(router-outlet) {
   display: block;
   height: 100%;
@@ -33,7 +31,6 @@ main > :not(router-outlet) {
   to { transform: translateX(250%); }
 }
 
-/* Avisos de "abrió la venta" de las películas con alerta */
 .avisos {
   max-width: 1100px;
   margin: 12px auto 0;

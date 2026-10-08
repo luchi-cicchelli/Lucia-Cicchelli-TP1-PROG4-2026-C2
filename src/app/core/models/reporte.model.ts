@@ -1,5 +1,5 @@
 export interface VentaDiaria {
-  dia: string; // yyyy-mm-dd
+  dia: string;
   compras: number;
   entradas: number;
   facturacion: number;
@@ -20,7 +20,6 @@ export interface LogActividad {
   usuario: { nombre: string; apellido: string; email: string | null } | null;
 }
 
-// Cómo se muestra cada acción del log.
 export const ACCIONES: Record<string, string> = {
   creo_funciones: 'Creó funciones',
   borro_funcion: 'Borró una función',

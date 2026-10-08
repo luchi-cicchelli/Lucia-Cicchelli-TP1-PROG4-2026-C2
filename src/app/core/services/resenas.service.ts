@@ -31,15 +31,12 @@ export class ResenasService {
     return data as MiResena | null;
   }
 
-  // Solo puede reseñar quien vio la película (misma regla que la policy de RLS).
   async vioPelicula(peliculaId: string): Promise<boolean> {
     const { data, error } = await this.supabase.client.rpc('vio_pelicula', { p_pelicula_id: peliculaId });
     if (error) throw error;
     return data as boolean;
   }
 
-  // upsert: si ya existe una reseña de este usuario para esta película, la edita.
-  // RLS solo deja escribir reseñas propias (usuario_id = auth.uid()).
   async guardar(usuarioId: string, peliculaId: string, estrellas: number, comentario: string): Promise<void> {
     const { error } = await this.supabase.client.from('resenas').upsert(
       {

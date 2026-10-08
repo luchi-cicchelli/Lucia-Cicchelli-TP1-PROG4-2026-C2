@@ -87,10 +87,8 @@
                 <div class="perfil__fila">
                   <div class="campo">
                     Fecha de nacimiento
-                    <app-selector-fecha [valor]="form.controls.fecha_nacimiento.value" [anioDesde]="anioActual" [anioHasta]="1900" etiqueta="Fecha de nacimiento" (cambio)="form.controls.fecha_nacimiento.setValue($event); form.controls.fecha_nacimiento.markAsTouched()" />
-                    @if (form.controls.fecha_nacimiento.touched && form.controls.fecha_nacimiento.invalid) {
-                      <span class="error-texto">Elegí una fecha válida (no puede ser futura).</span>
-                    }
+                    <p class="perfil__fijo">{{ p.fecha_nacimiento | date: 'dd/MM/yyyy' }}</p>
+                    <span class="perfil__ayuda">No se puede cambiar: define qué películas y cupones podés usar.</span>
                   </div>
                   <label class="campo">
                     Días de vacaciones por año

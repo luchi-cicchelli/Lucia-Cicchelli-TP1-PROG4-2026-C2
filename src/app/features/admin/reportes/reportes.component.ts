@@ -42,7 +42,6 @@ export class ReportesComponent implements OnInit {
   readonly hoy = aIso(new Date());
   readonly anioActual = new Date().getFullYear();
 
-  // ---------- Facturación por día ----------
   readonly form = inject(FormBuilder).nonNullable.group(
     {
       desde: [aIso(new Date(new Date().getFullYear(), new Date().getMonth(), 1)), Validators.required],
@@ -69,12 +68,10 @@ export class ReportesComponent implements OnInit {
     };
   });
 
-  // Altura de cada barra en % respecto del día que más facturó.
   readonly maxFacturacion = computed(() => Math.max(1, ...this.ventas().map((d) => d.facturacion)));
 
-  // ---------- Rankings (semana / mes) ----------
   readonly periodo = signal<Periodo>('semana');
-  readonly desplazamiento = signal(0); // 0 = actual, -1 = anterior…
+  readonly desplazamiento = signal(0);
   readonly peliculas = signal<Ranking[]>([]);
   readonly candy = signal<Ranking[]>([]);
   readonly cargandoRanking = signal(false);

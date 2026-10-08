@@ -17,7 +17,6 @@ function desdeInput(valor: string, finDelDia = false): string {
   return (finDelDia ? new Date(a, m - 1, d, 23, 59, 59) : new Date(a, m - 1, d)).toISOString();
 }
 
-/** La fecha "hasta" no puede ser anterior a "desde". */
 const vigenciaValida: ValidatorFn = (grupo: AbstractControl): ValidationErrors | null => {
   const desde = grupo.get('desde')?.value;
   const hasta = grupo.get('hasta')?.value;

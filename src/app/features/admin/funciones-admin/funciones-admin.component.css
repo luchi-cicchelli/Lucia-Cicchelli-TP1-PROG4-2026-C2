@@ -222,13 +222,11 @@
   font-size: 0.85rem;
 }
 
-/* Pestañas de días: se ve un día a la vez */
 .funciones__dias {
   display: flex;
   gap: 6px;
   overflow-x: auto;
   padding: 4px 0;
-  /* queda pegado arriba mientras scrolleás las funciones del día */
   position: sticky;
   top: -2px;
   z-index: 2;

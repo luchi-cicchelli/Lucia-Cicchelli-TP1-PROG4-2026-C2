@@ -30,14 +30,12 @@ export interface ComboFormValue {
   items: { producto_id: string; cantidad: number }[];
 }
 
-/** Lo que el cliente agrega a la compra. */
 export interface ItemCarrito {
   tipo: 'producto' | 'combo';
   id: string;
   cantidad: number;
 }
 
-/** Candy de una compra, como lo devuelve la base. */
 export interface ItemCandyCompra {
   tipo: 'producto' | 'combo';
   nombre: string;

@@ -122,7 +122,6 @@ export class FuncionesAdminComponent implements OnInit {
     { requireSync: true }
   );
 
-  // Todos los horarios de inicio que salen de combinar días, horas y rango de fechas.
   readonly inicios = computed<Date[]>(() => {
     const v = this.valores();
     if (!v.desde || !v.hasta || v.hasta < v.desde || v.dias.length === 0) return [];
@@ -159,7 +158,6 @@ export class FuncionesAdminComponent implements OnInit {
     return grupos;
   });
 
-  // El listado muestra un día a la vez (con pestañas de días) para no hacer una lista enorme.
   readonly diaListado = signal<string | null>(null);
   readonly grupoVisible = computed(() => {
     const grupos = this.funcionesPorDia();

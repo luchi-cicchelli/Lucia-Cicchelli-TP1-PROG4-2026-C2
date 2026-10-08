@@ -31,7 +31,6 @@ export class MisPeliculasComponent implements OnInit {
   readonly cargando = signal(true);
   readonly error = signal('');
 
-  // Una película "vista" = una compra no cancelada cuya función ya empezó.
   async ngOnInit() {
     const id = this.auth.perfil()?.id;
     if (!id) return;

@@ -1,7 +1,5 @@
 import { Component, computed, input, output } from '@angular/core';
 
-// Hora con dos desplegables (hora y minutos de 5 en 5) en vez del input time.
-// Recibe y emite 'HH:mm'.
 @Component({
   selector: 'app-selector-hora',
   standalone: true,

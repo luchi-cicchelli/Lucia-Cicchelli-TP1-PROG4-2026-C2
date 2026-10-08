@@ -1,7 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
-// Fecha relativa: "recién", "hace 5 min", "hace 3 h", "ayer", "hace 4 días".
-// Si pasó más de una semana devuelve la fecha (dd/mm/aaaa).
 @Pipe({ name: 'hace', standalone: true })
 export class HacePipe implements PipeTransform {
   transform(fecha: string | Date | null | undefined): string {

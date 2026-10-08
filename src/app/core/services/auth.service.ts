@@ -12,13 +12,11 @@ export class AuthService {
   readonly session = this._session.asReadonly();
   readonly perfil = this._perfil.asReadonly();
 
-  // Hay dos formas de entrar: con cuenta o como invitado (usuario anónimo de Supabase con su nombre).
   readonly tieneSesion = computed(() => this._session() !== null);
   readonly esInvitado = computed(() => !!this._session()?.user.is_anonymous);
   readonly nombreInvitado = computed(() =>
     this.esInvitado() ? (this._session()?.user.user_metadata['nombre'] as string) ?? '' : ''
   );
-  // Con cuenta registrada (los invitados no tienen perfil, puntos ni cancelaciones).
   readonly estaLogueado = computed(() => this.tieneSesion() && !this.esInvitado());
   readonly rol = computed<Rol | null>(() => this._perfil()?.rol ?? null);
   readonly esAdmin = computed(() => this.rol() === 'admin');
@@ -56,7 +54,6 @@ export class AuthService {
     await this.cargarPerfil(data.user.id);
   }
 
-  // Entrar sin cuenta: Supabase crea un usuario anónimo y guardamos el nombre en sus datos.
   async entrarComoInvitado(nombre: string): Promise<void> {
     const { error } = await this.supabase.client.auth.signInAnonymously({ options: { data: { nombre } } });
     if (error) throw new Error(this.traducirError(error));
@@ -83,13 +80,12 @@ export class AuthService {
   }
 
   async cerrarSesion(): Promise<void> {
-    // 'local': cierra la sesión solo en este navegador (si no, Supabase la cierra en todos los dispositivos).
     await this.supabase.client.auth.signOut({ scope: 'local' });
     this._perfil.set(null);
     await this.router.navigate(['/login']);
   }
 
-  async actualizarDatos(cambios: DatosPersonales): Promise<void> {
+  async actualizarDatos(cambios: Omit<DatosPersonales, 'fecha_nacimiento'>): Promise<void> {
     const id = this._session()?.user.id;
     if (!id) throw new Error('No hay sesión iniciada.');
 

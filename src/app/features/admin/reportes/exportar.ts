@@ -1,8 +1,5 @@
 import { VentaDiaria } from '../../../core/models/reporte.model';
 
-// Exportación del reporte de facturación a PDF (jsPDF) y a Excel (ExcelJS).
-// Las librerías se cargan con import() solo cuando se usan, así no pesan en el resto de la app.
-
 export interface DatosReporte {
   desde: string;
   hasta: string;
@@ -33,7 +30,7 @@ function descargar(blob: Blob, nombre: string) {
 export async function exportarPdf(d: DatosReporte) {
   const { jsPDF } = await import('jspdf');
   const doc = new jsPDF({ unit: 'mm', format: 'a4' });
-  const columnas = [20, 75, 115, 190]; // x de cada columna (la última alineada a la derecha)
+  const columnas = [20, 75, 115, 190];
 
   doc.setFont('times', 'normal');
   doc.setFontSize(20);
@@ -105,12 +102,10 @@ export async function exportarExcel(d: DatosReporte) {
 
   for (const v of d.ventas) {
     const [a, m, dia] = v.dia.split('-').map(Number);
-    // Excel guarda las fechas sin zona horaria: se pasa en UTC para que no se corra un día.
     hoja.addRow({ fecha: new Date(Date.UTC(a, m - 1, dia)), compras: v.compras, entradas: v.entradas, facturacion: v.facturacion });
   }
   hoja.getColumn('fecha').numFmt = 'dd/mm/yyyy';
 
-  // Fila de totales con fórmulas, así siguen andando si se edita la planilla.
   const ultima = d.ventas.length + 1;
   const total = hoja.addRow({
     fecha: 'Total',

@@ -1,7 +1,3 @@
--- Próximamente, preventa por película y alertas de estreno.
--- Correr después de beneficios.sql.
-
--- ---------- 1. Preventa configurable película por película ----------
 alter table public.peliculas add column if not exists preventa boolean not null default false;
 alter table public.peliculas add column if not exists precio_preventa numeric(10,2);
 alter table public.peliculas add column if not exists dias_preventa int not null default 7;
@@ -11,7 +7,6 @@ alter table public.peliculas add constraint peliculas_preventa_valida check (
   not preventa or (coalesce(precio_preventa, 0) > 0 and dias_preventa between 1 and 30)
 );
 
--- Inicio del día del estreno en hora argentina (ahí termina la preventa).
 create or replace function public.inicio_estreno(p_fecha date)
 returns timestamptz
 language sql
@@ -20,8 +15,6 @@ as $$
   select (p_fecha::timestamp at time zone 'America/Argentina/Buenos_Aires');
 $$;
 
--- Cuándo se pueden empezar a comprar entradas de una película:
--- con preventa, X días antes del estreno; sin preventa, el día del estreno.
 create or replace function public.apertura_venta(p_pelicula_id uuid)
 returns timestamptz
 language sql
@@ -37,8 +30,6 @@ $$;
 
 grant execute on function public.apertura_venta(uuid) to anon, authenticated;
 
--- Las funciones guardan el precio de preventa (así el cálculo del precio no cambia).
--- Cuando el admin cambia la preventa de la película, se actualizan sus funciones futuras.
 create or replace function public.sincronizar_preventa()
 returns trigger
 language plpgsql
@@ -61,8 +52,6 @@ create trigger sincronizar_preventa
   after update of preventa, precio_preventa, fecha_estreno on public.peliculas
   for each row execute function public.sincronizar_preventa();
 
-
--- ---------- 2. Crear funciones toma la preventa de la película ----------
 drop function if exists public.crear_funciones(uuid, timestamptz[], formato_funcion, idioma_funcion, numeric, numeric, boolean, timestamptz, numeric);
 
 create or replace function public.crear_funciones(
@@ -165,8 +154,6 @@ $$;
 revoke execute on function public.crear_funciones(uuid, timestamptz[], formato_funcion, idioma_funcion, numeric, numeric) from anon, public;
 grant execute on function public.crear_funciones(uuid, timestamptz[], formato_funcion, idioma_funcion, numeric, numeric) to authenticated;
 
-
--- ---------- 3. No se puede reservar antes de que abra la venta ----------
 create or replace function public.reservar_butaca(p_funcion_id uuid, p_butaca_id uuid, p_sesion text)
 returns timestamptz
 language plpgsql
@@ -224,16 +211,12 @@ begin
 end;
 $$;
 
-
--- ---------- 4. Alertas de estreno ----------
 alter table public.alertas_estreno enable row level security;
 
 drop policy if exists "alertas: las propias" on public.alertas_estreno;
 create policy "alertas: las propias" on public.alertas_estreno for all to authenticated
   using (usuario_id = auth.uid()) with check (usuario_id = auth.uid());
 
--- Alertas que ya hay que mandar: la venta abrió y hay funciones a la venta.
--- La usa la Edge Function "avisar-estrenos" (con la service role).
 create or replace function public.alertas_pendientes()
 returns table (alerta_id uuid, usuario_id uuid, pelicula_id uuid, pelicula text, preventa boolean)
 language sql

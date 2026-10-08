@@ -175,7 +175,6 @@
             <p class="checkout__nota">Precio de preventa aplicado a las butacas normales y accesibles.</p>
           }
 
-          <!-- Cupón -->
           <div class="checkout__cupon">
             @if (cuponAplicado(); as c) {
               <p class="checkout__cupon-ok">
@@ -195,7 +194,6 @@
             }
           </div>
 
-          <!-- Canje de puntos (solo con cuenta) -->
           @if (auth.estaLogueado() && recompensas().length) {
             <div class="checkout__canjes">
               <p class="checkout__subtitulo">Canjeá tus puntos <span>(tenés {{ auth.perfil()?.puntos_acumulados ?? 0 }})</span></p>
@@ -212,7 +210,6 @@
             </div>
           }
 
-          <!-- Crédito a favor -->
           @if (creditoDisponible() > 0) {
             <label class="checkout__credito">
               <input type="checkbox" [checked]="usarCredito()" (change)="usarCredito.set(!usarCredito())" />

@@ -19,7 +19,7 @@ export class FuncionesService {
     if (error) throw error;
     return data as FuncionConDetalle[];
   }
-  
+
   async crear(datos: NuevasFunciones): Promise<FuncionCreada[]> {
     const { data, error } = await this.supabase.client.rpc('crear_funciones', {
       p_pelicula_id: datos.peliculaId,
@@ -33,7 +33,6 @@ export class FuncionesService {
     return data as FuncionCreada[];
   }
 
-  // Por RPC para que quede en el log quién cambió el precio y de cuánto a cuánto.
   async cambiarPrecio(id: string, precioBase: number, precioVip: number): Promise<void> {
     const { error } = await this.supabase.client.rpc('cambiar_precio_funcion', {
       p_funcion_id: id,

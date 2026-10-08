@@ -63,7 +63,6 @@ export class UsuariosAdminComponent implements OnInit {
       );
     } catch (e: any) {
       this.error.set('No se pudo cambiar el rol: ' + e.message);
-      // Recarga para que el select vuelva a mostrar el rol real.
       await this.cargar();
     } finally {
       this.guardandoId.set(null);

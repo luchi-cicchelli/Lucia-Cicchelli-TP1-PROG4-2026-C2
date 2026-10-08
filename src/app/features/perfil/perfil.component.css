@@ -110,7 +110,6 @@
     gap: 0.6rem;
   }
 
-  /* Los tres datos siguen en una fila (chiquitos) para que quede lugar para la lista */
   .perfil__resumen {
     gap: 6px;
   }
@@ -143,4 +142,16 @@
   cursor: pointer;
   font-size: 0.85rem;
   padding: 7px 16px;
+}
+
+.perfil__fijo {
+  margin: 0;
+  padding: 10px 0;
+  color: var(--texto);
+  font-size: 0.95rem;
+}
+
+.perfil__ayuda {
+  font-size: 0.75rem;
+  color: var(--texto-muted);
 }

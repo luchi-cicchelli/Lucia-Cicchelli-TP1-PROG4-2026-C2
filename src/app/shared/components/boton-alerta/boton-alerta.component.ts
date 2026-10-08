@@ -3,7 +3,6 @@ import { RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { AlertasService } from '../../../core/services/alertas.service';
 
-// Botón "Avisarme cuando salgan las entradas" de las películas de Próximamente.
 @Component({
   selector: 'app-boton-alerta',
   standalone: true,
@@ -22,7 +21,6 @@ export class BotonAlertaComponent {
   readonly aviso = signal('');
 
   constructor() {
-    // Cuando se conoce el usuario, trae sus alertas (una sola vez, el servicio las guarda).
     effect(() => {
       const id = this.auth.perfil()?.id;
       if (id) this.alertas.cargar(id).catch(() => null);

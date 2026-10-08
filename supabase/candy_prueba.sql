@@ -1,5 +1,3 @@
--- Productos y combos de prueba para el candy bar. Correr UNA sola vez.
-
 insert into public.productos_candy (nombre, categoria, precio) values
   ('Pochoclo chico', 'Pochoclos', 3500),
   ('Pochoclo mediano', 'Pochoclos', 4500),

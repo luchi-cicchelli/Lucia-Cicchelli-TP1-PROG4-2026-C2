@@ -1,10 +1,3 @@
--- ============================================================
--- BIJOU CINEMA — Candy bar y combos
--- Correr DESPUÉS de escaner.sql. Se puede volver a correr.
--- Reemplaza confirmar_compra y detalle_compra de compra.sql.
--- ============================================================
-
--- ---------- 1. Ajustes de tablas ----------
 alter table public.compras add column if not exists candy_retirado_en timestamptz;
 alter table public.compras add column if not exists candy_entregado_por uuid references public.perfiles(id);
 
@@ -17,8 +10,6 @@ alter table public.combos add constraint combos_precio_positivo check (precio_fi
 alter table public.combo_items drop constraint if exists combo_items_cantidad_positiva;
 alter table public.combo_items add constraint combo_items_cantidad_positiva check (cantidad > 0);
 
-
--- ---------- 2. RLS: todos ven lo activo, solo el admin edita ----------
 alter table public.productos_candy enable row level security;
 alter table public.combos enable row level security;
 alter table public.combo_items enable row level security;
@@ -46,8 +37,6 @@ drop policy if exists "combo_items: admin escribe" on public.combo_items;
 create policy "combo_items: admin escribe" on public.combo_items for all to authenticated
   using (public.rol_actual() = 'admin') with check (public.rol_actual() = 'admin');
 
-
--- ---------- 3. Candy de una compra, con el contenido de cada combo ----------
 create or replace function public.items_candy(p_compra_id uuid)
 returns json
 language sql
@@ -72,11 +61,6 @@ as $$
   where ci.compra_id = p_compra_id;
 $$;
 
-
--- ---------- 4. Confirmar la compra con candy y combos (todo o nada) ----------
--- p_items: [{"tipo":"producto"|"combo","id":"<uuid>","cantidad":2}, ...]
--- Cada combo incluye una entrada general: reemplaza el precio general de una
--- butaca (si la butaca es VIP, se paga la diferencia).
 drop function if exists public.confirmar_compra(uuid, text, text);
 drop function if exists public.confirmar_compra(uuid, text, text, jsonb);
 
@@ -146,14 +130,12 @@ begin
     else v_funcion.precio_base
   end;
 
-  -- Entradas
   select coalesce(sum(case when b.tipo = 'vip' then v_funcion.precio_vip else v_precio_general end), 0)
   into v_subtotal
   from reservas_temporales r
   join butacas b on b.id = r.butaca_id
   where r.funcion_id = p_funcion_id and r.session_id = p_sesion;
 
-  -- Candy y combos: los precios salen de la base, nunca del front.
   for v_item in
     select x.tipo, x.id, x.cantidad
     from jsonb_to_recordset(coalesce(p_items, '[]'::jsonb)) as x(tipo text, id uuid, cantidad int)
@@ -184,7 +166,6 @@ begin
     raise exception 'Cada combo incluye una entrada: elegiste % combos y % butacas', v_cant_combos, v_cant_butacas;
   end if;
 
-  -- Cupón de bienvenida en la primera compra de un usuario registrado.
   if v_usuario is not null and not v_perfil.cupon_bienvenida_usado then
     select * into v_cupon from cupones
     where codigo = 'BIENVENIDA' and activo
@@ -204,7 +185,6 @@ begin
           jsonb_array_length(coalesce(p_items, '[]'::jsonb)) > 0)
   returning id into v_compra_id;
 
-  -- Entradas: las primeras v_cant_combos butacas (las no VIP primero) van incluidas en un combo.
   for v_reserva in
     select r.butaca_id, b.tipo
     from reservas_temporales r join butacas b on b.id = r.butaca_id
@@ -253,8 +233,6 @@ $$;
 
 grant execute on function public.confirmar_compra(uuid, text, text, jsonb) to anon, authenticated;
 
-
--- ---------- 5. Detalle de la compra, ahora con el candy ----------
 create or replace function public.detalle_compra(p_compra_id uuid)
 returns json
 language sql
@@ -294,8 +272,6 @@ as $$
   limit 1;
 $$;
 
-
--- ---------- 6. Entregar el candy con el QR (o código) de cualquier entrada de la compra ----------
 create or replace function public.validar_candy(p_codigo text)
 returns json
 language plpgsql

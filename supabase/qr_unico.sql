@@ -1,17 +1,11 @@
--- Un solo QR por compra (entradas + candy).
--- Correr después de reportes.sql (y después invitados.sql).
-
--- ---------- 1. El QR y el código manual pasan a ser de la compra ----------
 alter table public.compras add column if not exists qr_codigo text unique;
 alter table public.compras add column if not exists codigo_manual text unique;
 alter table public.compras add column if not exists nombre_comprador text;
 alter table public.compras add column if not exists email_comprador text;
 
--- Las entradas ya no tienen QR propio.
 alter table public.entradas alter column qr_codigo drop not null;
 alter table public.entradas alter column codigo_manual drop not null;
 
--- Genera el QR (uuid) y un código manual de 8 caracteres único para cada compra nueva.
 create or replace function public.generar_codigos_compra()
 returns trigger
 language plpgsql
@@ -33,7 +27,6 @@ create trigger generar_codigos_compra
   before insert on public.compras
   for each row execute function public.generar_codigos_compra();
 
--- Compras que ya existían: se les genera su código.
 do $$
 declare
   v_id uuid;
@@ -55,8 +48,6 @@ $$;
 alter table public.compras alter column qr_codigo set not null;
 alter table public.compras alter column codigo_manual set not null;
 
-
--- ---------- 3. Escáner: el QR de la compra valida todas sus entradas ----------
 create or replace function public.validar_entrada(p_codigo text)
 returns json
 language plpgsql
@@ -81,7 +72,6 @@ begin
     raise exception 'Ingresá un código';
   end if;
 
-  -- FOR UPDATE: si dos empleados escanean el mismo QR a la vez, el segundo espera.
   select * into v_compra from compras
   where qr_codigo = v_codigo or codigo_manual = upper(v_codigo)
   for update;
@@ -153,8 +143,6 @@ $$;
 revoke execute on function public.validar_entrada(text) from anon, public;
 grant execute on function public.validar_entrada(text) to authenticated;
 
-
--- ---------- 4. Candy: se retira con el mismo QR de la compra ----------
 create or replace function public.validar_candy(p_codigo text)
 returns json
 language plpgsql
@@ -227,8 +215,6 @@ $$;
 revoke execute on function public.validar_candy(text) from anon, public;
 grant execute on function public.validar_candy(text) to authenticated;
 
-
--- ---------- 5. Las compras de invitados no se cancelan ----------
 create or replace function public.cancelar_compra(p_compra_id uuid)
 returns numeric
 language plpgsql
@@ -264,7 +250,6 @@ begin
     raise exception 'No se puede cancelar: ya se usó una entrada o se retiró el candy';
   end if;
 
-  -- Se devuelve como crédito todo lo pagado, incluido el crédito que se había usado.
   v_credito := v_compra.total + v_compra.credito_usado;
 
   update entradas set estado = 'cancelada' where compra_id = p_compra_id;
@@ -298,8 +283,6 @@ $$;
 revoke execute on function public.cancelar_compra(uuid) from anon, public;
 grant execute on function public.cancelar_compra(uuid) to authenticated;
 
-
--- ---------- 6. Detalle de compra con el QR único y el nombre ----------
 create or replace function public.detalle_compra(p_compra_id uuid)
 returns json
 language sql

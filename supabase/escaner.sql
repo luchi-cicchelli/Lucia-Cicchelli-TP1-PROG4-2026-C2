@@ -1,11 +1,3 @@
--- ============================================================
--- BIJOU CINEMA — Validación de entradas (escáner de empleados)
--- Correr DESPUÉS de compra.sql. Se puede volver a correr.
--- ============================================================
-
--- Recibe el contenido del QR o el código manual de 8 caracteres.
--- Solo empleados y admins. Una entrada se valida UNA sola vez:
--- después de eso el QR deja de funcionar.
 create or replace function public.validar_entrada(p_codigo text)
 returns json
 language plpgsql
@@ -29,8 +21,6 @@ begin
     raise exception 'Ingresá un código';
   end if;
 
-  -- FOR UPDATE: si dos empleados escanean la misma entrada a la vez, el segundo espera
-  -- y después la encuentra ya validada.
   select * into v_entrada
   from entradas
   where qr_codigo = v_codigo or codigo_manual = upper(v_codigo)
@@ -62,7 +52,6 @@ begin
       to_char(v_funcion.fecha_hora_inicio at time zone v_zona, 'HH24:MI');
   end if;
 
-  -- Se puede ingresar desde 3 horas antes del comienzo.
   if v_funcion.fecha_hora_inicio > now() + interval '3 hours' then
     raise exception 'Todavía no se puede ingresar: la función es el % a las % hs',
       to_char(v_funcion.fecha_hora_inicio at time zone v_zona, 'DD/MM'),

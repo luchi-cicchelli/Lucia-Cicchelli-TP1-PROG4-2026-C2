@@ -22,7 +22,6 @@ export class LoginComponent {
     password: ['', Validators.required]
   });
 
-  // Entrar sin cuenta: alcanza con el nombre.
   readonly formInvitado = inject(FormBuilder).nonNullable.group({
     nombre: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(60), soloLetras]]
   });
@@ -31,7 +30,6 @@ export class LoginComponent {
   readonly error = signal('');
   readonly verPassword = signal(false);
 
-  // Botones para entrar con las cuentas de prueba sin tipear.
   readonly accesos = environment.accesosRapidos;
 
   async accesoRapido(acceso: { email: string; password: string }) {

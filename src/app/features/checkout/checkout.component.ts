@@ -36,7 +36,6 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   readonly metodosPago = METODOS_PAGO;
   readonly describirCombo = describirCombo;
 
-  // Fotos de los productos que trae un combo (los que tienen imagen).
   fotosCombo(c: Combo): string[] {
     return c.items.map((i) => i.producto?.imagen_url).filter((url): url is string => !!url);
   }
@@ -52,7 +51,6 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   readonly combos = signal<Combo[]>([]);
   readonly cantidades = signal<Map<string, number>>(new Map());
 
-  // Cupón, canje de puntos y crédito
   readonly codigoCupon = signal('');
   readonly cuponAplicado = signal<CuponValido | null>(null);
   readonly errorCupon = signal('');
@@ -61,7 +59,6 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   readonly canjes = signal<Map<string, number>>(new Map());
   readonly usarCredito = signal(false);
 
-  // Invitado: el nombre ya lo puso al entrar; acá puede dejar un mail (opcional).
   readonly formInvitado = inject(FormBuilder).nonNullable.group({
     email: ['', [Validators.email, Validators.maxLength(120)]]
   });
@@ -97,7 +94,6 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   readonly hayVip = computed(() => this.misButacas().some((m) => m.butaca.tipo === 'vip'));
   readonly subtotalEntradas = computed(() => this.misButacas().reduce((suma, m) => suma + m.precio, 0));
 
-  // Precio de una entrada general (lo que cubre cada combo).
   readonly precioGeneral = computed(() => {
     const f = this.funcion();
     if (!f) return 0;
@@ -133,7 +129,6 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     this.carrito().filter((c) => c.item.tipo === 'combo').reduce((suma, c) => suma + c.item.cantidad, 0)
   );
 
-  // Cada combo incluye una entrada general: se descuenta del precio de las entradas.
   readonly entradasEnCombos = computed(() => this.totalCombos() * this.precioGeneral());
 
   readonly subtotalCandy = computed(() =>
@@ -149,7 +144,6 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     return !!perfil && !perfil.cupon_bienvenida_usado && this.porcentajeBienvenida() > 0;
   });
 
-  // ---- Canje de puntos (mismo cálculo que confirmar_compra en la base) ----
   readonly listaCanjes = computed(() =>
     [...this.canjes().entries()]
       .map(([id, cantidad]) => ({ recompensa: this.recompensas().find((r) => r.id === id)!, cantidad }))
@@ -170,7 +164,6 @@ export class CheckoutComponent implements OnInit, OnDestroy {
 
   readonly subtotalConCanjes = computed(() => this.subtotal() - this.descuentoCanjes());
 
-  // ---- Un solo cupón: el de mayor porcentaje ----
   readonly cuponGanador = computed<'bienvenida' | 'codigo' | null>(() => {
     const bienvenida = this.aplicaBienvenida() ? this.porcentajeBienvenida() : 0;
     const codigo = this.cuponAplicado()?.porcentaje ?? 0;
@@ -388,7 +381,6 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     return this.canjes().get(id) ?? 0;
   }
 
-  /** Se puede sumar otro canje si alcanzan los puntos (y si hay butacas para las entradas gratis). */
   puedeCanjear(r: Recompensa): boolean {
     const puntos = this.auth.perfil()?.puntos_acumulados ?? 0;
     if (this.puntosACanjear() + r.puntos_requeridos > puntos) return false;
@@ -409,7 +401,6 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     });
   }
 
-  // Si se liberan butacas, no puede haber más combos que entradas.
   private ajustarCombos() {
     if (this.entradasGratis() + this.totalCombos() > this.misButacas().length) {
       this.canjes.update((mapa) => {

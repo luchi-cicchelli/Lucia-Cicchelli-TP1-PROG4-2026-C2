@@ -63,7 +63,6 @@
   color: var(--rosa-acento);
 }
 
-/* Gráfico de barras verticales: una barra por día */
 .rep__barras {
   display: flex;
   align-items: flex-end;
@@ -142,7 +141,6 @@
   color: var(--texto-muted);
 }
 
-/* Rankings: barras horizontales */
 .rep__navegar {
   display: flex;
   align-items: center;

@@ -7,13 +7,10 @@ const MESES = [
 
 interface Partes {
   dia: number | null;
-  mes: number | null; // 1 a 12
+  mes: number | null;
   anio: number | null;
 }
 
-// Fecha con tres desplegables (día, mes y año) en vez del input date del navegador.
-// Recibe y emite la fecha como texto 'aaaa-mm-dd' ('' si está incompleta), igual que un input date,
-// así el formulario reactivo y sus validadores no cambian.
 @Component({
   selector: 'app-selector-fecha',
   standalone: true,
@@ -30,7 +27,6 @@ export class SelectorFechaComponent {
   readonly meses = MESES;
   readonly partes = signal<Partes>({ dia: null, mes: null, anio: null });
 
-  // Años de mayor a menor si el rango va hacia atrás (por ejemplo, fecha de nacimiento).
   readonly anios = computed(() => {
     const desde = this.anioDesde();
     const hasta = this.anioHasta();
@@ -40,7 +36,6 @@ export class SelectorFechaComponent {
     return lista;
   });
 
-  // Cantidad de días según el mes y el año elegidos (febrero bisiesto incluido).
   readonly dias = computed(() => {
     const { mes, anio } = this.partes();
     const cantidad = mes ? new Date(anio ?? 2000, mes, 0).getDate() : 31;
@@ -48,7 +43,6 @@ export class SelectorFechaComponent {
   });
 
   constructor() {
-    // Si el formulario cambia el valor desde afuera (editar, reset), se reflejan las partes.
     effect(() => {
       const v = this.valor();
       if (v) {
@@ -64,7 +58,6 @@ export class SelectorFechaComponent {
     const texto = (evento.target as HTMLSelectElement).value;
     const nuevas = { ...this.partes(), [parte]: texto ? Number(texto) : null };
 
-    // Si el día ya no existe en el mes elegido (31 de febrero), se ajusta al último.
     if (nuevas.dia && nuevas.mes) {
       const ultimo = new Date(nuevas.anio ?? 2000, nuevas.mes, 0).getDate();
       nuevas.dia = Math.min(nuevas.dia, ultimo);

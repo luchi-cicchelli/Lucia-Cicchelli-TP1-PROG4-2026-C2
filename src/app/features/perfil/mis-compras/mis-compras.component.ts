@@ -47,7 +47,6 @@ export class MisComprasComponent implements OnInit {
     }
   }
 
-  // Todas las entradas de una compra son de la misma función.
   funcion(c: MiCompra) {
     return c.entradas[0]?.funcion ?? null;
   }
@@ -62,7 +61,6 @@ export class MisComprasComponent implements OnInit {
     return !!inicio && inicio < new Date();
   }
 
-  /** Misma regla que cancelar_compra en la base: hasta 2 horas antes y sin nada usado. */
   puedeCancelar(c: MiCompra): boolean {
     const inicio = this.inicio(c);
     return (

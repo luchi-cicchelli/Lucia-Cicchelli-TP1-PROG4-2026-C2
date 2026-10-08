@@ -24,7 +24,6 @@ export class ReportesService {
     return (data ?? []).map((d: any) => ({ nombre: d.producto, cantidad: d.unidades }));
   }
 
-  // Log de actividad, de a páginas (lo más nuevo primero). RLS: solo el admin lo puede leer.
   async logs(pagina: number, porPagina: number, acciones: string[] = []): Promise<LogActividad[]> {
     let consulta = this.supabase.client
       .from('logs_actividad')

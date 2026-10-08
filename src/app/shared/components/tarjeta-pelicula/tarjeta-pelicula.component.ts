@@ -19,7 +19,6 @@ export class TarjetaPeliculaComponent {
   readonly pelicula = input.required<PeliculaCartelera>();
   readonly posicion = input<number | null>(null);
   readonly proximamente = input(false);
-  // Versión chica (póster al costado), para las más vistas del inicio.
   readonly compacta = input(false);
 
   readonly generos = computed(() => this.pelicula().generos.map((g) => g.nombre).join(' · '));

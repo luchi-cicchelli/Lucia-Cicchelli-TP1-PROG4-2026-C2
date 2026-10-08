@@ -37,7 +37,6 @@ export class EscanerComponent implements OnDestroy {
   cambiarModo(modo: ModoEscaner) {
     this.modo.set(modo);
     this.resultado.set(null);
-    // Permite leer enseguida el mismo QR en el otro modo (entrada y después candy).
     this.ultimoCodigo = '';
   }
 
@@ -53,7 +52,6 @@ export class EscanerComponent implements OnDestroy {
         audio: false
       });
       this.camaraActiva.set(true);
-      // Espera a que el <video> aparezca en el template.
       setTimeout(async () => {
         const video = this.video()?.nativeElement;
         if (!video || !this.stream) return;
@@ -113,8 +111,6 @@ export class EscanerComponent implements OnDestroy {
     this.frame = requestAnimationFrame(() => this.leer());
   }
 
-  // Mientras el mismo QR siga frente a la cámara no se vuelve a validar;
-  // recién se acepta otra vez si desaparece por unos segundos.
   private alDetectar(codigo: string) {
     const ahora = Date.now();
     if (this.procesando()) return;

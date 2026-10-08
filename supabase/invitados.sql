@@ -1,9 +1,3 @@
--- Ingreso como invitado: para usar la app hay que entrar con cuenta o como invitado con tu nombre.
--- El invitado es un usuario anónimo de Supabase Auth (signInAnonymously): tiene sesión,
--- pero no tiene perfil, no suma puntos, no usa cupones de cuenta y no puede cancelar.
--- Correr después de qr_unico.sql. Requiere activar "Allow anonymous sign-ins" en Authentication.
-
--- ---------- 1. ¿El usuario de la sesión es un invitado? ----------
 create or replace function public.es_invitado()
 returns boolean
 language sql
@@ -14,8 +8,6 @@ $$;
 
 grant execute on function public.es_invitado() to anon, authenticated;
 
-
--- ---------- 2. Los invitados no tienen perfil ----------
 create or replace function public.crear_perfil_nuevo_usuario()
 returns trigger
 language plpgsql
@@ -45,8 +37,6 @@ begin
 end;
 $$;
 
-
--- ---------- 3. Cupones de edad: solo con cuenta ----------
 create or replace function public.validar_cupon(p_codigo text)
 returns json
 language plpgsql
@@ -89,8 +79,6 @@ $$;
 
 grant execute on function public.validar_cupon(text) to anon, authenticated;
 
-
--- ---------- 4. Confirmar compra (con nombre del invitado y un solo QR por compra) ----------
 drop function if exists public.confirmar_compra(uuid, text, text, jsonb, text, boolean, jsonb);
 
 create or replace function public.confirmar_compra(
@@ -112,7 +100,6 @@ as $$
 declare
   v_funcion funciones%rowtype;
   v_restriccion int;
-  -- Un invitado (usuario anónimo de Supabase) compra como si no tuviera cuenta.
   v_usuario uuid := case when public.es_invitado() then null else auth.uid() end;
   v_perfil perfiles%rowtype;
   v_cupon cupones%rowtype;
@@ -160,7 +147,6 @@ begin
     raise exception 'Tu reserva venció. Volvé a elegir las butacas.';
   end if;
 
-  -- Sin cuenta se compra como invitado: hay que dejar al menos un nombre.
   if v_usuario is null then
     if v_nombre is null or char_length(v_nombre) < 2 then
       raise exception 'Para comprar sin cuenta ingresá tu nombre';
@@ -186,13 +172,11 @@ begin
     else v_funcion.precio_base
   end;
 
-  -- Entradas
   select coalesce(sum(case when b.tipo = 'vip' then v_funcion.precio_vip else v_precio_general end), 0)
   into v_subtotal
   from reservas_temporales r join butacas b on b.id = r.butaca_id
   where r.funcion_id = p_funcion_id and r.session_id = p_sesion;
 
-  -- Candy y combos (precios de la base)
   for v_item in
     select x.tipo, x.id, x.cantidad
     from jsonb_to_recordset(coalesce(p_items, '[]'::jsonb)) as x(tipo text, id uuid, cantidad int)
@@ -218,7 +202,6 @@ begin
     raise exception 'Cada combo incluye una entrada: elegiste % combos y % butacas', v_cant_combos, v_cant_butacas;
   end if;
 
-  -- Canjes de puntos
   if jsonb_array_length(coalesce(p_canjes, '[]'::jsonb)) > 0 then
     if v_usuario is null then
       raise exception 'Para canjear puntos tenés que ingresar con tu cuenta';
@@ -250,7 +233,6 @@ begin
 
   v_subtotal := v_subtotal - v_descuento_canjes;
 
-  -- Un solo cupón: el de mayor porcentaje entre el ingresado y el de bienvenida.
   if v_usuario is not null and not v_perfil.cupon_bienvenida_usado then
     select * into v_cupon from cupones
     where codigo = 'BIENVENIDA' and activo
@@ -273,7 +255,6 @@ begin
   v_descuento := round(v_subtotal * v_porcentaje / 100, 2);
   v_total := v_subtotal - v_descuento;
 
-  -- Crédito a favor (por compras canceladas)
   if p_usar_credito and v_usuario is not null and v_perfil.credito_disponible > 0 then
     v_credito := least(v_perfil.credito_disponible, v_total);
     v_total := v_total - v_credito;
@@ -295,7 +276,6 @@ begin
           v_nombre, v_email)
   returning id into v_compra_id;
 
-  -- Entradas: primero las incluidas en combos, después las gratis por puntos (las no VIP primero).
   for v_reserva in
     select r.butaca_id, b.tipo
     from reservas_temporales r join butacas b on b.id = r.butaca_id
@@ -308,12 +288,10 @@ begin
       v_precio := v_precio - v_precio_general;
     end if;
 
-    -- Las entradas no tienen QR propio: se usa el de la compra.
     insert into entradas (compra_id, funcion_id, butaca_id, precio_pagado)
     values (v_compra_id, p_funcion_id, v_reserva.butaca_id, v_precio);
   end loop;
 
-  -- Candy comprado
   insert into compra_items (compra_id, tipo, referencia_id, cantidad, precio_unitario)
   select v_compra_id, x.tipo::tipo_item_compra, x.id, x.cantidad,
          case when x.tipo = 'producto'
@@ -321,14 +299,12 @@ begin
               else (select precio_fijo from combos where id = x.id) end
   from jsonb_to_recordset(coalesce(p_items, '[]'::jsonb)) as x(tipo text, id uuid, cantidad int);
 
-  -- Productos canjeados con puntos: se suman al candy a retirar, con precio 0.
   insert into compra_items (compra_id, tipo, referencia_id, cantidad, precio_unitario)
   select v_compra_id, 'producto', r.producto_id, x.cantidad, 0
   from jsonb_to_recordset(coalesce(p_canjes, '[]'::jsonb)) as x(recompensa_id uuid, cantidad int)
   join recompensas r on r.id = x.recompensa_id
   where r.tipo = 'producto_candy' and r.producto_id is not null;
 
-  -- Historial de canjes
   insert into puntos_historial (usuario_id, tipo, cantidad, compra_id, recompensa_id)
   select v_usuario, 'canjeado', r.puntos_requeridos * x.cantidad, v_compra_id, r.id
   from jsonb_to_recordset(coalesce(p_canjes, '[]'::jsonb)) as x(recompensa_id uuid, cantidad int)
@@ -355,10 +331,6 @@ $$;
 
 grant execute on function public.confirmar_compra(uuid, text, text, jsonb, text, boolean, jsonb, text, text) to anon, authenticated;
 
-
--- ---------- 5. Limpieza: invitados creados antes de correr este script ----------
--- Con el trigger viejo los invitados recibían un perfil y compraban como clientes
--- (cupón de bienvenida y puntos). Sus compras pasan a ser de invitado y se borra ese perfil.
 update public.compras c
 set usuario_id = null,
     puntos_ganados = 0,

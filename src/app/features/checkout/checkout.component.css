@@ -48,7 +48,6 @@
 }
 
 .checkout__cuerpo {
-  /* ocupa el resto de la pantalla: cada columna scrollea por su cuenta */
   flex: 1 1 0;
   min-height: 0;
   display: grid;
@@ -61,7 +60,6 @@
 .checkout__resumen {
   padding: 1.1rem 1.25rem;
   display: grid;
-  /* el contenido nunca ensancha la tarjeta: si el mapa no entra, scrollea él de costado */
   grid-template-columns: minmax(0, 1fr);
   gap: 0.75rem;
 }
@@ -237,7 +235,6 @@
     padding: 0.85rem 0.75rem 2rem;
   }
 
-  /* En celu: arriba el mapa y el candy (scrollean), abajo "Tu compra" siempre a la vista */
   .checkout__cuerpo {
     display: flex;
     flex-direction: column;
@@ -262,7 +259,6 @@
   }
 }
 
-/* ---------- Candy ---------- */
 .checkout__izquierda {
   display: grid;
   align-content: start;
@@ -392,7 +388,6 @@
   font-size: 0.85rem;
 }
 
-/* ---------- Cupón, canjes y crédito ---------- */
 .checkout__cupon-form {
   display: flex;
   gap: 8px;

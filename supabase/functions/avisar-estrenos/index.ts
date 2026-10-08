@@ -1,11 +1,3 @@
-// Edge Function "avisar-estrenos"
-// Cuando ya se pueden comprar entradas de una película (preventa o estreno), avisa a quienes
-// activaron la alerta: les manda un mail a la dirección de su cuenta. La llama el admin desde el panel.
-// (Además, la app les muestra un aviso la próxima vez que entran: ver supabase/avisos_app.sql.)
-//
-// Secretos que hay que cargar en Supabase (Edge Functions → Secrets):
-//   BREVO_API_KEY y MAIL_REMITENTE (el mail verificado en Brevo desde el que salen los avisos)
-// SUPABASE_URL y SUPABASE_SERVICE_ROLE_KEY ya vienen cargados por Supabase.
 
 import { createClient } from 'npm:@supabase/supabase-js@2';
 
@@ -23,7 +15,6 @@ function responder(cuerpo: unknown, status = 200) {
   });
 }
 
-// Manda el mail con la API de Brevo. Devuelve true si Brevo lo aceptó.
 async function enviarMail(para: string, nombre: string, asunto: string, html: string): Promise<boolean> {
   const respuesta = await fetch('https://api.brevo.com/v3/smtp/email', {
     method: 'POST',
@@ -50,10 +41,8 @@ Deno.serve(async (req) => {
     return responder({ error: 'Faltan los secretos BREVO_API_KEY y MAIL_REMITENTE en Supabase' }, 500);
   }
 
-  // Cliente con service role: puede leer los mails de todos.
   const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
 
-  // Solo un admin puede disparar el envío.
   const token = (req.headers.get('Authorization') ?? '').replace('Bearer ', '');
   const { data: usuario } = await supabase.auth.getUser(token);
   if (!usuario.user) return responder({ error: 'Tenés que iniciar sesión' }, 401);
@@ -73,7 +62,6 @@ Deno.serve(async (req) => {
     const enlace = `${URL_APP}/pelicula/${alerta.pelicula_id}`;
     let avisado = false;
 
-    // Mail a la dirección de la cuenta.
     const { data: cliente } = await supabase
       .from('perfiles')
       .select('nombre, email')
@@ -96,7 +84,6 @@ Deno.serve(async (req) => {
       }
     }
 
-    // Solo se marca como avisada si le llegó el mail; si no, queda pendiente para el próximo envío.
     if (avisado) {
       await supabase.from('alertas_estreno').update({ notificado: true }).eq('id', alerta.alerta_id);
     } else {

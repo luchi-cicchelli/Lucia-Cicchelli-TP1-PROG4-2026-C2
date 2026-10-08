@@ -11,7 +11,6 @@ import { ImagenRespaldoDirective, POSTER_RESPALDO } from '../../../shared/direct
 import { DuracionPipe } from '../../../shared/pipes/duracion.pipe';
 import { TextoCortoPipe } from '../../../shared/pipes/texto-corto.pipe';
 
-// Si la película tiene preventa, el precio y los días son obligatorios.
 const preventaValida: ValidatorFn = (grupo: AbstractControl): ValidationErrors | null => {
   if (!grupo.get('preventa')?.value) return null;
   const precio = Number(grupo.get('precio_preventa')?.value);
@@ -181,7 +180,6 @@ export class PeliculasAdminComponent implements OnInit {
     }
   }
 
-  // Llama a la Edge Function que manda los mails de "ya salieron las entradas".
   async enviarAlertas() {
     this.enviandoAlertas.set(true);
     this.error.set('');

@@ -10,7 +10,6 @@ export interface ResultadoEnvio {
   sinEnviar: number;
 }
 
-// Aviso que se muestra dentro de la app cuando abre la venta de una película con alerta.
 export interface AvisoEstreno {
   alerta_id: string;
   pelicula_id: string;
@@ -23,11 +22,9 @@ export class AlertasService {
   private readonly supabase = inject(SupabaseService);
   private readonly http = inject(HttpClient);
 
-  // Ids de las películas con alerta activa del usuario logueado.
   readonly mias = signal<ReadonlySet<string>>(new Set());
   private cargadasDe: string | null = null;
 
-  // Avisos "abrió la venta" que todavía no se mostraron en la app.
   readonly avisos = signal<AvisoEstreno[]>([]);
   private avisosDe: string | null = null;
 
@@ -68,8 +65,6 @@ export class AlertasService {
     });
   }
 
-  // Al entrar a la app: trae las alertas cuyas películas ya abrieron la venta (preventa o estreno)
-  // y que todavía no se avisaron en la app. Una vez por usuario por cada vez que se abre la app.
   async buscarAvisos(usuarioId: string) {
     if (this.avisosDe === usuarioId) return;
     this.avisosDe = usuarioId;
@@ -78,7 +73,6 @@ export class AlertasService {
     this.avisos.set(data ?? []);
   }
 
-  // Cuando el usuario cierra el aviso (o va a la película), se marca como visto para no volver a mostrarlo.
   async marcarVisto(aviso: AvisoEstreno) {
     this.avisos.update((lista) => lista.filter((a) => a.alerta_id !== aviso.alerta_id));
     const { error } = await this.supabase.client
@@ -93,8 +87,6 @@ export class AlertasService {
     this.avisosDe = null;
   }
 
-  // Admin: llama a la Edge Function que manda los mails pendientes.
-  // Los headers (apikey y token) los agrega el interceptor.
   enviarPendientes(): Promise<ResultadoEnvio> {
     return firstValueFrom(
       this.http.post<ResultadoEnvio>(`${environment.supabaseUrl}/functions/v1/avisar-estrenos`, {})

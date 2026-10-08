@@ -91,8 +91,6 @@
   background: color-mix(in srgb, var(--color-accesible) 25%, transparent);
 }
 
-/* Las butacas accesibles ocupan el lugar de dos butacas comunes (más anchas y altas),
-   así entra una silla de ruedas. 2 + 10 + 2 llenan exactamente los bloques de 4, 20 y 4. */
 .mapa__fila--acc .butaca--accesible {
   width: calc(2 * var(--butaca) + var(--separacion));
   height: calc(1.6 * var(--butaca));

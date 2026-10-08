@@ -63,7 +63,6 @@ export class CompraExitosaComponent implements OnInit {
     if (!compra) return;
     this.generandoPdf.set(true);
     try {
-      // jsPDF se carga recién cuando se necesita, para no agrandar la carga inicial.
       const { jsPDF } = await import('jspdf');
       const pdf = new jsPDF({ unit: 'mm', format: 'a5', compress: true });
       const ancho = pdf.internal.pageSize.getWidth();
@@ -71,7 +70,6 @@ export class CompraExitosaComponent implements OnInit {
       const fecha = inicio.toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
       const hora = inicio.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
 
-      // Una sola página con un solo QR: sirve para todas las entradas y para el candy.
       pdf.setFillColor(212, 83, 126);
       pdf.rect(0, 0, ancho, 22, 'F');
       pdf.setTextColor(255, 255, 255);

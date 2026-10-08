@@ -2,7 +2,6 @@ export const environment = {
   production: true,
   supabaseUrl: 'https://ozlakkistyikyopgkkgt.supabase.co',
   supabaseAnonKey: 'sb_publishable_fVGSDRhyyLdzjw7NP8Qrkw_3QmXrDXG',
-  // Cuentas de prueba para los accesos rápidos del login (para la corrección del TP).
   accesosRapidos: [
     { etiqueta: 'Admin', email: 'admin@bijou.com', password: 'Bijou2026' },
     { etiqueta: 'Empleado', email: 'empleado@bijou.com', password: 'Bijou2026' },

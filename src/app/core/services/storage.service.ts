@@ -9,8 +9,6 @@ export class StorageService {
 
   constructor(private supabase: SupabaseService) {}
 
-  // Sube la imagen al bucket público y devuelve su URL.
-  // El nombre es un UUID para que dos archivos nunca se pisen.
   async subirImagen(archivo: File, carpeta: CarpetaImagenes): Promise<string> {
     const extension = archivo.name.split('.').pop()?.toLowerCase() || 'jpg';
     const ruta = `${carpeta}/${crypto.randomUUID()}.${extension}`;

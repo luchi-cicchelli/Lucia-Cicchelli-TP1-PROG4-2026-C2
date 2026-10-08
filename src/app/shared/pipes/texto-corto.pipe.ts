@@ -1,6 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
-// Corta el texto sin partir palabras y agrega "…".
 @Pipe({ name: 'textoCorto', standalone: true })
 export class TextoCortoPipe implements PipeTransform {
   transform(texto: string | null | undefined, largoMaximo = 100): string {

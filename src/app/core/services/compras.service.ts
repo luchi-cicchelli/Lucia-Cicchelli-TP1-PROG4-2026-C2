@@ -101,7 +101,6 @@ export class ComprasService {
     return data as unknown as MiCompra[];
   }
 
-  /** Devuelve el crédito que se acreditó. La base valida las 2 horas y que sea del usuario. */
   async cancelar(compraId: string): Promise<number> {
     const { data, error } = await this.supabase.client.rpc('cancelar_compra', { p_compra_id: compraId });
     if (error) throw new Error(error.message);

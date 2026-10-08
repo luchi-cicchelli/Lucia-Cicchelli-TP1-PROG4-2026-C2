@@ -7,7 +7,6 @@ import { HacePipe } from '../../../shared/pipes/hace.pipe';
 
 const POR_PAGINA = 20;
 
-// Filtros que agrupan varias acciones del log.
 const FILTROS = [
   { etiqueta: 'Todo', acciones: [] },
   { etiqueta: 'Funciones', acciones: ['creo_funciones', 'borro_funcion'] },
@@ -37,7 +36,6 @@ export class ActividadComponent implements OnInit {
   readonly error = signal('');
   readonly busqueda = signal('');
 
-  // Búsqueda local sobre lo ya cargado (por persona o detalle).
   readonly visibles = computed(() => {
     const texto = this.busqueda().trim().toLowerCase();
     if (!texto) return this.logs();

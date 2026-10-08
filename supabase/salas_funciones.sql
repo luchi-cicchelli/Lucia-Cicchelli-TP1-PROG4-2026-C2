@@ -1,6 +1,5 @@
 create extension if not exists btree_gist with schema extensions;
 
--- ---------- 1. Butacas automáticas al crear una sala ----------
 create or replace function public.generar_butacas(p_sala_id int)
 returns void
 language plpgsql
@@ -47,8 +46,6 @@ create trigger al_crear_sala
 
 do $$ begin perform public.generar_butacas(id) from public.salas; end $$;
 
-
--- ---------- 2. Nunca dos funciones en la misma sala (con 30 min de margen) ----------
 create or replace function public.rango_ocupado(p_inicio timestamptz, p_fin timestamptz)
 returns tsrange
 language sql
@@ -69,8 +66,6 @@ alter table public.funciones drop constraint if exists funciones_fin_despues_ini
 alter table public.funciones
   add constraint funciones_fin_despues_inicio check (fecha_hora_fin > fecha_hora_inicio);
 
-
--- ---------- 3. Crear funciones con asignación automática de sala ----------
 create or replace function public.crear_funciones(
   p_pelicula_id uuid,
   p_inicios timestamptz[],
@@ -181,8 +176,6 @@ $$;
 revoke execute on function public.crear_funciones from anon, public;
 grant execute on function public.crear_funciones to authenticated;
 
-
--- ---------- 4. Log al borrar una función ----------
 create or replace function public.log_borrar_funcion()
 returns trigger
 language plpgsql
@@ -204,8 +197,6 @@ create trigger log_borrar_funcion
   after delete on public.funciones
   for each row execute function public.log_borrar_funcion();
 
-
--- ---------- 5. RLS ----------
 alter table public.salas enable row level security;
 alter table public.butacas enable row level security;
 alter table public.funciones enable row level security;

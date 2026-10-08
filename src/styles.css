@@ -40,9 +40,6 @@
 
 * { box-sizing: border-box; }
 
-/* ---------- Estructura: la página no crece, el navbar queda fijo ----------
-   La app ocupa exactamente el alto de la pantalla. Lo que scrollea es el <main>
-   (y, en las pantallas con listas largas, solo el recuadro .pantalla__scroll). */
 html,
 body {
   height: 100%;
@@ -59,9 +56,6 @@ app-root {
   height: 100dvh;
 }
 
-/* Pantalla que ocupa todo el alto disponible: título, filtros y botones quedan quietos
-   y solo scrollea el recuadro .pantalla__scroll. Si la pantalla es muy baja, en vez de
-   cortar algo, scrollea el <main> (por eso el min-height). */
 .pantalla {
   display: flex;
   flex-direction: column;
@@ -84,10 +78,8 @@ app-root {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   align-content: start;
-  /* cada fila mide lo que su contenido: las tarjetas no se achican ni se recortan */
   grid-auto-rows: max-content;
   gap: 0.75rem;
-  /* un poquito de aire para que no se recorten bordes ni el foco */
   padding: 2px 4px 12px 2px;
   margin: -2px -4px 0 -2px;
   scrollbar-width: thin;
@@ -169,7 +161,6 @@ h1, h2, h3, .titulo {
   border: 1px solid var(--borde);
 }
 
-/* Los botones heredan fuente y color (evita texto negro sobre fondo oscuro). */
 button {
   font: inherit;
   color: inherit;
@@ -237,7 +228,6 @@ button {
   color: var(--rosa-acento);
 }
 
-/* ---------- Pantallas de admin ---------- */
 .admin {
   max-width: 1100px;
   margin: 0 auto;
@@ -285,7 +275,6 @@ button {
   gap: 8px;
 }
 
-/* En pantallas anchas, las listas largas van en dos columnas para scrollear menos */
 @media (min-width: 900px) {
   .admin__lista--doble {
     grid-template-columns: 1fr 1fr;
@@ -297,7 +286,6 @@ button {
   text-align: center;
 }
 
-/* ---------- Selector de cantidad (+ / −) ---------- */
 .stepper {
   display: inline-flex;
   align-items: center;

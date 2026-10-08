@@ -91,7 +91,6 @@
   color: var(--texto-secundario);
 }
 
-/* ---------- Versión compacta (las más vistas del inicio) ---------- */
 :host(.compacta) .tarjeta-peli {
   grid-template-columns: 64px minmax(0, 1fr);
   align-items: center;

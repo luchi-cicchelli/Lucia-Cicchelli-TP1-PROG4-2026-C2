@@ -5,9 +5,6 @@ import { environment } from '../../../environments/environment';
 import { AuthService } from '../services/auth.service';
 import { CargandoService } from '../services/cargando.service';
 
-// Las Edge Functions de Supabase piden la apikey y el token del usuario.
-// En vez de agregarlos en cada llamada, el interceptor los suma a toda petición a Supabase
-// y de paso prende/apaga la barra de carga.
 export const supabaseInterceptor: HttpInterceptorFn = (req, next) => {
   if (!req.url.startsWith(environment.supabaseUrl)) {
     return next(req);

@@ -2,8 +2,6 @@ import { Formato, Idioma } from './funcion.model';
 import { TipoButaca } from './sala.model';
 import { ItemCandyCompra } from './candy.model';
 
-// Resultado de escanear el QR de una compra en la entrada a la sala:
-// se validan juntas todas sus entradas.
 export interface EntradaValidada {
   compra_id: string;
   codigo_manual: string;

@@ -37,7 +37,6 @@ export class PeliculaDetalleComponent implements OnInit {
   private readonly resenasService = inject(ResenasService);
   readonly auth = inject(AuthService);
 
-  // Viene del parámetro :id de la ruta (withComponentInputBinding).
   readonly id = input.required<string>();
 
   readonly pelicula = signal<PeliculaCartelera | null>(null);
@@ -47,7 +46,6 @@ export class PeliculaDetalleComponent implements OnInit {
   readonly error = signal('');
   readonly diaElegido = signal<string | null>(null);
 
-  // Mi reseña
   readonly miResena = signal<MiResena | null>(null);
   readonly puedeResenar = signal(false);
   readonly editandoResena = signal(false);
@@ -86,7 +84,6 @@ export class PeliculaDetalleComponent implements OnInit {
     return !!restriccion && edad !== null && edad < restriccion;
   });
 
-  // Preventa y apertura de la venta (misma regla que en la base de datos).
   readonly ventaAbierta = computed(() => {
     const p = this.pelicula();
     return !!p && ventaAbierta(p);
@@ -178,7 +175,6 @@ export class PeliculaDetalleComponent implements OnInit {
     }
   }
 
-  // Recarga la lista y la película (para actualizar el promedio).
   private async recargarResenas() {
     const [pelicula, resenas] = await Promise.all([
       this.cartelera.obtener(this.id()),

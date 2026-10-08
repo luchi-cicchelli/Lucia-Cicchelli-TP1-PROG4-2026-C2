@@ -2,7 +2,6 @@ import { Routes } from '@angular/router';
 import { authGuard, ingresoGuard, sinCuentaGuard, rolGuard } from './core/guards/auth.guards';
 
 export const routes: Routes = [
-  // --- Hay que entrar (con cuenta o como invitado) ---
   {
     path: '',
     canActivate: [ingresoGuard],
@@ -18,7 +17,6 @@ export const routes: Routes = [
       )
   },
   {
-    // Los invitados también pueden comprar.
     path: 'checkout/:funcionId',
     canActivate: [ingresoGuard],
     loadComponent: () =>
@@ -32,7 +30,6 @@ export const routes: Routes = [
       import('./features/compra-exitosa/compra-exitosa.component').then((m) => m.CompraExitosaComponent)
   },
 
-  // --- Login y registro (sin cuenta; un invitado puede entrar para crearse una) ---
   {
     path: 'login',
     canActivate: [sinCuentaGuard],
@@ -46,7 +43,6 @@ export const routes: Routes = [
       import('./features/auth/registro/registro.component').then((m) => m.RegistroComponent)
   },
 
-  // --- Cliente logueado ---
   {
     path: 'perfil',
     canActivate: [authGuard],
@@ -54,7 +50,6 @@ export const routes: Routes = [
       import('./features/perfil/perfil.component').then((m) => m.PerfilComponent)
   },
 
-  // --- Admin ---
   {
     path: 'admin',
     canActivate: [rolGuard(['admin'])],
@@ -128,7 +123,6 @@ export const routes: Routes = [
     ]
   },
 
-  // --- Empleado (el admin también puede entrar) ---
   {
     path: 'empleado/escaner',
     canActivate: [rolGuard(['empleado', 'admin'])],

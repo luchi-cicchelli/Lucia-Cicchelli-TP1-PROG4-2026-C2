@@ -13,7 +13,6 @@ export interface Cupon {
 
 export type CuponFormValue = Omit<Cupon, 'id'>;
 
-/** Lo que devuelve la base al validar un código. */
 export interface CuponValido {
   codigo: string;
   porcentaje: number;
