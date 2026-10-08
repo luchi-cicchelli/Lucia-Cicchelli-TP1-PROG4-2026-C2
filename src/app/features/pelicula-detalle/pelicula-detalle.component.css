@@ -1,16 +1,47 @@
 .detalle {
-  max-width: 1000px;
+  max-width: 1100px;
   margin: 0 auto;
-  padding: 1.25rem 1.5rem 2.5rem;
-  display: grid;
-  gap: 1.75rem;
+  padding: 1rem 1.5rem 0.75rem;
+  gap: 0.75rem;
+}
+
+/* En compu: info de la película a la izquierda y funciones/reseñas a la derecha.
+   Cada columna scrollea por su cuenta si no entra; la página no se mueve. */
+@media (min-width: 901px) {
+  .detalle {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    grid-template-rows: auto minmax(0, 1fr);
+    column-gap: 2rem;
+  }
+
+  .detalle > .detalle__volver,
+  .detalle > .detalle__vacio,
+  .detalle > .alerta {
+    grid-column: 1 / -1;
+  }
+
+  .detalle__cabecera {
+    min-height: 0;
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+
+  .detalle > .detalle__cuerpo {
+    min-height: 0;
+  }
+}
+
+.detalle__cuerpo {
+  gap: 1.5rem;
 }
 
 .detalle__volver {
   color: var(--texto-secundario);
   text-decoration: none;
   font-size: 0.85rem;
-  margin-bottom: -1rem;
+  justify-self: start;
+  align-self: start;
 }
 
 .detalle__volver:hover {
@@ -31,8 +62,9 @@
 
 .detalle__cabecera {
   display: grid;
-  grid-template-columns: 220px 1fr;
-  gap: 2rem;
+  grid-template-columns: 150px minmax(0, 1fr);
+  gap: 1.25rem;
+  align-content: start;
   align-items: start;
 }
 
@@ -65,11 +97,11 @@
 
 .detalle__info {
   display: grid;
-  gap: 14px;
+  gap: 10px;
 }
 
 .detalle__info h1 {
-  font-size: 2.25rem;
+  font-size: 1.75rem;
   line-height: 1.15;
 }
 
@@ -290,10 +322,24 @@
   margin-top: 0.75rem;
 }
 
+@media (max-width: 900px) {
+  .detalle__seccion h2 {
+    font-size: 1.15rem;
+  }
+
+  /* La info de arriba nunca se come toda la pantalla: si la sinopsis es larga, scrollea ella */
+  .detalle__cabecera {
+    max-height: 40vh;
+    max-height: 40dvh;
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+}
+
 @media (max-width: 700px) {
   .detalle {
-    padding: 0.85rem 0.75rem 2rem;
-    gap: 1.25rem;
+    padding: 0.75rem 0.75rem 0.5rem;
+    gap: 0.6rem;
   }
 
   /* En celular el póster va chico al costado y el texto lo rodea, en vez de ocupar toda la pantalla */
@@ -303,7 +349,7 @@
 
   .detalle__poster {
     float: left;
-    width: 110px;
+    width: 90px;
     margin: 0 0.85rem 0.5rem 0;
   }
 

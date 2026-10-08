@@ -1,4 +1,4 @@
-<section class="admin">
+<section class="admin pantalla">
   <a routerLink="/admin" class="admin__volver">← Panel</a>
 
   <header class="admin__encabezado">
@@ -22,165 +22,167 @@
   }
 
   <!-- ================= PRODUCTOS ================= -->
-  @if (pestania() === 'productos') {
-    @if (formProductoAbierto()) {
-      <form class="tarjeta candy__form" [formGroup]="formProducto" (ngSubmit)="guardarProducto()" novalidate>
-        <h2 class="titulo">{{ editandoProductoId() ? 'Editar producto' : 'Nuevo producto' }}</h2>
-        <div class="candy__fila">
-          <label class="campo">
-            Nombre
-            <input class="input" formControlName="nombre" />
+  <div class="pantalla__scroll">
+    @if (pestania() === 'productos') {
+      @if (formProductoAbierto()) {
+        <form class="tarjeta candy__form" [formGroup]="formProducto" (ngSubmit)="guardarProducto()" novalidate>
+          <h2 class="titulo">{{ editandoProductoId() ? 'Editar producto' : 'Nuevo producto' }}</h2>
+          <div class="candy__fila">
+            <label class="campo">
+              Nombre
+              <input class="input" formControlName="nombre" />
+            </label>
+            <label class="campo">
+              Categoría
+              <input class="input" formControlName="categoria" list="categorias" placeholder="Pochoclos, Bebidas…" />
+              <datalist id="categorias">
+                @for (c of categorias(); track c) {
+                  <option [value]="c"></option>
+                }
+              </datalist>
+            </label>
+          </div>
+          <div class="candy__fila">
+            <label class="campo">
+              Precio
+              <input class="input" type="number" min="1" formControlName="precio" placeholder="$" />
+            </label>
+          </div>
+          <div class="campo">
+            Imagen (opcional)
+            <app-subir-imagen carpeta="candy" [url]="formProducto.controls.imagen_url.value" (subida)="formProducto.controls.imagen_url.setValue($event)" />
+          </div>
+          <label class="candy__check">
+            <input type="checkbox" formControlName="activo" /> Disponible para la venta
           </label>
-          <label class="campo">
-            Categoría
-            <input class="input" formControlName="categoria" list="categorias" placeholder="Pochoclos, Bebidas…" />
-            <datalist id="categorias">
-              @for (c of categorias(); track c) {
-                <option [value]="c"></option>
-              }
-            </datalist>
-          </label>
-        </div>
-        <div class="candy__fila">
-          <label class="campo">
-            Precio
-            <input class="input" type="number" min="1" formControlName="precio" placeholder="$" />
-          </label>
-        </div>
-        <div class="campo">
-          Imagen (opcional)
-          <app-subir-imagen carpeta="candy" [url]="formProducto.controls.imagen_url.value" (subida)="formProducto.controls.imagen_url.setValue($event)" />
-        </div>
-        <label class="candy__check">
-          <input type="checkbox" formControlName="activo" /> Disponible para la venta
-        </label>
-        @if (formProducto.invalid && formProducto.touched) {
-          <p class="error-texto">Completá nombre, categoría y un precio mayor a cero.</p>
-        }
-        <div class="candy__acciones">
-          <button type="submit" class="boton">Guardar</button>
-          <button type="button" class="boton boton--secundario" (click)="formProductoAbierto.set(false)">Cancelar</button>
-        </div>
-      </form>
-    } @else {
-      <button type="button" class="boton candy__nuevo" (click)="nuevoProducto()">+ Nuevo producto</button>
-    }
-
-    @for (grupo of productosPorCategoria(); track grupo.categoria) {
-      <div class="candy__grupo">
-        <h3 class="candy__categoria">{{ grupo.categoria }}</h3>
-        <div class="admin__lista admin__lista--doble">
-          @for (p of grupo.productos; track p.id) {
-            <div class="tarjeta candy__item" [class.candy__item--inactivo]="!p.activo">
-              @if (p.imagen_url) {
-                <img class="candy__foto" [src]="p.imagen_url" [alt]="p.nombre" loading="lazy" />
-              } @else {
-                <span class="candy__foto candy__foto--vacia">Sin foto</span>
-              }
-              <div class="candy__datos">
-                <p class="candy__nombre">
-                  {{ p.nombre }}
-                  @if (!p.activo) {
-                    <span class="candy__oculto">(no disponible)</span>
-                  }
-                </p>
-                <p class="candy__precio">{{ p.precio | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }}</p>
-              </div>
-              <div class="candy__botones">
-                <button type="button" class="boton boton--secundario boton--chico" (click)="editarProducto(p)">Editar</button>
-                <button type="button" class="boton boton--secundario boton--chico" (click)="toggleProducto(p)">
-                  {{ p.activo ? 'Pausar' : 'Activar' }}
-                </button>
-              </div>
-            </div>
+          @if (formProducto.invalid && formProducto.touched) {
+            <p class="error-texto">Completá nombre, categoría y un precio mayor a cero.</p>
           }
-        </div>
-      </div>
-    } @empty {
-      @if (!cargando()) {
-        <p class="admin__vacio">Todavía no hay productos.</p>
+          <div class="candy__acciones">
+            <button type="submit" class="boton">Guardar</button>
+            <button type="button" class="boton boton--secundario" (click)="formProductoAbierto.set(false)">Cancelar</button>
+          </div>
+        </form>
+      } @else {
+        <button type="button" class="boton candy__nuevo" (click)="nuevoProducto()">+ Nuevo producto</button>
       }
-    }
-  }
 
-  <!-- ================= COMBOS ================= -->
-  @if (pestania() === 'combos') {
-    @if (formComboAbierto()) {
-      <form class="tarjeta candy__form" [formGroup]="formCombo" (ngSubmit)="guardarCombo()" novalidate>
-        <h2 class="titulo">{{ editandoComboId() ? 'Editar combo' : 'Nuevo combo' }}</h2>
-        <div class="candy__fila">
-          <label class="campo">
-            Nombre
-            <input class="input" formControlName="nombre" placeholder="Combo Clásico" />
-          </label>
-          <label class="campo">
-            Precio fijo (entrada incluida)
-            <input class="input" type="number" min="1" formControlName="precio_fijo" placeholder="$" />
-          </label>
-        </div>
-
-        <div class="campo">
-          Incluye: 1 entrada general +
-          <div class="candy__items" formArrayName="items">
-            @for (item of itemsCombo.controls; track $index; let i = $index) {
-              <div class="candy__item-combo" [formGroupName]="i">
-                <input class="input candy__cantidad" type="number" min="1" max="10" formControlName="cantidad" aria-label="Cantidad" />
-                <select class="input" formControlName="producto_id" aria-label="Producto">
-                  <option value="" disabled>Elegí un producto</option>
-                  @for (p of productos(); track p.id) {
-                    <option [value]="p.id">{{ p.nombre }}</option>
-                  }
-                </select>
-                <button type="button" class="candy__quitar" (click)="quitarItem(i)" aria-label="Quitar producto">×</button>
+      @for (grupo of productosPorCategoria(); track grupo.categoria) {
+        <div class="candy__grupo">
+          <h3 class="candy__categoria">{{ grupo.categoria }}</h3>
+          <div class="admin__lista admin__lista--doble">
+            @for (p of grupo.productos; track p.id) {
+              <div class="tarjeta candy__item" [class.candy__item--inactivo]="!p.activo">
+                @if (p.imagen_url) {
+                  <img class="candy__foto" [src]="p.imagen_url" [alt]="p.nombre" loading="lazy" />
+                } @else {
+                  <span class="candy__foto candy__foto--vacia">Sin foto</span>
+                }
+                <div class="candy__datos">
+                  <p class="candy__nombre">
+                    {{ p.nombre }}
+                    @if (!p.activo) {
+                      <span class="candy__oculto">(no disponible)</span>
+                    }
+                  </p>
+                  <p class="candy__precio">{{ p.precio | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }}</p>
+                </div>
+                <div class="candy__botones">
+                  <button type="button" class="boton boton--secundario boton--chico" (click)="editarProducto(p)">Editar</button>
+                  <button type="button" class="boton boton--secundario boton--chico" (click)="toggleProducto(p)">
+                    {{ p.activo ? 'Pausar' : 'Activar' }}
+                  </button>
+                </div>
               </div>
             }
-            <button type="button" class="boton boton--secundario boton--chico" (click)="agregarItem()">+ Producto</button>
-          </div>
-        </div>
-
-        <label class="candy__check">
-          <input type="checkbox" formControlName="activo" /> Disponible para la venta
-        </label>
-        @if (formCombo.invalid && formCombo.touched) {
-          <p class="error-texto">Completá nombre, precio y al menos un producto.</p>
-        }
-        <div class="candy__acciones">
-          <button type="submit" class="boton">Guardar</button>
-          <button type="button" class="boton boton--secundario" (click)="formComboAbierto.set(false)">Cancelar</button>
-        </div>
-      </form>
-    } @else {
-      <button type="button" class="boton candy__nuevo" (click)="nuevoCombo()">+ Nuevo combo</button>
-    }
-
-    <div class="admin__lista admin__lista--doble">
-      @for (c of combos(); track c.id) {
-        <div class="tarjeta candy__item candy__item--combo" [class.candy__item--inactivo]="!c.activo">
-          <div>
-            <p class="candy__nombre">
-              {{ c.nombre }}
-              @if (!c.activo) {
-                <span class="candy__oculto">(no disponible)</span>
-              }
-            </p>
-            <p class="candy__detalle">{{ describirCombo(c) }}</p>
-            <p class="candy__precio">
-              {{ c.precio_fijo | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }}
-              <span class="candy__suelto">· productos sueltos: {{ precioSuelto(c) | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }} + entrada</span>
-            </p>
-          </div>
-          <div class="candy__botones">
-            <button type="button" class="boton boton--secundario boton--chico" (click)="editarCombo(c)">Editar</button>
-            <button type="button" class="boton boton--secundario boton--chico" (click)="toggleCombo(c)">
-              {{ c.activo ? 'Pausar' : 'Activar' }}
-            </button>
           </div>
         </div>
       } @empty {
         @if (!cargando()) {
-          <p class="admin__vacio">Todavía no hay combos.</p>
+          <p class="admin__vacio">Todavía no hay productos.</p>
         }
       }
-    </div>
-  }
+    }
+
+    <!-- ================= COMBOS ================= -->
+    @if (pestania() === 'combos') {
+      @if (formComboAbierto()) {
+        <form class="tarjeta candy__form" [formGroup]="formCombo" (ngSubmit)="guardarCombo()" novalidate>
+          <h2 class="titulo">{{ editandoComboId() ? 'Editar combo' : 'Nuevo combo' }}</h2>
+          <div class="candy__fila">
+            <label class="campo">
+              Nombre
+              <input class="input" formControlName="nombre" placeholder="Combo Clásico" />
+            </label>
+            <label class="campo">
+              Precio fijo (entrada incluida)
+              <input class="input" type="number" min="1" formControlName="precio_fijo" placeholder="$" />
+            </label>
+          </div>
+
+          <div class="campo">
+            Incluye: 1 entrada general +
+            <div class="candy__items" formArrayName="items">
+              @for (item of itemsCombo.controls; track $index; let i = $index) {
+                <div class="candy__item-combo" [formGroupName]="i">
+                  <input class="input candy__cantidad" type="number" min="1" max="10" formControlName="cantidad" aria-label="Cantidad" />
+                  <select class="input" formControlName="producto_id" aria-label="Producto">
+                    <option value="" disabled>Elegí un producto</option>
+                    @for (p of productos(); track p.id) {
+                      <option [value]="p.id">{{ p.nombre }}</option>
+                    }
+                  </select>
+                  <button type="button" class="candy__quitar" (click)="quitarItem(i)" aria-label="Quitar producto">×</button>
+                </div>
+              }
+              <button type="button" class="boton boton--secundario boton--chico" (click)="agregarItem()">+ Producto</button>
+            </div>
+          </div>
+
+          <label class="candy__check">
+            <input type="checkbox" formControlName="activo" /> Disponible para la venta
+          </label>
+          @if (formCombo.invalid && formCombo.touched) {
+            <p class="error-texto">Completá nombre, precio y al menos un producto.</p>
+          }
+          <div class="candy__acciones">
+            <button type="submit" class="boton">Guardar</button>
+            <button type="button" class="boton boton--secundario" (click)="formComboAbierto.set(false)">Cancelar</button>
+          </div>
+        </form>
+      } @else {
+        <button type="button" class="boton candy__nuevo" (click)="nuevoCombo()">+ Nuevo combo</button>
+      }
+
+      <div class="admin__lista admin__lista--doble">
+        @for (c of combos(); track c.id) {
+          <div class="tarjeta candy__item candy__item--combo" [class.candy__item--inactivo]="!c.activo">
+            <div>
+              <p class="candy__nombre">
+                {{ c.nombre }}
+                @if (!c.activo) {
+                  <span class="candy__oculto">(no disponible)</span>
+                }
+              </p>
+              <p class="candy__detalle">{{ describirCombo(c) }}</p>
+              <p class="candy__precio">
+                {{ c.precio_fijo | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }}
+                <span class="candy__suelto">· productos sueltos: {{ precioSuelto(c) | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }} + entrada</span>
+              </p>
+            </div>
+            <div class="candy__botones">
+              <button type="button" class="boton boton--secundario boton--chico" (click)="editarCombo(c)">Editar</button>
+              <button type="button" class="boton boton--secundario boton--chico" (click)="toggleCombo(c)">
+                {{ c.activo ? 'Pausar' : 'Activar' }}
+              </button>
+            </div>
+          </div>
+        } @empty {
+          @if (!cargando()) {
+            <p class="admin__vacio">Todavía no hay combos.</p>
+          }
+        }
+      </div>
+    }
+  </div>
 </section>

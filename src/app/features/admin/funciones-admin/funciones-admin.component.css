@@ -227,7 +227,12 @@
   display: flex;
   gap: 6px;
   overflow-x: auto;
-  padding-bottom: 4px;
+  padding: 4px 0;
+  /* queda pegado arriba mientras scrolleás las funciones del día */
+  position: sticky;
+  top: -2px;
+  z-index: 2;
+  background: var(--fondo);
 }
 
 .funciones__dia-tab {

@@ -40,6 +40,58 @@
 
 * { box-sizing: border-box; }
 
+/* ---------- Estructura: la página no crece, el navbar queda fijo ----------
+   La app ocupa exactamente el alto de la pantalla. Lo que scrollea es el <main>
+   (y, en las pantallas con listas largas, solo el recuadro .pantalla__scroll). */
+html,
+body {
+  height: 100%;
+}
+
+body {
+  overflow: hidden;
+}
+
+app-root {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+}
+
+/* Pantalla que ocupa todo el alto disponible: título, filtros y botones quedan quietos
+   y solo scrollea el recuadro .pantalla__scroll. Si la pantalla es muy baja, en vez de
+   cortar algo, scrollea el <main> (por eso el min-height). */
+.pantalla {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 460px;
+}
+
+.pantalla > * {
+  flex-shrink: 0;
+}
+
+.pantalla > .pantalla__scroll {
+  flex: 1 1 0;
+  min-height: 220px;
+}
+
+.pantalla__scroll {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+  gap: 0.75rem;
+  /* un poquito de aire para que no se recorten bordes ni el foco */
+  padding: 2px 4px 12px 2px;
+  margin: -2px -4px 0 -2px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--rosa-suave) transparent;
+}
+
 body {
   margin: 0;
   background: var(--fondo);
@@ -187,18 +239,25 @@ button {
 .admin {
   max-width: 1100px;
   margin: 0 auto;
-  padding: 1.25rem 1rem 2rem;
+  padding: 1rem 1rem 0.75rem;
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 0.75rem;
+}
+
+.admin.pantalla {
+  display: flex;
 }
 
 @media (max-width: 600px) {
   .admin {
-    padding: 0.85rem 0.75rem 1.5rem;
+    padding: 0.75rem 0.75rem 0.5rem;
+    gap: 0.6rem;
   }
 }
 
 .admin__volver {
+  align-self: flex-start;
   color: var(--texto-secundario);
   text-decoration: none;
   font-size: 0.85rem;

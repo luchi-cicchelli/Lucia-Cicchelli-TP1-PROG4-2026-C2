@@ -1,4 +1,4 @@
-<section class="admin">
+<section class="admin pantalla">
   <a routerLink="/admin" class="admin__volver">← Panel</a>
 
   <header class="admin__encabezado pelis__encabezado">
@@ -23,146 +23,148 @@
     <p class="alerta alerta--ok">{{ mensaje() }}</p>
   }
 
-  @if (formAbierto()) {
-    <form class="tarjeta pelis__form" [formGroup]="form" (ngSubmit)="guardar()" novalidate>
-      <h2 class="titulo">{{ editandoId() ? 'Editar película' : 'Nueva película' }}</h2>
+  <div class="pantalla__scroll">
+    @if (formAbierto()) {
+      <form class="tarjeta pelis__form" [formGroup]="form" (ngSubmit)="guardar()" novalidate>
+        <h2 class="titulo">{{ editandoId() ? 'Editar película' : 'Nueva película' }}</h2>
 
-      <label class="campo">
-        Nombre
-        <input class="input" formControlName="nombre" />
-        @if (form.controls.nombre.touched && form.controls.nombre.invalid) {
-          <span class="error-texto">El nombre es obligatorio.</span>
-        }
-      </label>
-
-      <label class="campo">
-        Sinopsis
-        <textarea class="input" rows="3" formControlName="sinopsis"></textarea>
-        @if (form.controls.sinopsis.touched && form.controls.sinopsis.invalid) {
-          <span class="error-texto">La sinopsis es obligatoria.</span>
-        }
-      </label>
-
-      <div class="pelis__fila">
         <label class="campo">
-          Duración (minutos)
-          <input class="input" type="number" min="1" max="600" formControlName="duracion_minutos" />
-          @if (form.controls.duracion_minutos.touched && form.controls.duracion_minutos.invalid) {
-            <span class="error-texto">Entre 1 y 600 minutos.</span>
+          Nombre
+          <input class="input" formControlName="nombre" />
+          @if (form.controls.nombre.touched && form.controls.nombre.invalid) {
+            <span class="error-texto">El nombre es obligatorio.</span>
           }
         </label>
-        <div class="campo">
-          Fecha de estreno
-          <app-selector-fecha [valor]="form.controls.fecha_estreno.value" [anioDesde]="anioActual + 2" [anioHasta]="1950" etiqueta="Fecha de estreno" (cambio)="form.controls.fecha_estreno.setValue($event); form.controls.fecha_estreno.markAsTouched()" />
-        </div>
+
         <label class="campo">
-          Restricción de edad
-          <select class="input" formControlName="restriccion_edad">
-            <option [ngValue]="null">ATP</option>
-            <option [ngValue]="13">+13</option>
-            <option [ngValue]="18">+18</option>
-          </select>
-        </label>
-      </div>
-
-      <div class="campo">
-        Póster
-        <app-subir-imagen carpeta="peliculas" [url]="form.controls.imagen_url.value" (subida)="alSubirImagen($event)" />
-        <input class="input" formControlName="imagen_url" placeholder="…o pegá la URL de una imagen" />
-      </div>
-
-      <div class="campo">
-        Géneros
-        <div class="pelis__generos">
-          @for (g of generos(); track g.id) {
-            <button
-              type="button"
-              class="chip"
-              [class.chip--activo]="generoElegido(g.id)"
-              [attr.aria-pressed]="generoElegido(g.id)"
-              (click)="toggleGenero(g.id)"
-            >
-              {{ g.nombre }}
-            </button>
+          Sinopsis
+          <textarea class="input" rows="3" formControlName="sinopsis"></textarea>
+          @if (form.controls.sinopsis.touched && form.controls.sinopsis.invalid) {
+            <span class="error-texto">La sinopsis es obligatoria.</span>
           }
-        </div>
-      </div>
-
-      <div class="pelis__preventa">
-        <label class="pelis__check">
-          <input type="checkbox" formControlName="preventa" />
-          Abrir la venta antes del estreno con precio de preventa
         </label>
-        @if (form.controls.preventa.value) {
-          <div class="pelis__fila pelis__fila--dos">
-            <label class="campo">
-              Precio de preventa (entrada general)
-              <input class="input" type="number" min="1" formControlName="precio_preventa" placeholder="$" />
-            </label>
-            <label class="campo">
-              Días antes del estreno
-              <input class="input" type="number" min="1" max="30" formControlName="dias_preventa" />
-            </label>
+
+        <div class="pelis__fila">
+          <label class="campo">
+            Duración (minutos)
+            <input class="input" type="number" min="1" max="600" formControlName="duracion_minutos" />
+            @if (form.controls.duracion_minutos.touched && form.controls.duracion_minutos.invalid) {
+              <span class="error-texto">Entre 1 y 600 minutos.</span>
+            }
+          </label>
+          <div class="campo">
+            Fecha de estreno
+            <app-selector-fecha [valor]="form.controls.fecha_estreno.value" [anioDesde]="anioActual + 2" [anioHasta]="1950" etiqueta="Fecha de estreno" (cambio)="form.controls.fecha_estreno.setValue($event); form.controls.fecha_estreno.markAsTouched()" />
           </div>
-          <p class="pelis__ayuda">Desde el día del estreno, las entradas vuelven al precio normal de cada función.</p>
-          @if (form.hasError('preventaIncompleta') && form.touched) {
-            <span class="error-texto">Completá el precio y los días (entre 1 y 30).</span>
+          <label class="campo">
+            Restricción de edad
+            <select class="input" formControlName="restriccion_edad">
+              <option [ngValue]="null">ATP</option>
+              <option [ngValue]="13">+13</option>
+              <option [ngValue]="18">+18</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="campo">
+          Póster
+          <app-subir-imagen carpeta="peliculas" [url]="form.controls.imagen_url.value" (subida)="alSubirImagen($event)" />
+          <input class="input" formControlName="imagen_url" placeholder="…o pegá la URL de una imagen" />
+        </div>
+
+        <div class="campo">
+          Géneros
+          <div class="pelis__generos">
+            @for (g of generos(); track g.id) {
+              <button
+                type="button"
+                class="chip"
+                [class.chip--activo]="generoElegido(g.id)"
+                [attr.aria-pressed]="generoElegido(g.id)"
+                (click)="toggleGenero(g.id)"
+              >
+                {{ g.nombre }}
+              </button>
+            }
+          </div>
+        </div>
+
+        <div class="pelis__preventa">
+          <label class="pelis__check">
+            <input type="checkbox" formControlName="preventa" />
+            Abrir la venta antes del estreno con precio de preventa
+          </label>
+          @if (form.controls.preventa.value) {
+            <div class="pelis__fila pelis__fila--dos">
+              <label class="campo">
+                Precio de preventa (entrada general)
+                <input class="input" type="number" min="1" formControlName="precio_preventa" placeholder="$" />
+              </label>
+              <label class="campo">
+                Días antes del estreno
+                <input class="input" type="number" min="1" max="30" formControlName="dias_preventa" />
+              </label>
+            </div>
+            <p class="pelis__ayuda">Desde el día del estreno, las entradas vuelven al precio normal de cada función.</p>
+            @if (form.hasError('preventaIncompleta') && form.touched) {
+              <span class="error-texto">Completá el precio y los días (entre 1 y 30).</span>
+            }
           }
-        }
-      </div>
-
-      <label class="pelis__check">
-        <input type="checkbox" formControlName="activa" />
-        Visible para los clientes
-      </label>
-
-      <div class="pelis__acciones">
-        <button type="submit" class="boton" [disabled]="guardando()">
-          {{ guardando() ? 'Guardando…' : 'Guardar' }}
-        </button>
-        <button type="button" class="boton boton--secundario" (click)="formAbierto.set(false)">Cancelar</button>
-      </div>
-    </form>
-  }
-
-  @if (cargando()) {
-    <p class="admin__vacio">Cargando…</p>
-  }
-
-  <div class="admin__lista admin__lista--doble">
-    @for (p of peliculas(); track p.id) {
-      <div class="tarjeta pelis__item" [class.pelis__item--oculta]="!p.activa">
-        <img class="pelis__poster" [src]="p.imagen_url || posterRespaldo" [alt]="'Póster de ' + p.nombre" loading="lazy" appImagenRespaldo />
-        <div class="pelis__info">
-          <p class="pelis__nombre">
-            {{ p.nombre }}
-            @if (!p.activa) {
-              <span class="pelis__oculta">(oculta)</span>
-            }
-          </p>
-          <p class="pelis__detalle">
-            {{ p.duracion_minutos | duracion }} · Estreno {{ estreno(p) | date: 'd/MM/yyyy' }}
-            · {{ p.restriccion_edad ? '+' + p.restriccion_edad : 'ATP' }}
-            @if (p.preventa) {
-              · Preventa {{ p.dias_preventa }} días
-            }
-            @if (p.generos.length) {
-              · {{ generosTexto(p) }}
-            }
-          </p>
-          <p class="pelis__sinopsis">{{ p.sinopsis | textoCorto: 110 }}</p>
         </div>
-        <div class="pelis__botones">
-          <button type="button" class="boton boton--secundario boton--chico" (click)="editar(p)">Editar</button>
-          <button type="button" class="boton boton--secundario boton--chico" (click)="toggleActiva(p)">
-            {{ p.activa ? 'Ocultar' : 'Mostrar' }}
+
+        <label class="pelis__check">
+          <input type="checkbox" formControlName="activa" />
+          Visible para los clientes
+        </label>
+
+        <div class="pelis__acciones">
+          <button type="submit" class="boton" [disabled]="guardando()">
+            {{ guardando() ? 'Guardando…' : 'Guardar' }}
           </button>
+          <button type="button" class="boton boton--secundario" (click)="formAbierto.set(false)">Cancelar</button>
         </div>
-      </div>
-    } @empty {
-      @if (!cargando()) {
-        <p class="admin__vacio">Todavía no cargaste ninguna película.</p>
-      }
+      </form>
     }
+
+    @if (cargando()) {
+      <p class="admin__vacio">Cargando…</p>
+    }
+
+    <div class="admin__lista admin__lista--doble">
+      @for (p of peliculas(); track p.id) {
+        <div class="tarjeta pelis__item" [class.pelis__item--oculta]="!p.activa">
+          <img class="pelis__poster" [src]="p.imagen_url || posterRespaldo" [alt]="'Póster de ' + p.nombre" loading="lazy" appImagenRespaldo />
+          <div class="pelis__info">
+            <p class="pelis__nombre">
+              {{ p.nombre }}
+              @if (!p.activa) {
+                <span class="pelis__oculta">(oculta)</span>
+              }
+            </p>
+            <p class="pelis__detalle">
+              {{ p.duracion_minutos | duracion }} · Estreno {{ estreno(p) | date: 'd/MM/yyyy' }}
+              · {{ p.restriccion_edad ? '+' + p.restriccion_edad : 'ATP' }}
+              @if (p.preventa) {
+                · Preventa {{ p.dias_preventa }} días
+              }
+              @if (p.generos.length) {
+                · {{ generosTexto(p) }}
+              }
+            </p>
+            <p class="pelis__sinopsis">{{ p.sinopsis | textoCorto: 110 }}</p>
+          </div>
+          <div class="pelis__botones">
+            <button type="button" class="boton boton--secundario boton--chico" (click)="editar(p)">Editar</button>
+            <button type="button" class="boton boton--secundario boton--chico" (click)="toggleActiva(p)">
+              {{ p.activa ? 'Ocultar' : 'Mostrar' }}
+            </button>
+          </div>
+        </div>
+      } @empty {
+        @if (!cargando()) {
+          <p class="admin__vacio">Todavía no cargaste ninguna película.</p>
+        }
+      }
+    </div>
   </div>
 </section>

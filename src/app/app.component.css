@@ -1,3 +1,22 @@
+app-navbar,
+.avisos {
+  flex-shrink: 0;
+}
+
+/* El main ocupa el resto del alto y es lo único que scrollea (el navbar no se mueve). */
+main {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* El componente de cada ruta ocupa todo el alto del main (lo usan las pantallas .pantalla). */
+main > :not(router-outlet) {
+  display: block;
+  height: 100%;
+}
+
 .barra-carga {
   position: fixed;
   top: 0;

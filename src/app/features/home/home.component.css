@@ -1,50 +1,115 @@
+/* El inicio ocupa justo la pantalla: arriba las más vistas (chiquitas) y abajo
+   la cartelera, donde solo scrollea la grilla de películas. */
 .home {
   max-width: 1100px;
   margin: 0 auto;
-  padding: 1.25rem 1.5rem 2.5rem;
-  display: grid;
-  gap: 2rem;
-}
-
-.home__seccion {
-  display: grid;
+  padding: 1rem 1.5rem 0.75rem;
   gap: 0.85rem;
 }
 
-.home__encabezado h1,
-.home__encabezado h2 {
-  font-size: 1.45rem;
-  margin-bottom: 2px;
+.home__top {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.home__encabezado {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  column-gap: 12px;
+}
+
+.home__encabezado h1 {
+  font-size: 1.35rem;
 }
 
 .home__encabezado p {
   margin: 0;
   color: var(--texto-secundario);
-  font-size: 0.9rem;
+  font-size: 0.85rem;
 }
 
 .home__destacadas {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1rem;
-  max-width: 560px;
+  gap: 0.75rem;
+  max-width: 900px;
+}
+
+/* ---------- Cartelera / Próximamente ---------- */
+.home__cartelera {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.home__cartelera > * {
+  flex-shrink: 0;
+}
+
+.home__cartelera > .pantalla__scroll {
+  flex: 1 1 0;
+  min-height: 160px;
+}
+
+.home__pestanias {
+  display: flex;
+  gap: 1.25rem;
+  border-bottom: 1px solid var(--borde);
+}
+
+.home__pestania {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  padding: 6px 2px;
+  font-family: var(--fuente-titulo);
+  font-size: 1.2rem;
+  color: var(--texto-secundario);
+  cursor: pointer;
+}
+
+.home__pestania span {
+  font-family: var(--fuente-texto);
+  font-size: 0.75rem;
+  color: var(--texto-muted);
+}
+
+.home__pestania--activa {
+  color: var(--texto);
+  border-bottom-color: var(--rosa-acento);
+}
+
+.home__pestania--activa span {
+  color: var(--rosa-acento);
+}
+
+.home__ayuda {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--texto-secundario);
 }
 
 .home__filtros {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 10px;
+  gap: 8px 10px;
 }
 
 .home__buscador {
-  max-width: 320px;
+  max-width: 300px;
+  padding: 8px 12px;
 }
 
 .home__generos {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
+  min-width: 0;
 }
 
 .home__generos .chip {
@@ -61,9 +126,12 @@
 }
 
 .home__grilla {
-  display: grid;
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   gap: 1rem;
+}
+
+.home__grilla--proximas {
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
 }
 
 .home__vacio {
@@ -71,17 +139,54 @@
   color: var(--texto-secundario);
   text-align: center;
   padding: 2rem 0;
+  margin: 0;
+}
+
+.home__proxima {
+  display: grid;
+  gap: 8px;
+  align-content: start;
+}
+
+.home__proxima .boton {
+  text-align: center;
+  text-decoration: none;
 }
 
 @media (max-width: 700px) {
   .home {
-    padding: 0.85rem 0.75rem 2rem;
-    gap: 1.5rem;
+    padding: 0.75rem 0.75rem 0.5rem;
+    gap: 0.65rem;
+  }
+
+  .home__encabezado p {
+    display: none;
   }
 
   .home__destacadas {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.6rem;
+    gap: 0.5rem;
+  }
+
+  .home__pestania {
+    font-size: 1.05rem;
+  }
+
+  .home__buscador {
+    max-width: none;
+  }
+
+  /* Los géneros en una sola fila que se desliza de costado */
+  .home__generos {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    width: 100%;
+    padding-bottom: 2px;
+    scrollbar-width: none;
+  }
+
+  .home__generos .chip,
+  .home__limpiar {
+    flex-shrink: 0;
   }
 
   .home__grilla {
@@ -89,28 +194,7 @@
     gap: 0.75rem 0.6rem;
   }
 
-  .home__buscador {
-    max-width: none;
+  .home__grilla--proximas {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-
-  .home__generos {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    padding-bottom: 2px;
-  }
-
-  .home__generos .chip {
-    flex-shrink: 0;
-  }
-}
-
-.home__proxima {
-  display: grid;
-  gap: 10px;
-  align-content: start;
-}
-
-.home__proxima .boton {
-  text-align: center;
-  text-decoration: none;
 }

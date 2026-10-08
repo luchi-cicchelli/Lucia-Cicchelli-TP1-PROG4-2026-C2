@@ -1,4 +1,4 @@
-<div class="detalle">
+<div class="detalle pantalla">
   <a routerLink="/" class="detalle__volver">← Cartelera</a>
 
   @if (cargando()) {
@@ -72,133 +72,135 @@
       </div>
     </section>
 
-    <section class="detalle__seccion">
-      <h2 class="titulo">Funciones</h2>
+    <div class="detalle__cuerpo pantalla__scroll">
+      <section class="detalle__seccion">
+        <h2 class="titulo">Funciones</h2>
 
-      @if (dias().length) {
-        <div class="detalle__dias" role="tablist">
-          @for (d of dias(); track d.clave) {
-            <button
-              type="button"
-              role="tab"
-              class="detalle__dia"
-              [class.detalle__dia--activo]="diaActual()?.clave === d.clave"
-              [attr.aria-selected]="diaActual()?.clave === d.clave"
-              (click)="diaElegido.set(d.clave)"
-            >
-              <span>{{ d.fecha | date: 'EEE' }}</span>
-              <strong>{{ d.fecha | date: 'd' }}</strong>
-              <span>{{ d.fecha | date: 'MMM' }}</span>
-            </button>
-          }
-        </div>
+        @if (dias().length) {
+          <div class="detalle__dias" role="tablist">
+            @for (d of dias(); track d.clave) {
+              <button
+                type="button"
+                role="tab"
+                class="detalle__dia"
+                [class.detalle__dia--activo]="diaActual()?.clave === d.clave"
+                [attr.aria-selected]="diaActual()?.clave === d.clave"
+                (click)="diaElegido.set(d.clave)"
+              >
+                <span>{{ d.fecha | date: 'EEE' }}</span>
+                <strong>{{ d.fecha | date: 'd' }}</strong>
+                <span>{{ d.fecha | date: 'MMM' }}</span>
+              </button>
+            }
+          </div>
 
-        @if (diaActual(); as dia) {
-          <div class="detalle__grupos">
-            @for (g of dia.grupos; track g.etiqueta) {
-              <div class="detalle__grupo">
-                <p class="detalle__grupo-titulo">{{ g.etiqueta }}</p>
-                <div class="detalle__horarios">
-                  @for (f of g.funciones; track f.id) {
-                    @if (bloqueadaPorEdad() || !ventaAbierta()) {
-                      <span class="detalle__horario" [class.detalle__horario--bloqueado]="bloqueadaPorEdad()" [class.detalle__horario--pronto]="!bloqueadaPorEdad()">
-                        {{ f.fecha_hora_inicio | date: 'HH:mm' }}
-                      </span>
-                    } @else {
-                      <a class="detalle__horario" [routerLink]="['/checkout', f.id]">
-                        <strong>{{ f.fecha_hora_inicio | date: 'HH:mm' }}</strong>
-                        <span>{{ f.sala?.nombre }}</span>
-                        @if (enPreventa(f)) {
-                          <span class="detalle__preventa">
-                            Preventa {{ f.precio_preventa | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }}
-                          </span>
-                        } @else {
-                          <span>{{ f.precio_base | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }}</span>
-                        }
-                      </a>
+          @if (diaActual(); as dia) {
+            <div class="detalle__grupos">
+              @for (g of dia.grupos; track g.etiqueta) {
+                <div class="detalle__grupo">
+                  <p class="detalle__grupo-titulo">{{ g.etiqueta }}</p>
+                  <div class="detalle__horarios">
+                    @for (f of g.funciones; track f.id) {
+                      @if (bloqueadaPorEdad() || !ventaAbierta()) {
+                        <span class="detalle__horario" [class.detalle__horario--bloqueado]="bloqueadaPorEdad()" [class.detalle__horario--pronto]="!bloqueadaPorEdad()">
+                          {{ f.fecha_hora_inicio | date: 'HH:mm' }}
+                        </span>
+                      } @else {
+                        <a class="detalle__horario" [routerLink]="['/checkout', f.id]">
+                          <strong>{{ f.fecha_hora_inicio | date: 'HH:mm' }}</strong>
+                          <span>{{ f.sala?.nombre }}</span>
+                          @if (enPreventa(f)) {
+                            <span class="detalle__preventa">
+                              Preventa {{ f.precio_preventa | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }}
+                            </span>
+                          } @else {
+                            <span>{{ f.precio_base | currency: 'ARS' : 'symbol-narrow' : '1.0-0' }}</span>
+                          }
+                        </a>
+                      }
                     }
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        } @else {
+          <p class="detalle__nota">Todavía no hay funciones programadas para esta película.</p>
+        }
+      </section>
+
+      <section class="detalle__seccion" id="resenas">
+        <h2 class="titulo">Reseñas</h2>
+
+        @if (puedeResenar()) {
+          <div class="tarjeta detalle__mi-resena">
+            @let mia = miResena();
+            @if (editandoResena()) {
+              <form [formGroup]="formResena" (ngSubmit)="guardarResena()" novalidate>
+                <p class="detalle__grupo-titulo">Tu calificación</p>
+                <div class="detalle__elegir-estrellas">
+                  @for (n of estrellasOpciones; track n) {
+                    <button
+                      type="button"
+                      [class.activa]="n <= formResena.controls.estrellas.value"
+                      [attr.aria-label]="n + ' estrellas'"
+                      (click)="formResena.controls.estrellas.setValue(n)"
+                    >★</button>
                   }
                 </div>
-              </div>
-            }
-          </div>
-        }
-      } @else {
-        <p class="detalle__nota">Todavía no hay funciones programadas para esta película.</p>
-      }
-    </section>
-
-    <section class="detalle__seccion" id="resenas">
-      <h2 class="titulo">Reseñas</h2>
-
-      @if (puedeResenar()) {
-        <div class="tarjeta detalle__mi-resena">
-          @let mia = miResena();
-          @if (editandoResena()) {
-            <form [formGroup]="formResena" (ngSubmit)="guardarResena()" novalidate>
-              <p class="detalle__grupo-titulo">Tu calificación</p>
-              <div class="detalle__elegir-estrellas">
-                @for (n of estrellasOpciones; track n) {
-                  <button
-                    type="button"
-                    [class.activa]="n <= formResena.controls.estrellas.value"
-                    [attr.aria-label]="n + ' estrellas'"
-                    (click)="formResena.controls.estrellas.setValue(n)"
-                  >★</button>
+                <label class="campo">
+                  Comentario (opcional)
+                  <textarea class="input" rows="3" maxlength="280" formControlName="comentario"></textarea>
+                  <span class="detalle__contador">{{ formResena.controls.comentario.value.length }}/280</span>
+                </label>
+                @if (errorResena()) {
+                  <p class="error-texto">{{ errorResena() }}</p>
                 }
+                <div class="detalle__acciones-resena">
+                  <button type="submit" class="boton" [disabled]="guardandoResena()">
+                    {{ guardandoResena() ? 'Guardando…' : 'Publicar' }}
+                  </button>
+                  <button type="button" class="boton boton--secundario" (click)="editandoResena.set(false)">Cancelar</button>
+                </div>
+              </form>
+            } @else if (mia) {
+              <div class="detalle__resena-cabecera">
+                <app-estrellas [valor]="mia.estrellas" [mostrarNumero]="false" />
+                <strong>Tu reseña</strong>
               </div>
-              <label class="campo">
-                Comentario (opcional)
-                <textarea class="input" rows="3" maxlength="280" formControlName="comentario"></textarea>
-                <span class="detalle__contador">{{ formResena.controls.comentario.value.length }}/280</span>
-              </label>
-              @if (errorResena()) {
-                <p class="error-texto">{{ errorResena() }}</p>
+              @if (mia.comentario) {
+                <p>{{ mia.comentario }}</p>
               }
               <div class="detalle__acciones-resena">
-                <button type="submit" class="boton" [disabled]="guardandoResena()">
-                  {{ guardandoResena() ? 'Guardando…' : 'Publicar' }}
-                </button>
-                <button type="button" class="boton boton--secundario" (click)="editandoResena.set(false)">Cancelar</button>
+                <button type="button" class="boton boton--secundario" (click)="empezarResena()">Editar</button>
+                <button type="button" class="boton boton--secundario" (click)="borrarResena()">Borrar</button>
               </div>
-            </form>
-          } @else if (mia) {
-            <div class="detalle__resena-cabecera">
-              <app-estrellas [valor]="mia.estrellas" [mostrarNumero]="false" />
-              <strong>Tu reseña</strong>
-            </div>
-            @if (mia.comentario) {
-              <p>{{ mia.comentario }}</p>
+            } @else {
+              <p>¿Ya la viste? Contanos qué te pareció.</p>
+              <button type="button" class="boton" (click)="empezarResena()">Escribir reseña</button>
             }
-            <div class="detalle__acciones-resena">
-              <button type="button" class="boton boton--secundario" (click)="empezarResena()">Editar</button>
-              <button type="button" class="boton boton--secundario" (click)="borrarResena()">Borrar</button>
-            </div>
-          } @else {
-            <p>¿Ya la viste? Contanos qué te pareció.</p>
-            <button type="button" class="boton" (click)="empezarResena()">Escribir reseña</button>
-          }
-          @if (errorResena() && !editandoResena()) {
-            <p class="error-texto">{{ errorResena() }}</p>
-          }
-        </div>
-      } @else if (auth.estaLogueado()) {
-        <p class="detalle__nota">Podés dejar tu reseña después de ver la película en Bijou.</p>
-      }
-      @for (r of resenas(); track r.id) {
-        <article class="tarjeta detalle__resena">
-          <div class="detalle__resena-cabecera">
-            <app-estrellas [valor]="r.estrellas" [mostrarNumero]="false" />
-            <strong>{{ r.autor }}</strong>
-            <span>{{ r.fecha | date: 'd/MM/yyyy' }}</span>
+            @if (errorResena() && !editandoResena()) {
+              <p class="error-texto">{{ errorResena() }}</p>
+            }
           </div>
-          @if (r.comentario) {
-            <p>{{ r.comentario }}</p>
-          }
-        </article>
-      } @empty {
-        <p class="detalle__nota">Nadie dejó una reseña todavía.</p>
-      }
-    </section>
+        } @else if (auth.estaLogueado()) {
+          <p class="detalle__nota">Podés dejar tu reseña después de ver la película en Bijou.</p>
+        }
+        @for (r of resenas(); track r.id) {
+          <article class="tarjeta detalle__resena">
+            <div class="detalle__resena-cabecera">
+              <app-estrellas [valor]="r.estrellas" [mostrarNumero]="false" />
+              <strong>{{ r.autor }}</strong>
+              <span>{{ r.fecha | date: 'd/MM/yyyy' }}</span>
+            </div>
+            @if (r.comentario) {
+              <p>{{ r.comentario }}</p>
+            }
+          </article>
+        } @empty {
+          <p class="detalle__nota">Nadie dejó una reseña todavía.</p>
+        }
+      </section>
+    </div>
   }
 </div>

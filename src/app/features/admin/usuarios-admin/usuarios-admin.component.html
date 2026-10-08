@@ -1,4 +1,4 @@
-<section class="usuarios">
+<section class="usuarios pantalla">
   <a routerLink="/admin" class="usuarios__volver">← Panel</a>
 
   <header class="usuarios__encabezado">
@@ -26,41 +26,43 @@
     <p class="alerta alerta--error">{{ error() }}</p>
   }
 
-  @if (cargando() && usuarios().length === 0) {
-    <p class="usuarios__vacio">Cargando…</p>
-  }
-
-  <div class="usuarios__lista">
-    @for (u of usuariosFiltrados(); track u.id) {
-      <div class="tarjeta usuarios__fila">
-        <div class="usuarios__info">
-          <p class="usuarios__nombre">
-            {{ u.nombre }} {{ u.apellido }}
-            @if (esUnoMismo(u)) {
-              <span class="usuarios__vos">(vos)</span>
-            }
-          </p>
-          <p class="usuarios__detalle">{{ u.email }} · desde {{ u.created_at | date: 'dd/MM/yyyy' }}</p>
-        </div>
-
-        <select
-          class="input usuarios__rol"
-          [class.usuarios__rol--admin]="u.rol === 'admin'"
-          [class.usuarios__rol--empleado]="u.rol === 'empleado'"
-          [value]="u.rol"
-          [disabled]="esUnoMismo(u) || guardandoId() === u.id"
-          (change)="alCambiarRol(u, $event)"
-          [attr.aria-label]="'Rol de ' + u.nombre"
-        >
-          @for (r of roles; track r.valor) {
-            <option [value]="r.valor" [selected]="r.valor === u.rol">{{ r.etiqueta }}</option>
-          }
-        </select>
-      </div>
-    } @empty {
-      @if (!cargando()) {
-        <p class="usuarios__vacio">No hay usuarios que coincidan con la búsqueda.</p>
-      }
+  <div class="pantalla__scroll">
+    @if (cargando() && usuarios().length === 0) {
+      <p class="usuarios__vacio">Cargando…</p>
     }
+
+    <div class="usuarios__lista">
+      @for (u of usuariosFiltrados(); track u.id) {
+        <div class="tarjeta usuarios__fila">
+          <div class="usuarios__info">
+            <p class="usuarios__nombre">
+              {{ u.nombre }} {{ u.apellido }}
+              @if (esUnoMismo(u)) {
+                <span class="usuarios__vos">(vos)</span>
+              }
+            </p>
+            <p class="usuarios__detalle">{{ u.email }} · desde {{ u.created_at | date: 'dd/MM/yyyy' }}</p>
+          </div>
+
+          <select
+            class="input usuarios__rol"
+            [class.usuarios__rol--admin]="u.rol === 'admin'"
+            [class.usuarios__rol--empleado]="u.rol === 'empleado'"
+            [value]="u.rol"
+            [disabled]="esUnoMismo(u) || guardandoId() === u.id"
+            (change)="alCambiarRol(u, $event)"
+            [attr.aria-label]="'Rol de ' + u.nombre"
+          >
+            @for (r of roles; track r.valor) {
+              <option [value]="r.valor" [selected]="r.valor === u.rol">{{ r.etiqueta }}</option>
+            }
+          </select>
+        </div>
+      } @empty {
+        @if (!cargando()) {
+          <p class="usuarios__vacio">No hay usuarios que coincidan con la búsqueda.</p>
+        }
+      }
+    </div>
   </div>
 </section>

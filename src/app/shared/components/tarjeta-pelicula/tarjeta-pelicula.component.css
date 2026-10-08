@@ -90,3 +90,64 @@
   font-size: 0.75rem;
   color: var(--texto-secundario);
 }
+
+/* ---------- Versión compacta (las más vistas del inicio) ---------- */
+:host(.compacta) .tarjeta-peli {
+  grid-template-columns: 64px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  padding: 6px;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  background: var(--superficie);
+}
+
+:host(.compacta) .tarjeta-peli__poster {
+  border-radius: 8px;
+}
+
+:host(.compacta) .tarjeta-peli__ranking,
+:host(.compacta) .tarjeta-peli__edad {
+  top: 4px;
+  font-size: 0.62rem;
+  padding: 1px 6px;
+}
+
+:host(.compacta) .tarjeta-peli__ranking {
+  left: 4px;
+}
+
+:host(.compacta) .tarjeta-peli__edad {
+  display: none;
+}
+
+:host(.compacta) .tarjeta-peli__sin-imagen {
+  padding: 4px;
+}
+
+:host(.compacta) .tarjeta-peli__sin-imagen .titulo {
+  font-size: 0.7rem;
+}
+
+@media (max-width: 700px) {
+  :host(.compacta) .tarjeta-peli {
+    grid-template-columns: 38px minmax(0, 1fr);
+    gap: 6px;
+    padding: 4px;
+  }
+
+  :host(.compacta) .tarjeta-peli__nombre {
+    font-size: 0.8rem;
+  }
+
+  :host(.compacta) .tarjeta-peli__meta {
+    display: none;
+  }
+
+  :host(.compacta) .tarjeta-peli__ranking {
+    top: 2px;
+    left: 2px;
+    font-size: 0.55rem;
+    padding: 0 4px;
+  }
+}

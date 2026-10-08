@@ -32,6 +32,8 @@ export class HomeComponent implements OnInit {
   readonly ventaAbierta = ventaAbierta;
 
   readonly busqueda = signal('');
+  // Pestaña de abajo: películas en cartel o próximos estrenos.
+  readonly pestania = signal<'cartel' | 'proximamente'>('cartel');
   readonly generosElegidos = signal<ReadonlySet<number>>(new Set());
 
   readonly enCartel = computed(() => this.peliculas().filter((p) => p.fecha_estreno <= hoyIso()));
