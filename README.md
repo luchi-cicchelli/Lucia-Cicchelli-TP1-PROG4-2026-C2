@@ -20,7 +20,7 @@ ng serve
    `schema.sql`, `seed_generos.sql`, `auth.sql`, `salas_funciones.sql`, `cartelera.sql`, `compra.sql`, `escaner.sql`, `candy.sql`, `beneficios.sql`, `storage.sql`, `proximamente.sql`, `avisos_app.sql`, `reportes.sql`, `qr_unico.sql`, `invitados.sql`.
    En Authentication → Sign In / Providers, activar **Allow anonymous sign-ins** (lo usa el ingreso como invitado).
    Datos de prueba (una sola vez): `peliculas_prueba.sql` y `candy_prueba.sql`.
-3. Cuentas de prueba (accesos rápidos del login): registrar desde la app `admin@bijou.com`, `empleado@bijou.com` y `cliente@bijou.com` con la contraseña `Bijou2026`, y darles el rol:
+3. Cuentas de prueba (accesos rápidos del login): registrar desde la app las cuentas de admin, empleado y cliente configuradas en src/environments/, con una contraseña propia, y darles el rol:
    ```sql
    update public.perfiles set rol = 'admin' where email = 'admin@bijou.com';
    update public.perfiles set rol = 'empleado' where email = 'empleado@bijou.com';
